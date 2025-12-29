@@ -208,7 +208,7 @@ function Hero() {
                         culpa qui officia deserunt mollit anim id est laborum.
                     </p>
                     <div style={{ marginTop: "10px" }}>
-                        <button style={{ marginRight: "10px" }} className="primary-button">
+                        <button style={{ marginRight: "10px" }} className="primary-button contact-button">
                             Contact Me
                         </button>
                         <button className="secondary-button">Résumé</button>

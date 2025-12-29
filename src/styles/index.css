@@ -218,3 +218,18 @@ button {
 .warning-button:active {
   transform: scale(0.97);
 }
+
+/* Contact Button */
+
+.contact-button {
+  animation: shake 7s linear infinite;
+}
+
+@keyframes shake {
+  0% { rotate: 0deg; }
+  2% { rotate: 5deg;}
+  4% { rotate: -5deg; }
+  6% { rotate: 5deg; }
+  6.66% { rotate: 0deg; }
+  100% { rotate: 0deg;}
+}
