@@ -1,0 +1,11 @@
+main{
+    display: flex;
+    justify-content: center;
+}
+
+#projects {
+    padding-top: 15px;
+    width: 100%;
+    max-width: 1800px;
+    background-color: var(--Lcolor-bg-accent);
+}

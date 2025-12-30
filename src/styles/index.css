@@ -24,11 +24,17 @@
   --lh-loose: 1.75;
 
   /* Light Mode Colors */
-  --color-bg: #ffffff;
-  --color-text: #111111;
-  --color-muted: #666666;
-  --color-accent: #3b82f6;
-  --color-border: #e5e7eb;
+  --Lcolor-bg: #F5F6FB;
+  --Lcolor-text: #0e0f1a;
+  --Lcolor-bg-accent: #D9DCED;
+  --Lcolor-accent: #3b82f6;
+
+  /* Dark Mode Colors */
+  --Dcolor-bg: #13141c;
+  --Dcolor-text: #f5f6fa;
+  /* #0b0c12 */
+  --Dcolor-bg-accent: #13141c;
+  --Dcolor-accent: #3b82f6;
 
   /* Spacing scale */
   --space-xs: 0.25rem;
@@ -79,15 +85,15 @@ body {
   min-width: 100vw;
   min-height: 100vh;
 
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--Lcolor-bg);
+  color: var(--Lcolor-text);
   line-height: var(--lh-normal);
 }
 
 /* Accessibility */
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--Lcolor-accent);
   outline-offset: 2px;
 }
 
@@ -121,11 +127,11 @@ h6 {
 p {
   margin: 0;
   line-height: var(--lh-loose);
-  color: var(--color-text);
+  color: var(--Lcolor-text);
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--Lcolor-accent);
   text-decoration: none;
 }
 
