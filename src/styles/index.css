@@ -24,16 +24,15 @@
   --lh-loose: 1.75;
 
   /* Light Mode Colors */
-  --Lcolor-bg: #F5F6FB;
+  --Lcolor-bg: #D9DCED;
   --Lcolor-text: #0e0f1a;
-  --Lcolor-bg-accent: #D9DCED;
+  --Lcolor-bg-accent: #c9ccdb;
   --Lcolor-accent: #3b82f6;
 
   /* Dark Mode Colors */
   --Dcolor-bg: #13141c;
   --Dcolor-text: #f5f6fa;
-  /* #0b0c12 */
-  --Dcolor-bg-accent: #13141c;
+  --Dcolor-bg-accent: #0b0c12;
   --Dcolor-accent: #3b82f6;
 
   /* Spacing scale */
@@ -227,7 +226,6 @@ button {
 }
 
 /* Contact Button */
-
 .contact-button {
   animation: shake 7s linear infinite;
 }

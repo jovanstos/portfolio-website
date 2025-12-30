@@ -1,0 +1,33 @@
+.card {
+    background-color: var(--Lcolor-bg-accent);
+    box-shadow: 2px 2px black;
+    max-width: 300px;
+}
+
+.card > img {
+    border: 2px solid black
+}
+
+.card > div {
+    padding: 15px;
+}
+
+.card:hover{
+    transform: scale(1.03);
+    box-shadow: 10px 10px black;
+    transition: box-shadow 1s ease, transform 1s ease;
+}
+
+.large-card:hover {
+    transform: scale(1.03);
+    box-shadow: 7px 7px #FFCB00;
+    transition: box-shadow 1s ease, transform 1s ease;
+}
+
+.large-card > div > * {
+    margin-bottom: 15px;
+}
+
+.small-card{
+    max-width: 200px;
+}

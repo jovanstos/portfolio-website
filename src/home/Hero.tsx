@@ -1,4 +1,4 @@
-import "./styles/Hero.css";
+import "../styles/Hero.css";
 import Stars from "./Stars";
 import { useEffect, useRef, useState } from "react";
 
