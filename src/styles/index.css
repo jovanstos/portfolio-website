@@ -1,5 +1,6 @@
 :root {
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  /* https://fonts.google.com/specimen/Ubuntu */
+  font-family: "Ubuntu", sans-serif;
   color-scheme: light dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;

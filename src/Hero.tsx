@@ -9,7 +9,7 @@ function Hero() {
 
     const burstCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    const BADGE_DURATION_MS = 1000;
+    const BADGE_DURATION_MS = 1500;
     const FADE_DURATION_MS = 50;
 
     useEffect(() => {
@@ -40,7 +40,7 @@ function Hero() {
             const cy = height / 2;
 
             const COUNT = 500;
-            const DURATION = 600;
+            const DURATION = 1400;
             const MAX_SPEED = 10000;
 
             type Circle = {
@@ -232,8 +232,9 @@ function CircleBadge({ topText, bottomText, imageUrl }: CircleBadgeProps) {
                 <defs>
                     <path
                         id="topArc"
-                        d="M 100,115 m -75,0 a 75,75 0 1,1 150,0 a 150,150 0 1,1 0,0"
+                        d="M 35,105 A 65,65 0 0,1 165,105"
                     />
+
                     <path
                         id="bottomArc"
                         d="M 100,95 m -75,0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 0,0"
