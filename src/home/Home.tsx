@@ -1,6 +1,7 @@
 import "../styles/Home.css";
 import type { ReactNode } from "react";
 import Hero from "./Hero";
+import Nav from "../Nav"
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
 import SmallCard from "../cards/SmallCard";
@@ -27,6 +28,7 @@ const FadeInSection = ({ children }: FadeInChildern) => {
 function Home() {
   return (
     <>
+      <Nav />
       <Hero />
       <main>
         <section id="projects">

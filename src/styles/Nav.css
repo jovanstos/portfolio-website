@@ -1,0 +1,75 @@
+nav {
+  cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.rocketButton {
+  all: unset;
+  display: inline-flex;
+  cursor: pointer;
+  z-index: 999;
+}
+
+#rocket {
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+nav:hover #rocket {
+  transform: rotate(-90deg) scale(0.98);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+}
+
+nav:hover ~ * {
+    filter: blur(3px);
+}
+
+.wheel {
+  position: fixed;
+  z-index: 5;
+  top: 40px;
+  left: 42px;
+  width: 360px;
+  height: 360px;
+  border-radius: 999px;
+  background: rgba(51, 255, 0, 0.14);
+  border: 2px dotted rgb(39, 195, 0);
+  transform: translate(-50%, -50%);
+  transition: opacity 160ms ease, transform 160ms ease;
+  transform-origin: center;
+  touch-action: none;
+}
+
+.wheelInvisible {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.92);
+}
+
+.wheelVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wheelItem {
+  position: absolute;
+  top: 45%;
+  left: 35%;
+  transform-origin: center;
+  text-decoration: none;
+  color: white;
+  padding: 10px 12px;
+  font-size: var(--medium);
+  border-radius: var(--radius-lg);
+  background: rgba(51, 255, 0, 0.357);
+  border: 2px dotted rgb(39, 195, 0);
+  transition: transform 120ms ease, background 120ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wheelItem:hover {
+  background: rgba(39, 197, 0, 0.28);
+}
