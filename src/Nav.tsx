@@ -113,6 +113,7 @@ export default function Nav() {
                         key={item.href}
                         className="wheelItem"
                         href={item.href}
+                        rel="noopener noreferrer"
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={() => {
                             if (!canHover) setOpen(false);

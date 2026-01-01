@@ -11,9 +11,9 @@ const LINKS = [
 ];
 
 const SOCIALS = [
-    { label: <FaGithub size={35} />, href: "/" },
-    { label: <FaLinkedin size={35} />, href: "/" },
-    { label: <FaTwitter size={35} />, href: "/" },
+    { label: <FaGithub size={40} />, href: "https://github.com/jovanstos" },
+    { label: <FaLinkedin size={40} />, href: "https://www.linkedin.com/in/jovanstosic12/" },
+    { label: <FaTwitter size={40} />, href: "https://x.com/jovanstos" },
 ];
 
 function Footer() {
@@ -29,6 +29,8 @@ function Footer() {
                             <a
                                 key={media.href}
                                 href={media.href}
+                                rel="noopener noreferrer"
+                                target="_blank"
                                 style={{ color: "white", marginRight: "5px" }}
                             >
                                 {media.label}
@@ -40,9 +42,8 @@ function Footer() {
                     <h1>Links</h1>
                     <ul>
                         {LINKS.map((link) => (
-                            <li>
+                            <li key={link.href}>
                                 <a
-                                    key={link.href}
                                     href={link.href}
                                     style={{ color: "white" }}
                                 >

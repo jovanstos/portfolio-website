@@ -23,17 +23,11 @@
   --lh-normal: 1.5;
   --lh-loose: 1.75;
 
-  /* Light Mode Colors */
-  --Lcolor-bg: #D9DCED;
-  --Lcolor-text: #0e0f1a;
-  --Lcolor-bg-accent: #c9ccdb;
-  --Lcolor-accent: #3b82f6;
-
-  /* Dark Mode Colors */
-  --Dcolor-bg: #13141c;
-  --Dcolor-text: #f5f6fa;
-  --Dcolor-bg-accent: #0b0c12;
-  --Dcolor-accent: #3b82f6;
+  /* Colors */
+  --color-bg: light-dark(#D9DCED, #13141c);
+  --color-text: light-dark(#0e0f1a, #f5f6fa);
+  --color-bg-accent: light-dark(#c9ccdb, #0b0c12);
+  --color-accent: #3b82f6;
 
   /* Spacing scale */
   --space-xs: 0.25rem;
@@ -74,6 +68,10 @@
   box-sizing: border-box;
 }
 
+/* For light and dark mode */
+html.light { color-scheme: light; }
+html.dark  { color-scheme: dark; }
+
 html,
 body {
   height: 100%;
@@ -84,15 +82,15 @@ body {
   min-width: 100vw;
   min-height: 100vh;
 
-  background-color: var(--Lcolor-bg);
-  color: var(--Lcolor-text);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   line-height: var(--lh-normal);
 }
 
 /* Accessibility */
 
 :focus-visible {
-  outline: 2px solid var(--Lcolor-accent);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -126,11 +124,11 @@ h6 {
 p {
   margin: 0;
   line-height: var(--lh-loose);
-  color: var(--Lcolor-text);
+  color: var(--color-text);
 }
 
 a {
-  color: var(--Lcolor-accent);
+  color: var(--color-accent);
   text-decoration: none;
 }
 
@@ -243,7 +241,7 @@ button {
 
 footer{
   margin-top: 50px;
-  background-color: var(--Lcolor-accent);
+  background-color: var(--color-accent);
   padding: 15px;
   height: 100%;
   height: 240px;
@@ -274,3 +272,11 @@ ul {
 }
 
 /* Light Dark Toggle CSS */
+
+#lightDarkToggle{
+  cursor: pointer;
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 5;
+}

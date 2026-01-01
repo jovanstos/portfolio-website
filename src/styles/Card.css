@@ -1,5 +1,5 @@
 .card {
-    background-color: var(--Lcolor-bg-accent);
+    background-color: var(--color-bg-accent);
     box-shadow: 2px 2px black;
     max-width: 300px;
 }

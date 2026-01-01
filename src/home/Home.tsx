@@ -1,6 +1,7 @@
 import "../styles/Home.css";
 import type { ReactNode } from "react";
 import Hero from "./Hero";
+import LightDarkToggle from "../LightDarkToggle";
 import Nav from "../Nav"
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
@@ -29,6 +30,7 @@ function Home() {
   return (
     <>
       <Nav />
+      <LightDarkToggle />
       <Hero />
       <main>
         <section id="projects">
