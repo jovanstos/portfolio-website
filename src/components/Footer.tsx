@@ -1,5 +1,5 @@
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
-import "./styles/index.css";
+import "../styles/index.css";
 
 const LINKS = [
     { label: "Home", href: "/" },

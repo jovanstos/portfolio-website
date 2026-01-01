@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { IoRocketSharp } from "react-icons/io5";
-import "./styles/Nav.css";
+import "../styles/Nav.css";
 
 const LINKS = [
     { label: "Home", href: "/" },

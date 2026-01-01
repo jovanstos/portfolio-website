@@ -1,12 +1,12 @@
 import "../styles/Home.css";
 import type { ReactNode } from "react";
-import Hero from "./Hero";
-import LightDarkToggle from "../LightDarkToggle";
-import Nav from "../Nav"
+import Hero from "../components/Hero";
+import LightDarkToggle from "../components/LightDarkToggle";
+import Nav from "../components/Nav"
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
 import SmallCard from "../cards/SmallCard";
-import Footer from "../Footer";
+import Footer from "../components/Footer";
 import useIsVisible from "../hooks/useIsVisible";
 
 type FadeInChildern = {
