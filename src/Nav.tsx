@@ -4,10 +4,11 @@ import "./styles/Nav.css";
 
 const LINKS = [
     { label: "Home", href: "/" },
-    { label: "Projects", href: "/projects" },
     { label: "About Me", href: "/about" },
     { label: "Contact Me", href: "/contact" },
     { label: "Résumé", href: "/resume" },
+    { label: "Projects", href: "/projects" },
+    { label: "Junk Yard", href: "/junk" },
 ];
 
 function angleFromCenter(clientX: number, clientY: number, el: HTMLElement) {

@@ -5,7 +5,7 @@ import Nav from "../Nav"
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
 import SmallCard from "../cards/SmallCard";
-import Footer from "./Footer";
+import Footer from "../Footer";
 import useIsVisible from "../hooks/useIsVisible";
 
 type FadeInChildern = {
@@ -56,6 +56,11 @@ function Home() {
               <MediumCard />
               <MediumCard />
             </div>
+            <FadeInSection>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <button className="primary-button">See more</button>
+              </div>
+            </FadeInSection>
           </FadeInSection>
           <FadeInSection>
             <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center", marginTop: "var(--space-md)" }}>Junk Yard</h1>
@@ -66,6 +71,11 @@ function Home() {
               <SmallCard />
               <SmallCard />
             </div>
+            <FadeInSection>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <button className="primary-button">See more</button>
+              </div>
+            </FadeInSection>
           </FadeInSection>
         </section>
       </main>
