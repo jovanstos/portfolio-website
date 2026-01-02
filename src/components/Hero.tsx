@@ -1,11 +1,14 @@
 import "../styles/Hero.css";
 import Stars from "./Stars";
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from "react";
 
 type Phase = "STAR_BURST" | "BADGE" | "FADE_TO_HERO" | "HERO";
 
 function Hero() {
     const [phase, setPhase] = useState<Phase>("STAR_BURST");
+
+    const navigate = useNavigate();
 
     const burstCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -145,7 +148,12 @@ function Hero() {
             const t = window.setTimeout(() => setPhase("HERO"), FADE_DURATION_MS);
             return () => window.clearTimeout(t);
         }
+
     }, [phase]);
+
+    function handleButtonClick(href: string) {
+        navigate(href);
+    };
 
     return (
         <section className="hero">
@@ -206,13 +214,13 @@ function Hero() {
                         reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
                         pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
                         culpa qui officia deserunt mollit anim id est laborum.
-                        <a href="/aboutme" rel="noopener noreferrer"> Click to learn more.</a>
+                        <a href="/about" rel="noopener noreferrer"> Click to learn more.</a>
                     </p>
                     <div style={{ marginTop: "10px" }}>
-                        <button style={{ marginRight: "10px" }} className="primary-button contact-button">
+                        <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
                             Contact Me
                         </button>
-                        <button className="secondary-button">Résumé</button>
+                        <button className="secondary-button" onClick={() => handleButtonClick("/resume")}>Résumé</button>
                     </div>
                 </div>
             </div>

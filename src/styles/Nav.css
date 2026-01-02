@@ -60,7 +60,7 @@ nav:hover ~ * {
   transform-origin: center;
   text-decoration: none;
   color: white;
-  padding: 10px 12px;
+  padding: 7px 12px;
   font-size: var(--medium);
   border-radius: var(--radius-lg);
   background: rgba(51, 255, 0, 0.357);

@@ -25,9 +25,9 @@ function LightDarkToggle() {
     return (
         <div id="lightDarkToggle">
             {theme === "dark" ? (
-                <FaSun color="white" size={35} onClick={() => setTheme("light")} />
+                <FaSun color="var(--color-accent" size={35} onClick={() => setTheme("light")} />
             ) : (
-                <FaMoon color="white" size={35} onClick={() => setTheme("dark")} />
+                <FaMoon color="var(--color-accent" size={35} onClick={() => setTheme("dark")} />
             )}
         </div>
     );

@@ -96,7 +96,7 @@ export default function Nav() {
                 aria-expanded={open}
                 onClick={rocketClick}
             >
-                <IoRocketSharp id="rocket" size={55} color="white" />
+                <IoRocketSharp id="rocket" size={55} color="var(--color-accent)" />
             </button>
             <div
                 ref={wheelRef}

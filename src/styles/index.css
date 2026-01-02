@@ -27,6 +27,7 @@
   --color-bg: light-dark(#D9DCED, #13141c);
   --color-text: light-dark(#0e0f1a, #f5f6fa);
   --color-bg-accent: light-dark(#c9ccdb, #0b0c12);
+  --color-bg-daccent: light-dark(#bec0ce, #06060a);
   --color-accent: #3b82f6;
 
   /* Spacing scale */
@@ -45,7 +46,7 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-    /* Button colors */
+  /* Button colors */
   --btn-primary: #2563eb;
   --btn-primary-hover: #1d4ed8;
 
@@ -238,7 +239,6 @@ button {
 }
 
 /* Footer CSS */
-
 footer{
   margin-top: 50px;
   background-color: var(--color-accent);
@@ -256,6 +256,9 @@ footer > section {
   color: white;
   display: flex;
   justify-content: space-between;
+}
+footer > section > div {
+  margin: 0px 10px;
 }
 
 ul {

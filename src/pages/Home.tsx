@@ -1,5 +1,6 @@
 import "../styles/Home.css";
 import type { ReactNode } from "react";
+import { useNavigate } from 'react-router-dom';
 import Hero from "../components/Hero";
 import LightDarkToggle from "../components/LightDarkToggle";
 import Nav from "../components/Nav";
@@ -27,6 +28,13 @@ const FadeInSection = ({ children }: FadeInChildern) => {
 };
 
 function Home() {
+
+  const navigate = useNavigate();
+
+  function handleButtonClick(href: string) {
+    navigate(href);
+  };
+
   return (
     <>
       <Nav />
@@ -60,7 +68,7 @@ function Home() {
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button className="primary-button">See more</button>
+                <button className="primary-button" onClick={() => handleButtonClick("/projects")}>See more</button>
               </div>
             </FadeInSection>
           </FadeInSection>
@@ -75,7 +83,7 @@ function Home() {
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button className="primary-button">See more</button>
+                <button className="primary-button" onClick={() => handleButtonClick("/junk")}>See more</button>
               </div>
             </FadeInSection>
           </FadeInSection>
