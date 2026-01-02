@@ -1,0 +1,16 @@
+#about{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    min-height: 80vh;
+}
+
+#about > h1{
+    margin: 25px 0px;
+    border-bottom: 2px solid black ;
+}
+
+#about > article{
+  max-width: 750px;
+}
