@@ -280,3 +280,15 @@ ul {
   right: 25px;
   z-index: 5;
 }
+
+/* Not found Page CSS */
+
+#not-found{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 80vh;
+  color: #f5f6fa;
+}

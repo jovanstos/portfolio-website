@@ -2,7 +2,7 @@ import "../styles/Home.css";
 import type { ReactNode } from "react";
 import Hero from "../components/Hero";
 import LightDarkToggle from "../components/LightDarkToggle";
-import Nav from "../components/Nav"
+import Nav from "../components/Nav";
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
 import SmallCard from "../cards/SmallCard";
@@ -32,7 +32,7 @@ function Home() {
       <Nav />
       <LightDarkToggle />
       <Hero />
-      <main>
+      <main id="home">
         <section id="projects">
           <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center" }}>Featured Projects</h1>
           <p style={{ fontSize: "var(--medium)", textAlign: "center" }}>
