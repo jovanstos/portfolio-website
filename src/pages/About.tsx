@@ -8,42 +8,35 @@ function About() {
     const timelineItems = [
         {
             id: "t1",
-            date: "August 17th 2020",
+            date: "August 2020",
             title: "Started My CS Degree",
             description:
                 "FILL IN",
         },
         {
             id: "t2",
-            date: "February 10th 2023",
-            title: "I sold my car",
+            date: "February 2023",
+            title: "I sold my car & Started Bootcamp",
             description:
                 "FILL IN",
         },
         {
             id: "t3",
-            date: "February 20th 2023",
-            title: "Started a CS Bootcamp",
-            description:
-                "FILL IN",
-        },
-        {
-            id: "t4",
-            date: "August 1st 2023",
+            date: "August 2023",
             title: "Got Hired At RIM Logistics",
             description:
                 "FILL IN",
         },
         {
-            id: "t5",
-            date: "August 3rd 2024",
+            id: "t4",
+            date: "August 2024",
             title: "Went Back To College Online",
             description:
                 "FILL IN",
         },
         {
             id: "t100",
-            date: "December 22nd 2025",
+            date: "December 2025",
             title: "Graduted College",
             description:
                 "FILL IN",

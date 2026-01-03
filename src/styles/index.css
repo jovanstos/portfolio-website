@@ -26,7 +26,7 @@
   /* Colors */
   --color-bg: light-dark(#D9DCED, #13141c);
   --color-text: light-dark(#0e0f1a, #f5f6fa);
-  --color-bg-accent: light-dark(#c9ccdb, #0b0c12);
+  --color-bg-accent: light-dark(#c3c6d5, #0b0c12);
   --color-bg-daccent: light-dark(#bec0ce, #06060a);
   --color-accent: #3b82f6;
 
@@ -75,6 +75,7 @@ html.dark  { color-scheme: dark; }
 
 html,
 body {
+  background-color: var(--color-bg);
   height: 100%;
 }
 
@@ -82,8 +83,7 @@ body {
   margin: 0;
   min-width: 100vw;
   min-height: 100vh;
-
-  background-color: var(--color-bg);
+  
   color: var(--color-text);
   line-height: var(--lh-normal);
 }

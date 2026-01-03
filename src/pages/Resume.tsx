@@ -20,7 +20,7 @@ function Resume() {
             <main id="resume">
                 <h1>Resume</h1>
                 <p>Presonal informaiton has been removed but feel free to contact me for more info!</p>
-                <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
                     Contact Me
                 </button>
                 <article id="resume-text">
@@ -65,7 +65,7 @@ function Resume() {
                             <h3>Professional Experience</h3>
                             <hr />
                             <div className="resumeDetail">
-                                <h4>RIM logistics</h4>
+                                <h4>RIM Logistics</h4>
                                 <p>August 2023 - Present</p>
                             </div>
                             <div className="resumeDetail">
@@ -73,14 +73,14 @@ function Resume() {
                                 <p>Bartlett, IL</p>
                             </div>
                             <div className="resumeDetail">
-                                <h4>RIM logistics</h4>
+                                <h4>RIM Logistics</h4>
                                 <p>June 2022 - January 2023</p>
                             </div>
                             <div className="resumeDetail">
                                 <p>Intern</p>
                                 <p>Bartlett, IL</p>
                             </div>
-                            <p>For more expernice dating back all the way to 2017 please reach out, and I will send you the full resume!</p>
+                            <p><mark>For more expernice dating back all the way to 2017 please reach out, and I will send you the full resume!</mark></p>
                         </section>
                     </FadeInSection>
                     <FadeInSection>
@@ -89,19 +89,21 @@ function Resume() {
                             <hr />
                             <div className="resumeDetail">
                                 <h4>ITIL® Foundation</h4>
-                                <p>Credential ID GR671831016JS</p>
-                            </div>
-                            <div className="resumeDetail">
-                                <p>PeopleCert</p>
                                 <p>November 2025</p>
                             </div>
                             <div className="resumeDetail">
+                                <p>PeopleCert</p>
+                                <p>Credential ID GR671831016JS</p>
+                            </div>
+                            <div className="resumeDetail">
                                 <h4>Linux Essentials Certification</h4>
-                                <p>Credential ID tq4dylymmj</p>
+                                <p>October 2025</p>
                             </div>
                             <div className="resumeDetail">
                                 <p>Linux Professional Institute (LPI)</p>
-                                <p>October 2025</p>
+                                <a href="http://lpi.org/v/LPI000671780/tq4dylymmj" rel="noopener noreferrer">
+                                    Credential ID tq4dylymmj
+                                </a>
                             </div>
                             <div className="resumeDetail">
                                 <h4>Fundamentals of Cybersecurity Skill Path</h4>
