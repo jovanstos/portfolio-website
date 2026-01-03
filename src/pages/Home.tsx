@@ -1,5 +1,4 @@
 import "../styles/Home.css";
-import type { ReactNode } from "react";
 import { useNavigate } from 'react-router-dom';
 import Hero from "../components/Hero";
 import LightDarkToggle from "../components/LightDarkToggle";
@@ -8,24 +7,7 @@ import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
 import SmallCard from "../cards/SmallCard";
 import Footer from "../components/Footer";
-import useIsVisible from "../hooks/useIsVisible";
-
-type FadeInChildern = {
-  children: ReactNode;
-};
-
-const FadeInSection = ({ children }: FadeInChildern) => {
-  const { ref, isVisible } = useIsVisible({ threshold: 0.1 });
-
-  return (
-    <div
-      ref={ref}
-      className={`fade-in-section ${isVisible ? "is-visible" : ""}`}
-    >
-      {children}
-    </div>
-  );
-};
+import FadeInSection from "../components/FadeInSection";
 
 function Home() {
 

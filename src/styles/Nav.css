@@ -34,8 +34,8 @@ nav:hover ~ * {
   width: 360px;
   height: 360px;
   border-radius: 999px;
-  background: rgba(51, 255, 0, 0.14);
-  border: 2px dotted rgb(39, 195, 0);
+  background: #3b83f669;
+  border: 2px dotted #3b82f6;
   transform: translate(-50%, -50%);
   transition: opacity 160ms ease, transform 160ms ease;
   transform-origin: center;
@@ -63,13 +63,13 @@ nav:hover ~ * {
   padding: 7px 12px;
   font-size: var(--medium);
   border-radius: var(--radius-lg);
-  background: rgba(51, 255, 0, 0.357);
-  border: 2px dotted rgb(39, 195, 0);
+  background: rgba(255, 255, 255, 0.484);
+  border: 2px dotted rgb(255, 255, 255);
   transition: transform 120ms ease, background 120ms ease;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 .wheelItem:hover {
-  background: rgba(39, 197, 0, 0.28);
+  background: rgba(140, 140, 140, 0.484);
 }
