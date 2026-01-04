@@ -1,0 +1,122 @@
+#contact-page {
+    width: min(980px, 92vw);
+    margin: 50px auto;
+    height: 100%;
+    min-height: 80vh;
+    padding: 15px;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-accent);
+}
+
+.contact-hero {
+    margin-bottom: 1.75rem;
+}
+
+.contact-title {
+    font-size: var(--xxlarge);
+}
+
+.contact-card {
+    border-radius: 16px;
+    padding: 15px;
+    background: var(--color-bg-daccent);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+}
+
+@media (min-width: 720px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.field label {
+    font-weight: bold;
+}
+
+.field input,
+.field textarea {
+    width: 100%;
+    border-radius: 12px;
+    padding: 0.85rem 0.9rem;
+    outline: none;
+    border: none;
+    background-color: var(--color-bg);
+    color: inherit;
+    transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 160px;
+}
+
+.error {
+    color: red;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.contact-alert {
+    border-radius: 14px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.contact-alert h2 {
+    margin: 0 0 0.4rem;
+    font-size: 1.25rem;
+}
+
+.contact-alert p {
+    margin: 0 0 0.9rem;
+    opacity: 0.9;
+    line-height: 1.55;
+}
+
+.contact-alert.success {
+    border-color: rgba(120, 255, 180, 0.25);
+    background: rgba(120, 255, 180, 0.08);
+}
+
+.contact-alert.error {
+    border-color: rgba(255, 120, 120, 0.25);
+    background: rgba(255, 120, 120, 0.08);
+}
+
+.privacy-note {
+    opacity: 1;
+}
+
+/* Honeypot: visually hidden, still present in DOM */
+.honeypot {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
