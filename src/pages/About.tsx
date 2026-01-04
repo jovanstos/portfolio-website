@@ -3,6 +3,7 @@ import Nav from "../components/Nav";
 import LightDarkToggle from "../components/LightDarkToggle";
 import Footer from "../components/Footer";
 import Timeline from "../components/Timeline";
+import Stars from "../components/Stars";
 
 function About() {
     const timelineItems = [
@@ -47,22 +48,32 @@ function About() {
         <>
             <Nav />
             <LightDarkToggle />
+            <Stars />
             <main id="about">
-                <section id="aboutSection">
-                    <h1>About Me</h1>
-                    <p>It's a good read trust me</p>
-                    <article id="aboutMainArticle">
-                        <img src="temp.jpg" width={"200px"} alt="About" />
-                        <p>Put pics here showing my journey</p>
+                <h1 style={{ color: "white", textAlign: "center", paddingTop: "50px" }}>About Me</h1>
+                <p style={{ color: "white", textAlign: "center" }}>It's a good read trust me</p>
+                <section className="about-section">
+                    <article className="about-article-left">
+                        <h2>I Sold My Car For This</h2>
                         <p>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...
                         </p>
                     </article>
-                    <h1>Timeline</h1>
-                    <p>Here is a timeline of key events</p>
-                    <article>
-                        <Timeline items={timelineItems} />
+                    <img src="temp.jpg" width={"180px"} alt="About" />
+                </section>
+                <section className="about-section">
+                    <img src="temp.jpg" width={"180px"} alt="About" />
+                    <article className="about-article-right">
+                        <h2>Title</h2>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...
+                        </p>
                     </article>
+                </section>
+                <h1 style={{ color: "white", textAlign: "center" }}>Timeline</h1>
+                <p style={{ color: "white", textAlign: "center" }}>Here is a timeline of key events</p>
+                <section>
+                    <Timeline items={timelineItems} />
                 </section>
             </main>
             <Footer />

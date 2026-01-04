@@ -25,7 +25,7 @@
 
   /* Colors */
   --color-bg: light-dark(#D9DCED, #13141c);
-  --color-text: light-dark(#0e0f1a, #f5f6fa);
+  --color-text: light-dark(black, white);
   --color-bg-accent: light-dark(#c3c6d5, #0b0c12);
   --color-bg-daccent: light-dark(#bec0ce, #06060a);
   --color-accent: #3b82f6;
@@ -246,7 +246,6 @@ button {
 
 /* Footer CSS */
 footer{
-  margin-top: 50px;
   background-color: var(--color-accent);
   padding: 15px;
   height: 100%;

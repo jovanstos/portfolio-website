@@ -64,7 +64,6 @@ nav:hover ~ * {
   font-size: var(--medium);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.484);
-  border: 2px dotted rgb(255, 255, 255);
   transition: transform 120ms ease, background 120ms ease;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
