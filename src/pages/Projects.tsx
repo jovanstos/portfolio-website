@@ -16,10 +16,12 @@ function Projects() {
         <>
             <Nav />
             <LightDarkToggle />
-            <h1>All Projects</h1>
-            <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
-                Contact Me
-            </button>
+            <main id="projects">
+                <h1>All Projects</h1>
+                <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                    Contact Me
+                </button>
+            </main>
             <Footer />
         </>
     );

@@ -16,10 +16,13 @@ function Junk() {
         <>
             <Nav />
             <LightDarkToggle />
-            <h1>Junk</h1>
-            <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
-                Contact Me
-            </button>
+            <main id="junk">
+                <h1>Junk Yard</h1>
+                <p>All the treasures and trinkets</p>
+                <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                    Contact Me
+                </button>
+            </main>
             <Footer />
         </>
     );
