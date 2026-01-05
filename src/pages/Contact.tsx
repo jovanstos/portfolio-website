@@ -161,7 +161,7 @@ function Contact() {
                 <header className="contact-hero">
                     <h1 className="contact-title">Contact Me</h1>
                     <p className="contact-subtitle">
-                        Shoot me a message!
+                        Shoot me a message! I'll email you back from <a href="mailto:jovanstosic012@gmail.com" rel="noopener noreferrer">jovanstosic012@gmail.com</a>
                     </p>
                 </header>
                 <section className="contact-card" aria-label="Contact form">

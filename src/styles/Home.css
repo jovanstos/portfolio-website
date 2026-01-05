@@ -16,7 +16,7 @@
   transform: translateY(0);
 }
 
-#projects {
+.home-projects {
     padding-top: 15px;
     width: 100%;
     max-width: 1800px;

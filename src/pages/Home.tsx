@@ -23,7 +23,7 @@ function Home() {
       <LightDarkToggle />
       <Hero />
       <main id="home">
-        <section id="projects">
+        <section className="home-projects">
           <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center" }}>Featured Projects</h1>
           <p style={{ fontSize: "var(--medium)", textAlign: "center" }}>
             Some of my favorites
