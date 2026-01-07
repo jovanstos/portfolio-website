@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
+import Admin from './pages/Admin'
 import Contact from './pages/Contact';
 import Resume from './pages/Resume';
 import Projects from './pages/Projects';
@@ -16,6 +17,7 @@ function App() {
             <Route path="/resume" element={<Resume />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/junk" element={<Junk />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );
