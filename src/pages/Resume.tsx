@@ -27,7 +27,7 @@ function Resume() {
                     <FadeInSection>
                         <header id="resume-header">
                             <h1>Jovan Stosic</h1>
-                            <a href="mailto:jovanstosic012@gmail.com" rel="noopener noreferrer">jovanstosic012@gmail.com</a> • <a href="https://www.linkedin.com/in/jovanstosic12/" rel="noopener noreferrer">Linkedin</a> • <a href="https://github.com/jovanstos" rel="noopener noreferrer">GitHub</a> • <a href="http://www.jovanstosic.dev" rel="noopener noreferrer">www.jovanstosic.dev</a>
+                            <a href="mailto:jovanstosic012@gmail.com" rel="noopener noreferrer" target="_blank">jovanstosic012@gmail.com</a> • <a href="https://www.linkedin.com/in/jovanstosic12/" rel="noopener noreferrer" target="_blank">Linkedin</a> • <a href="https://github.com/jovanstos" rel="noopener noreferrer" target="_blank">GitHub</a> • <a href="http://www.jovanstosic.dev" rel="noopener noreferrer" target="_blank">www.jovanstosic.dev</a>
                         </header>
                     </FadeInSection>
                     <FadeInSection>
@@ -101,7 +101,7 @@ function Resume() {
                             </div>
                             <div className="resumeDetail">
                                 <p>Linux Professional Institute (LPI)</p>
-                                <a href="http://lpi.org/v/LPI000671780/tq4dylymmj" rel="noopener noreferrer">
+                                <a href="http://lpi.org/v/LPI000671780/tq4dylymmj" rel="noopener noreferrer" target="_blank">
                                     Credential ID tq4dylymmj
                                 </a>
                             </div>
