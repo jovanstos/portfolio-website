@@ -1,6 +1,7 @@
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from "url";
+import projectRoutes from "./routes/projectRoutes.js"
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,7 +13,9 @@ const clientDistPath = path.join(__dirname, "..", "dist");
 
 app.use(express.static(clientDistPath));
 
-app.get('/', (req, res) => {
+app.use("/api/projects", projectRoutes);
+
+app.use((req, res) => {
     res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
