@@ -4,32 +4,74 @@ import { pool } from '../database/connection.js'
 const router: Router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
-    console.log("get");
+    const query = `
+    SELECT 
+    projects.id, 
+    projects.title, 
+    projects.description, 
+    projects.url,
+    images.description AS imageDescription,
+    images.url AS imageUrl
+    FROM projects
+    JOIN images ON projects.image_id = images.id 
+    WHERE 
+    projects.hidden IS FALSE 
+    AND projects.junk IS FALSE
+    AND projects.featured IS FALSE
+    `
 
-    const result = await pool.query('SELECT * FROM projects');
+    const result = await pool.query(query);
 
-    console.log(result);
-
-    const data = {
-        message: 'Hello, world!',
-        timestamp: Date.now(),
-        status: 200
-    };
+    const data = result.rows;
 
     res.json(data);
 });
 
-router.get('/:id', (req: Request, res: Response) => {
+router.get('/frontpage', async (req: Request, res: Response) => {
+    const query = `
+    SELECT 
+    projects.id, 
+    projects.title, 
+    projects.description, 
+    projects.url,
+    images.description AS imageDescription,
+    images.url AS imageUrl
+    FROM projects
+    JOIN images ON projects.image_id = images.id 
+    WHERE 
+    projects.hidden IS FALSE 
+    AND projects.junk IS FALSE
+    AND projects.featured IS FALSE
+    LIMIT 5
+    `
+
+    const result = await pool.query(query);
+
+    const data = result.rows;
+
+    res.json(data);
+});
+
+router.get('/:id', async (req: Request, res: Response) => {
     const projectID = req.params.id;
 
-    console.log("get id");
+    const query = `
+    SELECT 
+    projects.id, 
+    projects.title, 
+    projects.description, 
+    projects.url,
+    images.description AS imageDescription,
+    images.url AS imageUrl
+    FROM projects
+    JOIN images ON projects.image_id = images.id 
+    WHERE
+    projects.id = ${projectID}
+    `
 
-    const data = {
-        message: 'Hello, world!',
-        id: projectID,
-        timestamp: Date.now(),
-        status: 200
-    };
+    const result = await pool.query(query);
+
+    const data = result.rows;
 
     res.json(data);
 });
