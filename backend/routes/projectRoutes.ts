@@ -83,7 +83,7 @@ router.get('/id/:id', async (req: Request, res: Response) => {
 
     const { rows } = await pool.query(query, [id]);
 
-    res.json(rows);
+    res.json(rows[0]);
 });
 
 export default router;

@@ -183,7 +183,6 @@ function Hero() {
                     </div>
                 )}
             </div>
-
             <div
                 className={[
                     "realHero",

@@ -5,6 +5,7 @@ import Admin from './pages/Admin'
 import Contact from './pages/Contact';
 import Resume from './pages/Resume';
 import Projects from './pages/Projects';
+import Project from './pages/Project';
 import Junk from './pages/Junk';
 import NotFound from './pages/NotFound';
 
@@ -16,6 +17,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/resume" element={<Resume />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/id/:id" element={<Project />} />
             <Route path="/junk" element={<Junk />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />

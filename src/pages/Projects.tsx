@@ -20,21 +20,32 @@ function Projects() {
         navigate(href);
     };
 
-    if (isLoading) return <p>Loading...</p>;
-    if (error) return <p>Error loading projects</p>;
-
     return (
         <>
             <Nav />
             <LightDarkToggle />
             <main id="projects">
-                <h1>All Projects</h1>
-                <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
-                    Contact Me
-                </button>
-                {data!.map((project) => (
-                    <MediumCard title={project.title} imgURL={project.imageurl} imgDescription={project.imagedescription} />
-                ))}
+                <div style={{ marginBottom: "50px" }}>
+                    <h1>All Projects</h1>
+                    <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                        Contact Me
+                    </button>
+                </div>
+                {isLoading ? (
+                    <p>Loading...</p>
+                ) : error ? (
+                    <p>Error loading projects</p>
+                ) : (
+                    data!.map((project) => (
+                        <MediumCard
+                            key={project.id}
+                            id={project.id}
+                            title={project.title}
+                            imgURL={project.imageurl}
+                            imgDescription={project.imagedescription}
+                        />
+                    ))
+                )}
             </main>
             <Footer />
         </>

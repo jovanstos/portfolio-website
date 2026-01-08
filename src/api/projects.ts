@@ -1,6 +1,6 @@
 import { api } from "./client";
 
-export interface projects {
+export interface project {
     id: number;
     title: string;
     description: string;
@@ -13,7 +13,7 @@ export const getProjects = async ({
     queryKey,
 }: {
     queryKey: [string, string];
-}): Promise<projects[]> => {
+}): Promise<project[]> => {
     const [, type] = queryKey;
 
     const res = await api.get(`/projects/all/${type}`);
@@ -25,7 +25,7 @@ export const getLimitedProjects = async ({
     queryKey,
 }: {
     queryKey: [string, string, string];
-}): Promise<projects[]> => {
+}): Promise<project[]> => {
     const [, type, limit] = queryKey;
 
     const res = await api.get(`/projects/all/${type}/${limit}`);
@@ -37,7 +37,7 @@ export const getProjectByID = async ({
     queryKey,
 }: {
     queryKey: [string, string];
-}): Promise<projects[]> => {
+}): Promise<project> => {
     const [, id] = queryKey;
 
     const res = await api.get(`/projects/id/${id}`);
