@@ -3,77 +3,87 @@ import { pool } from '../database/connection.js'
 
 const router: Router = Router();
 
-router.get('/', async (req: Request, res: Response) => {
+const ALLOWED_TYPES = ['regular', 'junk', 'featured'] as const;
+type ProjectType = typeof ALLOWED_TYPES[number];
+
+function parseType(type: string): ProjectType {
+    if (!ALLOWED_TYPES.includes(type as ProjectType)) {
+        throw new Error('Invalid type');
+    }
+
+    return type as ProjectType;
+}
+
+function parseLimit(limit?: string): number {
+    const n = Number(limit);
+
+    if (!Number.isInteger(n) || n < 1) return 5;
+
+    return Math.min(n, 20);
+}
+
+const getProjectsHandler = async (req: Request, res: Response) => {
+    try {
+        const type = parseType(req.params.type);
+        const limit = parseLimit(req.params.limit);
+
+        const conditions = ['projects.hidden = FALSE'];
+
+        if (type === 'junk') conditions.push('projects.junk = TRUE');
+        else if (type === 'featured') conditions.push('projects.featured = TRUE');
+        else {
+            conditions.push('projects.junk = FALSE');
+            conditions.push('projects.featured = FALSE');
+        }
+
+        const query = `
+        SELECT
+        projects.id,
+        projects.title,
+        projects.description,
+        projects.url,
+        images.description AS imageDescription,
+        images.url AS imageUrl
+        FROM projects
+        JOIN images ON projects.image_id = images.id
+        WHERE ${conditions.join(' AND ')}
+        LIMIT $1
+        `;
+
+        const { rows } = await pool.query(query, [limit]);
+        res.json(rows);
+    } catch {
+        res.status(400).json({ message: 'Invalid request' });
+    }
+};
+
+router.get('/all/:type', getProjectsHandler);
+router.get('/all/:type/:limit', getProjectsHandler);
+
+router.get('/id/:id', async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        return res.status(400).json({ message: 'Invalid ID' });
+    }
+
     const query = `
-    SELECT 
-    projects.id, 
-    projects.title, 
-    projects.description, 
+    SELECT
+    projects.id,
+    projects.title,
+    projects.description,
     projects.url,
     images.description AS imageDescription,
     images.url AS imageUrl
     FROM projects
-    JOIN images ON projects.image_id = images.id 
-    WHERE 
-    projects.hidden IS FALSE 
-    AND projects.junk IS FALSE
-    AND projects.featured IS FALSE
-    `
+    JOIN images ON projects.image_id = images.id
+    WHERE projects.hidden = FALSE
+    AND projects.id = $1
+    `;
 
-    const result = await pool.query(query);
+    const { rows } = await pool.query(query, [id]);
 
-    const data = result.rows;
-
-    res.json(data);
-});
-
-router.get('/frontpage', async (req: Request, res: Response) => {
-    const query = `
-    SELECT 
-    projects.id, 
-    projects.title, 
-    projects.description, 
-    projects.url,
-    images.description AS imageDescription,
-    images.url AS imageUrl
-    FROM projects
-    JOIN images ON projects.image_id = images.id 
-    WHERE 
-    projects.hidden IS FALSE 
-    AND projects.junk IS FALSE
-    AND projects.featured IS FALSE
-    LIMIT 5
-    `
-
-    const result = await pool.query(query);
-
-    const data = result.rows;
-
-    res.json(data);
-});
-
-router.get('/:id', async (req: Request, res: Response) => {
-    const projectID = req.params.id;
-
-    const query = `
-    SELECT 
-    projects.id, 
-    projects.title, 
-    projects.description, 
-    projects.url,
-    images.description AS imageDescription,
-    images.url AS imageUrl
-    FROM projects
-    JOIN images ON projects.image_id = images.id 
-    WHERE
-    projects.id = ${projectID}
-    `
-
-    const result = await pool.query(query);
-
-    const data = result.rows;
-
-    res.json(data);
+    res.json(rows);
 });
 
 export default router;

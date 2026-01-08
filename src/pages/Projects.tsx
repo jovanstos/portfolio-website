@@ -10,7 +10,7 @@ import { getProjects } from "../api/projects";
 function Projects() {
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ["projects"],
+        queryKey: ["projects", "regular"],
         queryFn: getProjects,
     });
 
