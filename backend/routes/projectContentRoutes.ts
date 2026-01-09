@@ -13,6 +13,7 @@ router.get('/id/:id', async (req: Request, res: Response) => {
     const query = `
     SELECT
     project_content.id,
+    project_content.title,
     project_content.text,
     images.description AS imageDescription,
     images.url AS imageUrl

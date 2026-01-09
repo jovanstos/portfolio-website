@@ -22,6 +22,7 @@ CREATE TABLE projects (
 
 CREATE TABLE project_content (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title TEXT,
     project_id INTEGER,
     image_id INTEGER,
     text TEXT,

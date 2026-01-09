@@ -1,8 +1,8 @@
-import "../styles/Projects.css";
+import "../styles/Project.css";
 import Nav from "../components/Nav";
 import LightDarkToggle from "../components/LightDarkToggle";
 import Footer from "../components/Footer";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
@@ -10,8 +10,6 @@ import type { projectContent, project } from "../types/project"
 
 function Project() {
     const { id } = useParams<{ id: string }>();
-
-    const navigate = useNavigate();
 
     const projectQuery = useQuery<project>({
         queryKey: ["project", id!],
@@ -30,7 +28,7 @@ function Project() {
             <>
                 <Nav />
                 <LightDarkToggle />
-                <main id="projects">
+                <main id="project">
                     <p>Loading...</p>
                 </main>
                 <Footer />
@@ -43,7 +41,7 @@ function Project() {
             <>
                 <Nav />
                 <LightDarkToggle />
-                <main id="projects">
+                <main id="project">
                     <p>Error loading project</p>
                 </main>
                 <Footer />
@@ -58,17 +56,11 @@ function Project() {
         <>
             <Nav />
             <LightDarkToggle />
-            <main id="projects">
-                <div style={{ marginBottom: "50px", textAlign: "center" }}>
-                    <h1>{projectData.title}</h1>
-                    <button
-                        className="primary-button contact-button"
-                        onClick={() => navigate("/contact")}
-                    >
-                        Contact Me
-                    </button>
-                </div>
+            <main id="project">
+                <h1>{projectData.title}</h1>
+                <p style={{ marginBottom: "15px" }}>To have the best experience desktop is recommended.</p>
                 <img
+                    id="main-project-img"
                     src={projectData.imageurl}
                     alt={projectData.imagedescription}
                     width="1000"
@@ -79,20 +71,24 @@ function Project() {
                         const hasImage = Boolean(articleData.imageurl);
 
                         return (
-                            <article key={articleData.id}>
+                            <article className="project-article" key={articleData.id}>
                                 {hasImage && (
-                                    <img
-                                        src={articleData.imageurl}
-                                        alt={articleData.imagedescription || ""}
-                                        width={hasText ? 750 : 750}
-                                    />
+                                    <>
+                                        <h2 className="project-h2">{articleData.title}</h2>
+                                        <img
+                                            src={articleData.imageurl}
+                                            alt={articleData.imagedescription || ""}
+                                            width={750}
+                                        />
+                                        <p style={{ textAlign: "center" }}>{!hasText ? articleData.imagedescription : ""}</p>
+                                    </>
                                 )}
                                 {hasText && <p>{articleData.text}</p>}
                             </article>
                         );
                     })}
                 </section>
-            </main >
+            </main>
             <Footer />
         </>
     );

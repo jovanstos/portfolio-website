@@ -18,7 +18,7 @@ function NotFound() {
                         Home
                     </button>
                 </a>
-            </main >
+            </main>
             <Footer />
         </div >
     );

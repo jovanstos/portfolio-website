@@ -9,6 +9,7 @@ export interface project {
 
 export interface projectContent {
     id: number;
+    title: string;
     text: string;
     imagedescription: string;
     imageurl: string;
