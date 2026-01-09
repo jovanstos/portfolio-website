@@ -1,13 +1,5 @@
 import { api } from "./client";
-
-export interface project {
-    id: number;
-    title: string;
-    description: string;
-    url: string;
-    imagedescription: string;
-    imageurl: string;
-}
+import type { project } from "../types/project"
 
 export const getProjects = async ({
     queryKey,
@@ -33,14 +25,10 @@ export const getLimitedProjects = async ({
     return res.data;
 };
 
-export const getProjectByID = async ({
-    queryKey,
-}: {
-    queryKey: [string, string];
-}): Promise<project> => {
+export const getProjectByID = async ({ queryKey }: any): Promise<project> => {
     const [, id] = queryKey;
 
     const res = await api.get(`/projects/id/${id}`);
 
     return res.data;
-};
+}

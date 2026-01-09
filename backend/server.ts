@@ -2,6 +2,7 @@ import express from 'express'
 import path from 'path'
 import { fileURLToPath } from "url";
 import projectRoutes from "./routes/projectRoutes.js"
+import projectContentRoutes from "./routes/projectContentRoutes.js"
 import rateLimit from 'express-rate-limit';
 
 const app = express();
@@ -23,6 +24,8 @@ app.use(
 );
 
 app.use("/api/projects", projectRoutes);
+
+app.use("/api/project-content", projectContentRoutes);
 
 app.use((req, res) => {
     res.sendFile(path.join(clientDistPath, 'index.html'));

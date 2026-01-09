@@ -13,10 +13,6 @@ function Home() {
 
   const navigate = useNavigate();
 
-  function handleButtonClick(href: string) {
-    navigate(href);
-  };
-
   return (
     <>
       <Nav />
@@ -50,7 +46,7 @@ function Home() {
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button className="primary-button" onClick={() => handleButtonClick("/projects")}>See more</button>
+                <button className="primary-button" onClick={() => navigate("/projects")}>See more</button>
               </div>
             </FadeInSection>
           </FadeInSection>
@@ -65,7 +61,7 @@ function Home() {
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button className="primary-button" onClick={() => handleButtonClick("/junk")}>See more</button>
+                <button className="primary-button" onClick={() => navigate("/junk")}>See more</button>
               </div>
             </FadeInSection>
           </FadeInSection>

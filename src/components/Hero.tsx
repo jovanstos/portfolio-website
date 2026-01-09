@@ -151,10 +151,6 @@ function Hero() {
 
     }, [phase]);
 
-    function handleButtonClick(href: string) {
-        navigate(href);
-    };
-
     return (
         <section className="hero">
             <Stars />
@@ -216,10 +212,10 @@ function Hero() {
                         <a href="/about" rel="noopener noreferrer"> Click to learn more.</a>
                     </p>
                     <div style={{ marginTop: "10px" }}>
-                        <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                        <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => navigate("/contact")}>
                             Contact Me
                         </button>
-                        <button className="secondary-button" onClick={() => handleButtonClick("/resume")}>Résumé</button>
+                        <button className="secondary-button" onClick={() => navigate("/resume")}>Résumé</button>
                     </div>
                 </div>
             </div>

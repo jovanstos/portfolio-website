@@ -25,15 +25,21 @@ function parseLimit(limit?: string): number {
 const getProjectsHandler = async (req: Request, res: Response) => {
     try {
         const type = parseType(req.params.type);
-        const limit = parseLimit(req.params.limit);
+        let limit = null
+
+        if (req.params.limit) {
+            limit = parseLimit(req.params.limit);
+        }
 
         const conditions = ['projects.hidden = FALSE'];
 
         if (type === 'junk') conditions.push('projects.junk = TRUE');
         else if (type === 'featured') conditions.push('projects.featured = TRUE');
         else {
+            if (limit) {
+                conditions.push('projects.featured = FALSE');
+            }
             conditions.push('projects.junk = FALSE');
-            conditions.push('projects.featured = FALSE');
         }
 
         const query = `

@@ -7,27 +7,33 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "../api/projects";
 
-function Projects() {
+type ProjectsProps = {
+    title?: string;
+    projectType?: string;
+    subheading?: string;
+};
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ["projects", "regular"],
-        queryFn: getProjects,
-    });
-
+function Projects({
+    title,
+    projectType = "regular",
+    subheading
+}: ProjectsProps) {
     const navigate = useNavigate();
 
-    function handleButtonClick(href: string) {
-        navigate(href);
-    };
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["projects", projectType],
+        queryFn: getProjects,
+    });
 
     return (
         <>
             <Nav />
             <LightDarkToggle />
             <main id="projects">
-                <div style={{ marginBottom: "50px" }}>
-                    <h1>All Projects</h1>
-                    <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                <div style={{ marginBottom: "50px", textAlign: "center" }}>
+                    <h1>{title}</h1>
+                    <p>{subheading}</p>
+                    <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => navigate("/contact")}>
                         Contact Me
                     </button>
                 </div>

@@ -9,10 +9,6 @@ function Resume() {
 
     const navigate = useNavigate();
 
-    function handleButtonClick(href: string) {
-        navigate(href);
-    };
-
     return (
         <>
             <Nav />
@@ -20,7 +16,7 @@ function Resume() {
             <main id="resume">
                 <h1>Resume</h1>
                 <p>Presonal informaiton has been removed but feel free to contact me for more info!</p>
-                <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => handleButtonClick("/contact")}>
+                <button style={{ marginTop: "10px" }} className="primary-button contact-button" onClick={() => navigate("/contact")}>
                     Contact Me
                 </button>
                 <article id="resume-text">
