@@ -1,6 +1,7 @@
 import "../styles/Project.css";
 import Nav from "../components/Nav";
 import LightDarkToggle from "../components/LightDarkToggle";
+import FadeInSection from "../components/FadeInSection";
 import Footer from "../components/Footer";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -71,20 +72,22 @@ function Project() {
                         const hasImage = Boolean(articleData.imageurl);
 
                         return (
-                            <article className="project-article" key={articleData.id}>
-                                {hasImage && (
-                                    <>
-                                        <h2 className="project-h2">{articleData.title}</h2>
-                                        <img
-                                            src={articleData.imageurl}
-                                            alt={articleData.imagedescription || ""}
-                                            width={750}
-                                        />
-                                        <p style={{ textAlign: "center" }}>{!hasText ? articleData.imagedescription : ""}</p>
-                                    </>
-                                )}
-                                {hasText && <p>{articleData.text}</p>}
-                            </article>
+                            <FadeInSection>
+                                <article className="project-article" key={articleData.id}>
+                                    {hasImage && (
+                                        <>
+                                            <h2 className="project-h2">{articleData.title}</h2>
+                                            <img
+                                                src={articleData.imageurl}
+                                                alt={articleData.imagedescription || ""}
+                                                width={750}
+                                            />
+                                            <p style={{ textAlign: "center" }}>{!hasText ? articleData.imagedescription : ""}</p>
+                                        </>
+                                    )}
+                                    {hasText && <p>{articleData.text}</p>}
+                                </article>
+                            </FadeInSection>
                         );
                     })}
                 </section>
