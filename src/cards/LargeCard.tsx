@@ -8,6 +8,7 @@ type CardProps = {
     imgDescription?: string;
 };
 
+const internalProjectIDs = new Set<number>([0]);
 
 function LargeCard({
     id = 1,
@@ -17,7 +18,11 @@ function LargeCard({
     imgDescription = "placeholder image"
 }: CardProps) {
 
-    const url = `/projects/id/${id}`
+    const isInternal = internalProjectIDs.has(id);
+
+    const url = isInternal
+        ? `/projects/featured/${id}`
+        : `/projects/id/${id}`;
 
     return (
         <a className="card-a-tag" href={url} rel="noopener noreferrer">
