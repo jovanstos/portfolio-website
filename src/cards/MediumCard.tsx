@@ -21,7 +21,7 @@ function MediumCard({
     const isInternal = internalProjectIDs.has(id);
 
     const url = isInternal
-        ? `/projects/featured/${id}`
+        ? `/projects/live/${id}`
         : `/projects/id/${id}`;
 
     return (
