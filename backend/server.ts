@@ -1,4 +1,6 @@
 import express from 'express'
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
 import path from 'path'
 import { fileURLToPath } from "url";
 import projectRoutes from "./routes/projectRoutes.js"
@@ -6,6 +8,8 @@ import projectContentRoutes from "./routes/projectContentRoutes.js"
 import rateLimit from 'express-rate-limit';
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,6 +35,10 @@ app.use((req, res) => {
     res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
-app.listen(PORT, () => {
+io.on('connection', (socket) => {
+    console.log('A user connected');
+});
+
+server.listen(3000, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
