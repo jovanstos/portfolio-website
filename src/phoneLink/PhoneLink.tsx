@@ -1,48 +1,10 @@
-import "../styles/Project.css";
-import FadeInSection from "../components/FadeInSection";
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getProjectByID } from "../api/projects";
-import { getProjectContentByID } from "../api/projectContent";
-import type { projectContent, project } from "../types/project"
+import "../styles/PhoneLink.css";
 
-function Project() {
-    const { id } = useParams<{ id: string }>();
-
-    const projectQuery = useQuery<project>({
-        queryKey: ["project", id!],
-        queryFn: getProjectByID,
-        enabled: !!id,
-    });
-
-    const contentQuery = useQuery<projectContent[]>({
-        queryKey: ["projectContent", id!],
-        queryFn: getProjectContentByID,
-        enabled: !!id,
-    });
-
-    if (projectQuery.isLoading || contentQuery.isLoading) {
-        return (
-            <main id="project">
-                <p>Loading...</p>
-            </main>
-        );
-    }
-
-    if (projectQuery.error || contentQuery.error) {
-        return (
-            <main id="project">
-                <p>Error loading project</p>
-            </main>
-        );
-    }
-
-    const projectData: any = projectQuery.data;
-    const contentData: any = contentQuery.data;
+function PhoneLink() {
 
     return (
         <main id="project">
-            <h1>{projectData.title}</h1>
+            {/* <h1>{projectData.title}</h1>
             <p style={{ marginBottom: "15px" }}>To have the best experience desktop is recommended.</p>
             <img
                 id="main-project-img"
@@ -74,9 +36,9 @@ function Project() {
                         </FadeInSection>
                     );
                 })}
-            </section>
+            </section> */}
         </main>
     );
 }
 
-export default Project;
+export default PhoneLink;

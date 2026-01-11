@@ -1,13 +1,8 @@
-import Nav from "../components/Nav";
-import LightDarkToggle from "../components/LightDarkToggle";
 import Stars from "../components/Stars";
-import Footer from "../components/Footer";
 
 function NotFound() {
     return (
         <div style={{ backgroundColor: "#13141c" }}>
-            <Nav />
-            <LightDarkToggle />
             <Stars speed={5} />
             <main id="not-found">
                 <h1>404 Page Not found</h1>
@@ -19,7 +14,6 @@ function NotFound() {
                     </button>
                 </a>
             </main>
-            <Footer />
         </div >
     );
 }

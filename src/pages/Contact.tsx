@@ -1,8 +1,5 @@
 import { useMemo, useState } from "react";
 import "../styles/Contact.css";
-import Nav from "../components/Nav";
-import LightDarkToggle from "../components/LightDarkToggle";
-import Footer from "../components/Footer";
 
 type ContactStatus = "idle" | "sending" | "success" | "error";
 
@@ -154,148 +151,142 @@ function Contact() {
     }
 
     return (
-        <>
-            <Nav />
-            <LightDarkToggle />
-            <main id="contact-page">
-                <header className="contact-hero">
-                    <h1 className="contact-title">Contact Me</h1>
-                    <p className="contact-subtitle">
-                        Shoot me a message! I'll email you back from <a href="mailto:jovanstosic012@gmail.com" rel="noopener noreferrer">jovanstosic012@gmail.com</a>
-                    </p>
-                </header>
-                <section className="contact-card" aria-label="Contact form">
-                    {status === "success" ? (
-                        <div className="contact-alert success" role="status" aria-live="polite">
-                            <h2>Message sent ✅</h2>
-                            <p>Thanks for reaching out, I'll email you as soon as I can!</p>
-                            <button
-                                className="primary-button"
-                                type="button"
-                                onClick={() => {
-                                    setStatus("idle");
-                                    setErrorMsg("");
-                                }}
-                            >
-                                Send another message
-                            </button>
+        <main id="contact-page">
+            <header className="contact-hero">
+                <h1 className="contact-title">Contact Me</h1>
+                <p className="contact-subtitle">
+                    Shoot me a message! I'll email you back from <a href="mailto:jovanstosic012@gmail.com" rel="noopener noreferrer">jovanstosic012@gmail.com</a>
+                </p>
+            </header>
+            <section className="contact-card" aria-label="Contact form">
+                {status === "success" ? (
+                    <div className="contact-alert success" role="status" aria-live="polite">
+                        <h2>Message sent ✅</h2>
+                        <p>Thanks for reaching out, I'll email you as soon as I can!</p>
+                        <button
+                            className="primary-button"
+                            type="button"
+                            onClick={() => {
+                                setStatus("idle");
+                                setErrorMsg("");
+                            }}
+                        >
+                            Send another message
+                        </button>
+                    </div>
+                ) : (
+                    <form className="contact-form" onSubmit={onSubmit} noValidate>
+                        <div className="grid">
+                            <div className="field">
+                                <label htmlFor="name">Name</label>
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    autoComplete="name"
+                                    value={form.name}
+                                    onChange={onChange}
+                                    onBlur={onBlur}
+                                    aria-invalid={Boolean(touched.name && errors.name)}
+                                    aria-describedby={touched.name && errors.name ? "name-error" : undefined}
+                                    placeholder="Your name"
+                                />
+                                {touched.name && errors.name && (
+                                    <div className="error" id="name-error">
+                                        {errors.name}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="field">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    value={form.email}
+                                    onChange={onChange}
+                                    onBlur={onBlur}
+                                    aria-invalid={Boolean(touched.email && errors.email)}
+                                    aria-describedby={touched.email && errors.email ? "email-error" : undefined}
+                                    placeholder="you@example.com"
+                                />
+                                {touched.email && errors.email && (
+                                    <div className="error" id="email-error">
+                                        {errors.email}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    ) : (
-                        <form className="contact-form" onSubmit={onSubmit} noValidate>
-                            <div className="grid">
-                                <div className="field">
-                                    <label htmlFor="name">Name</label>
-                                    <input
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        autoComplete="name"
-                                        value={form.name}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
-                                        aria-invalid={Boolean(touched.name && errors.name)}
-                                        aria-describedby={touched.name && errors.name ? "name-error" : undefined}
-                                        placeholder="Your name"
-                                    />
-                                    {touched.name && errors.name && (
-                                        <div className="error" id="name-error">
-                                            {errors.name}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="field">
-                                    <label htmlFor="email">Email</label>
-                                    <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="email"
-                                        value={form.email}
-                                        onChange={onChange}
-                                        onBlur={onBlur}
-                                        aria-invalid={Boolean(touched.email && errors.email)}
-                                        aria-describedby={touched.email && errors.email ? "email-error" : undefined}
-                                        placeholder="you@example.com"
-                                    />
-                                    {touched.email && errors.email && (
-                                        <div className="error" id="email-error">
-                                            {errors.email}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="field">
-                                <label htmlFor="subject">Subject</label>
-                                <input
-                                    id="subject"
-                                    name="subject"
-                                    type="text"
-                                    value={form.subject}
-                                    onChange={onChange}
-                                    onBlur={onBlur}
-                                    aria-invalid={Boolean(touched.subject && errors.subject)}
-                                    aria-describedby={touched.subject && errors.subject ? "subject-error" : undefined}
-                                    placeholder="What's this about?"
-                                />
-                                {touched.subject && errors.subject && (
-                                    <div className="error" id="subject-error">
-                                        {errors.subject}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="field">
-                                <label htmlFor="message">Message</label>
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    rows={7}
-                                    value={form.message}
-                                    onChange={onChange}
-                                    onBlur={onBlur}
-                                    aria-invalid={Boolean(touched.message && errors.message)}
-                                    aria-describedby={touched.message && errors.message ? "message-error" : undefined}
-                                    placeholder="Write your message here..."
-                                />
-                                <div className="meta-row">
-                                    <span className="hint">Minimum 10 characters.</span>
-                                    <span className="count">{form.message.trim().length}/2000</span>
-                                </div>
-                                {touched.message && errors.message && (
-                                    <div className="error" id="message-error">
-                                        {errors.message}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="honeypot" aria-hidden="true">
-                                <label htmlFor="company">Company</label>
-                                <input
-                                    id="company"
-                                    name="company"
-                                    type="text"
-                                    tabIndex={-1}
-                                    autoComplete="off"
-                                    value={form.company}
-                                    onChange={onChange}
-                                />
-                            </div>
-                            {status === "error" && (
-                                <div className="contact-alert error" role="alert" aria-live="assertive">
-                                    {errorMsg}
+                        <div className="field">
+                            <label htmlFor="subject">Subject</label>
+                            <input
+                                id="subject"
+                                name="subject"
+                                type="text"
+                                value={form.subject}
+                                onChange={onChange}
+                                onBlur={onBlur}
+                                aria-invalid={Boolean(touched.subject && errors.subject)}
+                                aria-describedby={touched.subject && errors.subject ? "subject-error" : undefined}
+                                placeholder="What's this about?"
+                            />
+                            {touched.subject && errors.subject && (
+                                <div className="error" id="subject-error">
+                                    {errors.subject}
                                 </div>
                             )}
-                            <button className="primary-button" type="submit" disabled={!canSubmit}>
-                                {status === "sending" ? "Sending..." : "Send message"}
-                            </button>
-                            <p className="privacy-note">
-                                By sending this, you agree to be contacted back via the email you provided.
-                            </p>
-                        </form>
-                    )}
-                </section>
-            </main>
-
-            <Footer />
-        </>
+                        </div>
+                        <div className="field">
+                            <label htmlFor="message">Message</label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows={7}
+                                value={form.message}
+                                onChange={onChange}
+                                onBlur={onBlur}
+                                aria-invalid={Boolean(touched.message && errors.message)}
+                                aria-describedby={touched.message && errors.message ? "message-error" : undefined}
+                                placeholder="Write your message here..."
+                            />
+                            <div className="meta-row">
+                                <span className="hint">Minimum 10 characters.</span>
+                                <span className="count">{form.message.trim().length}/2000</span>
+                            </div>
+                            {touched.message && errors.message && (
+                                <div className="error" id="message-error">
+                                    {errors.message}
+                                </div>
+                            )}
+                        </div>
+                        <div className="honeypot" aria-hidden="true">
+                            <label htmlFor="company">Company</label>
+                            <input
+                                id="company"
+                                name="company"
+                                type="text"
+                                tabIndex={-1}
+                                autoComplete="off"
+                                value={form.company}
+                                onChange={onChange}
+                            />
+                        </div>
+                        {status === "error" && (
+                            <div className="contact-alert error" role="alert" aria-live="assertive">
+                                {errorMsg}
+                            </div>
+                        )}
+                        <button className="primary-button" type="submit" disabled={!canSubmit}>
+                            {status === "sending" ? "Sending..." : "Send message"}
+                        </button>
+                        <p className="privacy-note">
+                            By sending this, you agree to be contacted back via the email you provided.
+                        </p>
+                    </form>
+                )}
+            </section>
+        </main>
     );
 }
 

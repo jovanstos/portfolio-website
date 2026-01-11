@@ -1,7 +1,4 @@
 import "../styles/About.css";
-import Nav from "../components/Nav";
-import LightDarkToggle from "../components/LightDarkToggle";
-import Footer from "../components/Footer";
 import Timeline from "../components/Timeline";
 import Stars from "../components/Stars";
 import FadeInSection from "../components/FadeInSection";
@@ -47,8 +44,6 @@ function About() {
 
     return (
         <>
-            <Nav />
-            <LightDarkToggle />
             <Stars speed={5} />
             <main id="about">
                 <h1 style={{ color: "white", textAlign: "center", paddingTop: "50px" }}>About Me</h1>
@@ -94,7 +89,6 @@ function About() {
                     </section>
                 </FadeInSection>
             </main>
-            <Footer />
         </>
     );
 }

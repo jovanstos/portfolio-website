@@ -1,12 +1,9 @@
 import "../styles/Home.css";
 import { useNavigate } from 'react-router-dom';
 import Hero from "../components/Hero";
-import LightDarkToggle from "../components/LightDarkToggle";
-import Nav from "../components/Nav";
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
 import SmallCard from "../cards/SmallCard";
-import Footer from "../components/Footer";
 import FadeInSection from "../components/FadeInSection";
 
 function Home() {
@@ -15,8 +12,6 @@ function Home() {
 
   return (
     <>
-      <Nav />
-      <LightDarkToggle />
       <Hero />
       <main id="home">
         <section className="home-projects">
@@ -67,7 +62,6 @@ function Home() {
           </FadeInSection>
         </section>
       </main>
-      <Footer />
     </>
   );
 }
