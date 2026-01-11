@@ -1,6 +1,6 @@
-import "../styles/PhoneLink.css";
+import "../styles/Zipline.css";
 
-function PhoneLink() {
+function Zipline() {
 
     return (
         <main id="project">
@@ -41,4 +41,4 @@ function PhoneLink() {
     );
 }
 
-export default PhoneLink;
+export default Zipline;
