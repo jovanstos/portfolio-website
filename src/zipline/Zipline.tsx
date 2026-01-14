@@ -2,7 +2,6 @@ import ZiplineApp from "./ZiplineApp";
 import "../styles/Project.css";
 
 function Zipline() {
-
     return (
         <main id="project">
             <h1>Zipline</h1>

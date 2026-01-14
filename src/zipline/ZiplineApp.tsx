@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import Popup from "../components/Popup";
 import { socket } from './socket';
 import {
     generateKeyPair,
@@ -25,6 +26,7 @@ function ZiplineApp() {
     const [pairingCode, setPairingCode] = useState<string>("");
     const [approved, setApproved] = useState<boolean>(false);
     const [messages, setMessages] = useState<string[]>([]);
+    const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
     useEffect(() => {
         socket.on("peer:public-key", async ({ publicKey }) => {
@@ -57,7 +59,7 @@ function ZiplineApp() {
 
             console.log("Text", text);
 
-            setMessages((prev) => [...prev, `Other Device: ${text}`]);
+            setMessages((prev) => [...prev, `Paired Device: ${text}`]);
         });
 
         socket.on("file:init", ({ meta }) => {
@@ -86,6 +88,10 @@ function ZiplineApp() {
         };
     }, []);
 
+
+    function closePopup() {
+        setIsPopupOpen(!isPopupOpen)
+    }
 
     const handleRoomIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRoomSateId(event.target.value);
@@ -118,6 +124,7 @@ function ZiplineApp() {
         socket.on("room:pairing-code", ({ pairingCode, approved }) => {
             setPairingCode(pairingCode);
             setApproved(approved);
+            setIsPopupOpen(true)
         });
     }
 
@@ -187,6 +194,16 @@ function ZiplineApp() {
 
     return (
         <section id="zipline-app">
+            <Popup isOpen={isPopupOpen} onClose={closePopup}>
+                <h2>Time to pair!</h2>
+                <p>Get your pairing device and enter in the following information to be able to link correctly.</p>
+                <br />
+                <h3>Information:</h3>
+                <p><i>Host ID: </i><b>{roomSateID}</b></p>
+                <p><i>Pairing Code: </i><b>{pairingCode}</b></p>
+                <br />
+                <p>All linked up? Once you close this you will no longer be able to see this information!</p>
+            </Popup>
             {!approved ? (
                 <section id="room-options">
                     <div id="create-room">

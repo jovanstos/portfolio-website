@@ -1,0 +1,51 @@
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 15vh;
+  z-index: 1000;
+}
+
+.popup-container {
+  position: relative;
+  background: var(--color-bg-accent);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: popupFadeIn 0.2s ease-out;
+}
+
+.popup-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: var(--xlarge);
+  cursor: pointer;
+}
+
+.popup-close:hover {
+  color: var(--color-accent);
+}
+
+.popup-content {
+  margin-top: 12px;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
