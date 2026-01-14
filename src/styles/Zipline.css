@@ -1,0 +1,47 @@
+#zipline-app{
+    margin-bottom: 30px;
+    padding: 45px;
+    background-color: var(--color-bg-accent);
+}
+
+#room-options{
+    text-align: center;
+    min-width: 300px;
+}
+
+#create-room, #join-room{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#create-room, #join-room{
+    padding: 20px;
+    margin-bottom: 5px;
+    border-radius: 15px;
+    transition: background-color 220ms ease, box-shadow 220ms ease;
+}
+
+#create-room:hover, #join-room:hover{
+  box-shadow: 0 5px 25px rgba(255, 255, 255, 0.5);
+  background-color: var(--color-bg-daccent);
+}
+
+#create-room > * {
+    margin-bottom: 7px;
+}
+
+#join-room{
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+#join-room > * {
+    margin: 5px;
+}
+
+@media screen and (max-width: 750px) {
+    #room-options{
+        min-width: 100px;
+    }
+}

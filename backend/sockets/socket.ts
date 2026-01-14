@@ -1,17 +1,6 @@
 import { Server, Socket } from "socket.io";
+import { RoomState } from "../types/socketTypes.js";
 import crypto from "crypto";
-import { log } from "console";
-
-type DeviceInfo = {
-    socketId: string;
-    publicKey: string;
-    approved: boolean;
-};
-
-type RoomState = {
-    pairingCode: string;
-    devices: Map<string, DeviceInfo>;
-};
 
 const rooms = new Map<string, RoomState>();
 
