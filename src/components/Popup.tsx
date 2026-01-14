@@ -20,7 +20,6 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
                 <button className="popup-close" onClick={onClose}>
                     <MdCancel />
                 </button>
-
                 <div className="popup-content">
                     {children}
                 </div>

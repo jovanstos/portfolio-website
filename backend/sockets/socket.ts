@@ -91,15 +91,24 @@ export function initSockets(io: Server) {
         });
 
         socket.on("file:init", ({ roomID, meta }) => {
-            relayToRoom(socket, roomID, "file:init", meta);
+            const room = rooms.get(roomID);
+            if (!room) return;
+
+            socket.to(roomID).emit("file:init", { meta });
         });
 
         socket.on("file:chunk", ({ roomID, payload }) => {
-            relayToRoom(socket, roomID, "file:chunk", payload);
+            const room = rooms.get(roomID);
+            if (!room) return;
+
+            socket.to(roomID).emit("file:chunk", { payload });
         });
 
         socket.on("file:complete", ({ roomID }) => {
-            relayToRoom(socket, roomID, "file:complete", null);
+            const room = rooms.get(roomID);
+            if (!room) return;
+
+            socket.to(roomID).emit("file:complete");
         });
 
         socket.on("disconnect", () => {

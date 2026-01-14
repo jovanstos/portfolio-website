@@ -1,5 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
+import { ImFolderUpload } from "react-icons/im";
+import { FaCopy, FaDownload } from "react-icons/fa";
 import Popup from "../components/Popup";
+import type { ChatMessage } from '../types/zipline';
 import { socket } from './socket';
 import {
     generateKeyPair,
@@ -20,19 +23,24 @@ function ZiplineApp() {
     const publicKeyRef = useRef<CryptoKey | null>(null);
     const peerPublicKeyRef = useRef<CryptoKey | null>(null);
     const sessionKeyRef = useRef<CryptoKey | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const incomingFileRef = useRef<{
+        meta: { name: string; type: string };
+        chunks: Uint8Array[];
+    } | null>(null);
     const roomID = useRef<string>("");
 
     const [roomSateID, setRoomSateId] = useState<string>("");
     const [pairingCode, setPairingCode] = useState<string>("");
     const [approved, setApproved] = useState<boolean>(false);
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messageInput, setMessageInput] = useState<string>("");
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
     useEffect(() => {
         socket.on("peer:public-key", async ({ publicKey }) => {
             const imported = await importPublicKey(publicKey);
             peerPublicKeyRef.current = imported;
-            console.log("Peer public key received");
 
             if (sessionKeyRef.current) {
                 await sendSessionKey();
@@ -47,8 +55,6 @@ function ZiplineApp() {
 
             const aesKey = await importAESKey(decrypted);
             sessionKeyRef.current = aesKey;
-
-            console.log("Session key established");
         });
 
         socket.on("msg:encrypted", async ({ payload }) => {
@@ -57,25 +63,44 @@ function ZiplineApp() {
             const decrypted = await aesDecrypt(payload, sessionKeyRef.current);
             const text = new TextDecoder().decode(decrypted);
 
-            console.log("Text", text);
-
-            setMessages((prev) => [...prev, `Paired Device: ${text}`]);
+            setMessages(prev => [
+                ...prev,
+                { id: uid(), from: "other", type: "text", text }
+            ]);
         });
 
         socket.on("file:init", ({ meta }) => {
-            console.log("Receiving file:", meta);
+            incomingFileRef.current = {
+                meta,
+                chunks: [],
+            };
         });
 
         socket.on("file:chunk", async ({ payload }) => {
-            if (!sessionKeyRef.current) return;
+            if (!sessionKeyRef.current || !incomingFileRef.current) return;
 
-            console.log(payload);
-
-            console.log("Received file chunk");
+            const decrypted = await aesDecrypt(payload, sessionKeyRef.current);
+            incomingFileRef.current.chunks.push(new Uint8Array(decrypted));
         });
 
         socket.on("file:complete", () => {
-            console.log("File transfer complete");
+            if (!incomingFileRef.current) return;
+
+            const { meta, chunks } = incomingFileRef.current;
+            const blob = new Blob(chunks as BlobPart[], { type: meta.type });
+
+            setMessages(prev => [
+                ...prev,
+                {
+                    id: uid(),
+                    from: "other",
+                    type: "file",
+                    name: meta.name,
+                    blob,
+                },
+            ]);
+
+            incomingFileRef.current = null;
         });
 
         return () => {
@@ -88,9 +113,25 @@ function ZiplineApp() {
         };
     }, []);
 
+    const uid = () => crypto.randomUUID();
 
     function closePopup() {
         setIsPopupOpen(!isPopupOpen)
+    }
+
+    const handleFileClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        sendFile(file);
+    };
+
+    function handleMessageInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setMessageInput(event.target.value);
     }
 
     const handleRoomIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,8 +181,6 @@ function ZiplineApp() {
         socket.on("room:approved", () => {
             setApproved(true);
         });
-
-        console.log(approved);
     }
 
     async function sendSessionKey() {
@@ -158,20 +197,23 @@ function ZiplineApp() {
             currentRoomID,
             payload: btoa(String.fromCharCode(...new Uint8Array(encryptedKey))),
         });
-
-        console.log("Session key sent to peer");
     }
 
     async function sendMessage(text: string) {
-        if (!sessionKeyRef.current) return;
+        if (!sessionKeyRef.current || !text) return;
 
-        const currentRoomID = roomID.current
-
+        const currentRoomID = roomID.current;
         const encoded = new TextEncoder().encode(text);
         const encrypted = await aesEncrypt(encoded, sessionKeyRef.current);
 
         socket.emit("msg:encrypted", { currentRoomID, payload: encrypted });
-        setMessages((prev) => [...prev, `This Device: ${text}`]);
+
+        setMessages(prev => [
+            ...prev,
+            { id: uid(), from: "self", type: "text", text }
+        ]);
+
+        setMessageInput("");
     }
 
     async function sendFile(file: File) {
@@ -189,53 +231,123 @@ function ZiplineApp() {
         }
 
         socket.emit("file:complete", { currentRoomID });
-        console.log("File sent:", file.name);
+
+        setMessages(prev => [
+            ...prev,
+            {
+                id: uid(),
+                from: "self",
+                type: "file",
+                name: file.name,
+                blob: file,
+            },
+        ]);
+    }
+
+    function copyToClipboard(text: string) {
+        navigator.clipboard.writeText(text);
+    }
+
+    function downloadBlob(blob: Blob, filename: string) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     return (
         <section id="zipline-app">
             <Popup isOpen={isPopupOpen} onClose={closePopup}>
-                <h2>Time to pair!</h2>
-                <p>Get your pairing device and enter in the following information to be able to link correctly.</p>
+                <h2>Pairing Information</h2>
                 <br />
-                <h3>Information:</h3>
-                <p><i>Host ID: </i><b>{roomSateID}</b></p>
-                <p><i>Pairing Code: </i><b>{pairingCode}</b></p>
+                <div id='pairing-info-container'>
+                    <div>
+                        <h3 className='pairing-info'>ID: {roomSateID}</h3>
+                        <h3 className='pairing-info'>Code: {pairingCode}</h3>
+                    </div>
+                </div>
                 <br />
                 <p>All linked up? Once you close this you will no longer be able to see this information!</p>
             </Popup>
-            {!approved ? (
-                <section id="room-options">
-                    <div id="create-room">
-                        <h2 style={{ margin: "0px" }}>Host</h2>
-                        <p className='error'>Error</p>
-                        <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Create an ID" />
-                        <button className='primary-button' onClick={createRoom}>Create Room</button>
-                    </div>
-                    <h2>Or</h2>
-                    <div id="join-room">
-                        <h2>Pair Device</h2>
-                        <p className='error'>Error</p>
-                        <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Host ID" />
-                        <input type="text" value={pairingCode} onChange={handlePairKeyChange} placeholder="Pairing Code" />
-                        <button className='primary-button' onClick={joinRoom}>Join Room</button>
-                    </div>
-                </section>
-            ) : (
-                <section>
-                    <h2>Send Message</h2>
-                    <button onClick={() => sendMessage("Hello Peer!")}>Send "Hello Peer!"</button>
-                    <h2>Send File</h2>
-                    <input type="file" onChange={(e) => e.target.files && sendFile(e.target.files[0])} />
-                    <h2>Messages</h2>
-                    <ul>
-                        {messages.map((msg, idx) => (
-                            <li key={idx}>{msg}</li>
-                        ))}
-                    </ul>
-                </section>
-            )}
-        </section>
+            {
+                !approved ? (
+                    <section id="room-options">
+                        <div id="create-room">
+                            <h2 style={{ margin: "0px" }}>Host</h2>
+                            <p className='error'>Error</p>
+                            <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Create an ID" />
+                            <button className='primary-button' onClick={createRoom}>Create Room</button>
+                        </div>
+                        <h2>Or</h2>
+                        <div id="join-room">
+                            <h2>Pair Device</h2>
+                            <p className='error'>Error</p>
+                            <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Host ID" />
+                            <input type="text" value={pairingCode} onChange={handlePairKeyChange} placeholder="Pairing Code" />
+                            <button className='primary-button' onClick={joinRoom}>Join Room</button>
+                        </div>
+                    </section>
+                ) : (
+                    <section id='zipline-chat-section'>
+                        <article id='chat-feed'>
+                            <h2>Feed</h2>
+                            <div id='message-feed'>
+                                <ul>
+                                    {messages.map(msg => (
+                                        <li key={msg.id} className={msg.from}>
+                                            {msg.type === "text" ? (
+                                                <ul className='message'>
+                                                    <span>Text from {msg.from}: </span>
+                                                    <b>{msg.text}</b>
+                                                    <button onClick={() => copyToClipboard(msg.text)}>
+                                                        <FaCopy />
+                                                    </button>
+                                                </ul>
+                                            ) : (
+                                                <ul className='message'>
+                                                    <span>File from {msg.from}: </span>
+                                                    <b>{msg.name}</b>
+                                                    <button onClick={() => downloadBlob(msg.blob, msg.name)}>
+                                                        <FaDownload />
+                                                    </button>
+                                                </ul>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div id='chat-input'>
+                                <input id='text-input' type="text"
+                                    value={messageInput}
+                                    onChange={handleMessageInputChange} placeholder="Message..." />
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    style={{ display: "none" }}
+                                />
+                                <button
+                                    id="chat-folder"
+                                    aria-label="Upload file"
+                                    type="button"
+                                    onClick={handleFileClick}
+                                >
+                                    <ImFolderUpload />
+                                </button>
+                                <button id='chat-send' onClick={() => sendMessage(messageInput)}>Send</button>
+                            </div>
+                        </article>
+                        <article id='control-panel'>
+                            <h2>Control Panel</h2>
+                            <h3>Actions</h3>
+                            <button>Leave</button>
+                        </article>
+                    </section>
+                )
+            }
+        </section >
     );
 }
 
