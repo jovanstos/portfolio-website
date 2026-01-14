@@ -1,9 +1,10 @@
 import { Server, Socket } from "socket.io";
 import crypto from "crypto";
+import { log } from "console";
 
 type DeviceInfo = {
     socketId: string;
-    publicKey: string; // sent from client
+    publicKey: string;
     approved: boolean;
 };
 
@@ -22,86 +23,90 @@ export function initSockets(io: Server) {
             let room = rooms.get(roomID);
 
             if (!room) {
-                room = {
-                    pairingCode: generatePairingCode(),
-                    devices: new Map()
-                };
+                room = { pairingCode: generatePairingCode(), devices: new Map() };
                 rooms.set(roomID, room);
 
                 room.devices.set(socket.id, {
                     socketId: socket.id,
                     publicKey,
-                    approved: room.devices.size === 0 // first device auto-approved
+                    approved: room.devices.size === 0,
                 });
 
                 socket.join(roomID);
 
                 socket.emit("room:pairing-code", {
                     pairingCode: room.pairingCode,
-                    approved: room.devices.get(socket.id)?.approved
+                    approved: room.devices.get(socket.id)?.approved,
                 });
-
             } else {
-                console.log("room already exists set this up to send message");
+                console.log("update me to send errors");
             }
-
-
         });
 
         socket.on("room:join", ({ roomID, publicKey, pairingCode }) => {
             const room = rooms.get(roomID);
 
-            if (!room) return;
+            console.log("update me to send errors");
 
-            if (room.pairingCode !== pairingCode) {
-                socket.emit("room:approval-failed");
-                return;
-            }
+            if (!room) return;
+            if (room.pairingCode !== pairingCode) return;
+            if (room.devices.size >= 2) return;
 
             room.devices.set(socket.id, {
                 socketId: socket.id,
                 publicKey,
-                approved: true
+                approved: true,
             });
 
             socket.join(roomID);
 
+            for (const [id, device] of room.devices) {
+                if (id !== socket.id) {
+                    socket.emit("peer:public-key", {
+                        socketId: id,
+                        publicKey: device.publicKey,
+                    });
+
+                    socket.to(id).emit("peer:public-key", {
+                        socketId: socket.id,
+                        publicKey,
+                    });
+                }
+            }
+
             socket.emit("room:approved");
         });
 
-        socket.on("room:approve", ({ roomID, pairingCode }) => {
-            console.log("APPROVE HIT", roomID, pairingCode);
-
+        socket.on("session:key", ({ roomID, payload }) => {
             const room = rooms.get(roomID);
+
+            console.log("update me to send errors");
             if (!room) return;
 
-            if (room.pairingCode !== pairingCode) {
-                socket.emit("room:approval-failed");
-                return;
-            }
+            for (const [id] of room.devices) {
+                if (id !== socket.id) {
 
-            const device = room.devices.get(socket.id);
-            if (device) {
-                console.log("ALLOWED");
+                    socket.emit("session:key", {
+                        payload: payload
+                    });
 
-                device.approved = true;
-                socket.emit("room:approved");
+                    socket.to(id).emit("session:key", {
+                        payload: payload
+                    });
+                }
             }
         });
 
         socket.on("msg:encrypted", ({ roomID, payload }) => {
-            console.log(roomID, payload);
-
-            relayToRoom(socket, roomID, "msg:encrypted",
-                payload);
+            relayToRoom(socket, roomID, "msg:encrypted", payload);
         });
 
         socket.on("file:init", ({ roomID, meta }) => {
             relayToRoom(socket, roomID, "file:init", meta);
         });
 
-        socket.on("file:chunk", ({ roomID, chunk }) => {
-            relayToRoom(socket, roomID, "file:chunk", chunk);
+        socket.on("file:chunk", ({ roomID, payload }) => {
+            relayToRoom(socket, roomID, "file:chunk", payload);
         });
 
         socket.on("file:complete", ({ roomID }) => {
@@ -114,33 +119,23 @@ export function initSockets(io: Server) {
     });
 }
 
-function relayToRoom(
-    socket: Socket,
-    roomID: string,
-    event: string,
-    payload: any
-) {
+function relayToRoom(socket: Socket, roomID: string, event: string, payload: any) {
     const room = rooms.get(roomID);
     if (!room) return;
 
     const sender = room.devices.get(socket.id);
     if (!sender?.approved) return;
 
-    socket.to(roomID).emit(event, {
-        from: socket.id,
-        payload
-    });
+    socket.to(roomID).emit(event, { from: socket.id, payload });
 }
 
 function generatePairingCode(): string {
-    return crypto.randomBytes(3).toString("hex"); // e.g. "a3f92c"
+    return crypto.randomBytes(3).toString("hex").toUpperCase();
 }
 
 function cleanupSocket(socketId: string) {
     for (const [roomID, room] of rooms) {
         room.devices.delete(socketId);
-        if (room.devices.size === 0) {
-            rooms.delete(roomID);
-        }
+        if (room.devices.size === 0) rooms.delete(roomID);
     }
 }

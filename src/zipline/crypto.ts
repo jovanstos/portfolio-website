@@ -13,11 +13,13 @@ export async function generateKeyPair() {
 
 export async function exportPublicKey(key: CryptoKey) {
     const buffer = await crypto.subtle.exportKey("spki", key);
+
     return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
 
 export async function importPublicKey(base64: string) {
     const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
     return crypto.subtle.importKey(
         "spki",
         buffer,
@@ -34,6 +36,7 @@ export async function encryptText(text: string, publicKey: CryptoKey) {
         publicKey,
         encoded
     );
+
     return encrypted;
 }
 
@@ -46,5 +49,67 @@ export async function decryptText(
         privateKey,
         encrypted
     );
+
     return new TextDecoder().decode(decrypted);
+}
+
+export async function generateAESKey() {
+    return crypto.subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+export async function exportAESKey(key: CryptoKey) {
+    const raw = await crypto.subtle.exportKey("raw", key);
+
+    return btoa(String.fromCharCode(...new Uint8Array(raw)));
+}
+
+export async function importAESKey(base64: string) {
+    const raw = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
+    return crypto.subtle.importKey(
+        "raw",
+        raw,
+        "AES-GCM",
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+export async function aesEncrypt(
+    data: Uint8Array,
+    key: CryptoKey
+) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    const encrypted = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        key,
+        data as BufferSource
+    );
+
+    return {
+        iv: btoa(String.fromCharCode(...iv)),
+        payload: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+    };
+}
+
+export async function aesDecrypt(
+    encrypted: { iv: string; payload: string },
+    key: CryptoKey
+) {
+    const iv = Uint8Array.from(atob(encrypted.iv), (c) => c.charCodeAt(0));
+    const data = Uint8Array.from(atob(encrypted.payload), (c) => c.charCodeAt(0));
+
+    // TypeScript-safe: use data.buffer
+    const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv },
+        key,
+        data.buffer
+    );
+
+    return new Uint8Array(decrypted);
 }
