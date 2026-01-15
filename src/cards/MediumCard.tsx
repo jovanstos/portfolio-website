@@ -1,14 +1,6 @@
 import "../styles/Card.css";
-
-type CardProps = {
-    id?: number;
-    title?: string;
-    description?: string;
-    imgURL?: string;
-    imgDescription?: string;
-};
-
-const internalProjectIDs = new Set<number>([0]);
+import type { CardProps } from "../types/card";
+import { internalProjectIDs } from "./LargeCard";
 
 function MediumCard({
     id = 1,

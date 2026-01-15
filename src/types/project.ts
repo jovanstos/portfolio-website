@@ -14,3 +14,8 @@ export interface projectContent {
     imagedescription: string;
     imageurl: string;
 }
+
+export interface projectProps {
+    subHeading?: string
+    mainContent?: React.ReactNode | null;
+}

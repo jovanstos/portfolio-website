@@ -1,4 +1,3 @@
-import React from "react";
 import { MdCancel } from "react-icons/md";
 import "../styles/Popup.css";
 

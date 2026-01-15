@@ -4,10 +4,15 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
-import type { projectContent, project } from "../types/project"
+import type { projectContent, project, projectProps } from "../types/project"
 
-function Project() {
+function Project({
+    subHeading = "To have the best experience desktop is recommended.",
+    mainContent = null
+}: projectProps) {
     const { id } = useParams<{ id: string }>();
+
+    console.log(id);
 
     const projectQuery = useQuery<project>({
         queryKey: ["project", id!],
@@ -43,13 +48,17 @@ function Project() {
     return (
         <main id="project">
             <h1>{projectData.title}</h1>
-            <p style={{ marginBottom: "15px" }}>To have the best experience desktop is recommended.</p>
-            <img
-                id="main-project-img"
-                src={projectData.imageurl}
-                alt={projectData.imagedescription}
-                width="1000"
-            />
+            <p style={{ marginBottom: "15px" }}>{subHeading}</p>
+            {mainContent ? (
+                mainContent
+            ) : (
+                <img
+                    id="main-project-img"
+                    src={projectData.imageurl}
+                    alt={projectData.imagedescription}
+                    width="1000"
+                />
+            )}
             <section className="project-content">
                 {contentData?.map((articleData: any) => {
                     const hasText = Boolean(articleData.text);

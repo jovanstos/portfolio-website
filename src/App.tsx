@@ -7,7 +7,6 @@ import Resume from './pages/Resume';
 import Projects from './pages/Projects';
 import Project from './pages/Project';
 import Zipline from './zipline/Zipline';
-// import SocketTest from './zipline/SocketTest';
 import NotFound from './pages/NotFound';
 import Nav from "./components/Nav";
 import LightDarkToggle from "./components/LightDarkToggle";
@@ -25,6 +24,7 @@ function App() {
                 <Route path="/resume" element={<Resume />} />
                 <Route path="/projects" element={<Projects title='All Projects' />} />
                 <Route path="/projects/id/:id" element={<Project />} />
+                <Route path="/projects/live/:id" element={<Project subHeading='An app for sharing text and files between two devices, but with encryption!' mainContent={<Zipline />} />} />
                 <Route path="/dev" element={<Zipline />} />
                 <Route path="/junk" element={<Projects title='Junk Yard' projectType="junk" subheading='All the treasures and trinkets' />} />
                 <Route path="/admin" element={<Admin />} />
