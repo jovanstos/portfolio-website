@@ -30,6 +30,7 @@ function Zipline() {
     } | null>(null);
     const roomID = useRef<string>("");
 
+    const [error, setError] = useState<string>("");
     const [roomSateID, setRoomSateId] = useState<string>("");
     const [pairingCode, setPairingCode] = useState<string>("");
     const [approved, setApproved] = useState<boolean>(false);
@@ -101,6 +102,11 @@ function Zipline() {
             ]);
 
             incomingFileRef.current = null;
+        });
+
+        socket.on("room:error-message", ({ message }) => {
+            console.log(message);
+            setError(message)
         });
 
         return () => {
@@ -274,16 +280,15 @@ function Zipline() {
             {
                 !approved ? (
                     <section id="room-options">
+                        <h3 className='error'>{error}</h3>
                         <div id="create-room">
                             <h2 style={{ margin: "0px" }}>Host</h2>
-                            <p className='error'>Error</p>
                             <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Create an ID" />
                             <button className='primary-button' onClick={createRoom}>Create Room</button>
                         </div>
                         <h2>Or</h2>
                         <div id="join-room">
                             <h2>Pair Device</h2>
-                            <p className='error'>Error</p>
                             <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Host ID" />
                             <input type="text" value={pairingCode} onChange={handlePairKeyChange} placeholder="Pairing Code" />
                             <button className='primary-button' onClick={joinRoom}>Join Room</button>

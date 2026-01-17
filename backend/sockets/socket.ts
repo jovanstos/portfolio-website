@@ -4,11 +4,18 @@ import crypto from "crypto";
 
 const rooms = new Map<string, RoomState>();
 
+function emitErrorMessage(socket: Socket, message: string) {
+    socket.emit("room:error-message", { message });
+}
+
 export function initSockets(io: Server) {
     io.on("connection", (socket: Socket) => {
-        console.log("Socket connected:", socket.id);
-
         socket.on("room:create", ({ roomID, publicKey }) => {
+            if (!roomID || roomID.trim() === "") {
+                emitErrorMessage(socket, "ID must have at least one character or number")
+                return;
+            }
+
             let room = rooms.get(roomID);
 
             if (!room) {
@@ -28,18 +35,25 @@ export function initSockets(io: Server) {
                     approved: room.devices.get(socket.id)?.approved,
                 });
             } else {
-                console.log("update me to send errors");
+                emitErrorMessage(socket, "ID already exists try a diffrent ID")
             }
         });
 
         socket.on("room:join", ({ roomID, publicKey, pairingCode }) => {
             const room = rooms.get(roomID);
 
-            console.log("update me to send errors");
-
-            if (!room) return;
-            if (room.pairingCode !== pairingCode) return;
-            if (room.devices.size >= 2) return;
+            if (!room) {
+                emitErrorMessage(socket, "ID entered was not found")
+                return
+            }
+            if (room.pairingCode !== pairingCode) {
+                emitErrorMessage(socket, "Incorrect pairing code please try again")
+                return
+            }
+            if (room.devices.size >= 2) {
+                emitErrorMessage(socket, "This session has already been paired and the maximum of 2 devices has been reached")
+                return
+            }
 
             room.devices.set(socket.id, {
                 socketId: socket.id,
@@ -69,8 +83,10 @@ export function initSockets(io: Server) {
         socket.on("session:key", ({ roomID, payload }) => {
             const room = rooms.get(roomID);
 
-            console.log("update me to send errors");
-            if (!room) return;
+            if (!room) {
+                emitErrorMessage(socket, "ID entered was not found")
+                return
+            }
 
             for (const [id] of room.devices) {
                 if (id !== socket.id) {
@@ -92,21 +108,33 @@ export function initSockets(io: Server) {
 
         socket.on("file:init", ({ roomID, meta }) => {
             const room = rooms.get(roomID);
-            if (!room) return;
+
+            if (!room) {
+                emitErrorMessage(socket, "ID entered was not found")
+                return
+            }
 
             socket.to(roomID).emit("file:init", { meta });
         });
 
         socket.on("file:chunk", ({ roomID, payload }) => {
             const room = rooms.get(roomID);
-            if (!room) return;
+
+            if (!room) {
+                emitErrorMessage(socket, "ID entered was not found")
+                return
+            }
 
             socket.to(roomID).emit("file:chunk", { payload });
         });
 
         socket.on("file:complete", ({ roomID }) => {
             const room = rooms.get(roomID);
-            if (!room) return;
+
+            if (!room) {
+                emitErrorMessage(socket, "ID entered was not found")
+                return
+            }
 
             socket.to(roomID).emit("file:complete");
         });
@@ -119,10 +147,17 @@ export function initSockets(io: Server) {
 
 function relayToRoom(socket: Socket, roomID: string, event: string, payload: any) {
     const room = rooms.get(roomID);
-    if (!room) return;
+
+    if (!room) {
+        emitErrorMessage(socket, "ID entered was not found")
+        return
+    }
 
     const sender = room.devices.get(socket.id);
-    if (!sender?.approved) return;
+    if (!sender?.approved) {
+        emitErrorMessage(socket, "You are not approved to send messages in this session")
+        return
+    }
 
     socket.to(roomID).emit(event, { from: socket.id, payload });
 }
