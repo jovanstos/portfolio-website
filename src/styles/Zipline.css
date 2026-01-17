@@ -1,5 +1,6 @@
 #zipline-app{
     margin-bottom: 30px;
+    border-radius: var(--radius-lg);
     padding: 45px;
     background-color: var(--color-bg-accent);
 }
@@ -65,7 +66,6 @@
 
 #message-feed{
     margin: 10px 0px;
-    padding: 7px;
     background-color: var(--color-bg);
     border-radius: var(--radius-lg);
     width: 350px;
@@ -103,10 +103,9 @@
 }
 
 .message{
-    padding: 7px;
-    margin-bottom: 5px;
-    border-radius: var(--radius-lg);
-    border: 2px solid var(--color-bg-accent);
+    padding: 15px;
+    border-bottom: 1px solid var(--color-text);
+    background-color: light-dark(#e7eaff, #181827);;
 }
 
 .message > button {

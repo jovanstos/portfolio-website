@@ -376,7 +376,7 @@ function Zipline() {
                         <article id='control-panel'>
                             <h2>Control Panel</h2>
                             <h3>Actions</h3>
-                            <button onClick={leaveRoom}>Leave</button>
+                            <button className='danger-button' onClick={leaveRoom}>Leave</button>
                         </article>
                     </section>
                 )

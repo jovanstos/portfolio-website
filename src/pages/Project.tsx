@@ -12,8 +12,6 @@ function Project({
 }: projectProps) {
     const { id } = useParams<{ id: string }>();
 
-    console.log(id);
-
     const projectQuery = useQuery<project>({
         queryKey: ["project", id!],
         queryFn: getProjectByID,
