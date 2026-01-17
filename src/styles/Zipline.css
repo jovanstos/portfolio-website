@@ -80,13 +80,13 @@
 
 #text-input{
     border-radius: 50px 0px 0px 50px;
-    border: 2px solid var(--color-bg);
+    border: 2px solid var(--color-bg-daccent);
     padding: 7px;
 }
 
 #chat-folder{
     border-radius: 0px;
-    border: 2px solid var(--color-bg);
+    border: 2px solid var(--color-bg-daccent);
     padding: 7px 7px;
     padding-bottom: 9px;
     font-size: var(--large);
@@ -94,7 +94,7 @@
 
 #chat-send{
     border-radius: 0px 50px 50px 0px;
-    border: 2px solid var(--color-bg);
+    border: 2px solid var(--color-bg-daccent);
     padding: 5px; 
 }
 
