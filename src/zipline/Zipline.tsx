@@ -166,7 +166,7 @@ function Zipline() {
 
         const exportedPublicKey = await exportPublicKey(publicKeyRef.current!);
 
-        socket.emit("room:create", { currentRoomID, publicKey: exportedPublicKey });
+        socket.emit("room:create", { roomID: currentRoomID, publicKey: exportedPublicKey });
 
         socket.on("room:pairing-code", ({ pairingCode, approved }) => {
             setPairingCode(pairingCode);
@@ -182,7 +182,7 @@ function Zipline() {
 
         const exportedPublicKey = await exportPublicKey(publicKeyRef.current!);
 
-        socket.emit("room:join", { currentRoomID, publicKey: exportedPublicKey, pairingCode });
+        socket.emit("room:join", { roomID: currentRoomID, publicKey: exportedPublicKey, pairingCode });
 
         socket.on("room:approved", () => {
             setApproved(true);
