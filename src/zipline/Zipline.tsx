@@ -84,6 +84,12 @@ function Zipline() {
             incomingFileRef.current.chunks.push(new Uint8Array(decrypted));
         });
 
+        socket.on("file:abort", async () => {
+            if (!sessionKeyRef.current || !incomingFileRef.current) return;
+
+            incomingFileRef.current = null;
+        });
+
         socket.on("file:complete", () => {
             if (!incomingFileRef.current) return;
 
@@ -105,7 +111,6 @@ function Zipline() {
         });
 
         socket.on("room:error-message", ({ message }) => {
-            console.log(message);
             setError(message)
         });
 
@@ -172,6 +177,7 @@ function Zipline() {
             setPairingCode(pairingCode);
             setApproved(approved);
             setIsPopupOpen(true)
+            setError("")
         });
     }
 
@@ -186,6 +192,7 @@ function Zipline() {
 
         socket.on("room:approved", () => {
             setApproved(true);
+            setError("")
         });
     }
 
@@ -200,9 +207,11 @@ function Zipline() {
         const encryptedKey = await encryptText(exportedAES, peerPublicKeyRef.current);
 
         socket.emit("session:key", {
-            currentRoomID,
+            roomID: currentRoomID,
             payload: btoa(String.fromCharCode(...new Uint8Array(encryptedKey))),
         });
+
+        setError("")
     }
 
     async function sendMessage(text: string) {
@@ -212,7 +221,7 @@ function Zipline() {
         const encoded = new TextEncoder().encode(text);
         const encrypted = await aesEncrypt(encoded, sessionKeyRef.current);
 
-        socket.emit("msg:encrypted", { currentRoomID, payload: encrypted });
+        socket.emit("msg:encrypted", { roomID: currentRoomID, payload: encrypted });
 
         setMessages(prev => [
             ...prev,
@@ -220,6 +229,7 @@ function Zipline() {
         ]);
 
         setMessageInput("");
+        setError("")
     }
 
     async function sendFile(file: File) {
@@ -228,15 +238,15 @@ function Zipline() {
         const currentRoomID = roomID.current
 
         const chunkSize = 64 * 1024;
-        socket.emit("file:init", { currentRoomID, meta: { name: file.name, size: file.size, type: file.type } });
+        socket.emit("file:init", { roomID: currentRoomID, meta: { name: file.name, size: file.size, type: file.type } });
 
         for (let offset = 0; offset < file.size; offset += chunkSize) {
             const chunk = new Uint8Array(await file.slice(offset, offset + chunkSize).arrayBuffer());
             const encrypted = await aesEncrypt(chunk, sessionKeyRef.current);
-            socket.emit("file:chunk", { currentRoomID, payload: encrypted });
+            socket.emit("file:chunk", { roomID: currentRoomID, payload: encrypted });
         }
 
-        socket.emit("file:complete", { currentRoomID });
+        socket.emit("file:complete", { roomID: currentRoomID });
 
         setMessages(prev => [
             ...prev,
@@ -248,6 +258,8 @@ function Zipline() {
                 blob: file,
             },
         ]);
+
+        setError("")
     }
 
     function copyToClipboard(text: string) {
@@ -261,6 +273,22 @@ function Zipline() {
         a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
+    }
+
+    function leaveRoom() {
+        socket.emit("leave")
+
+        privateKeyRef.current = null
+        publicKeyRef.current = null
+        peerPublicKeyRef.current = null
+        sessionKeyRef.current = null
+        roomID.current = ""
+
+        setApproved(false)
+        setMessageInput("")
+        setMessages([])
+        setRoomSateId("")
+        setError("")
     }
 
     return (
@@ -298,6 +326,7 @@ function Zipline() {
                     <section id='zipline-chat-section'>
                         <article id='chat-feed'>
                             <h2>Feed</h2>
+                            <h3 className='error'>{error}</h3>
                             <div id='message-feed'>
                                 <ul>
                                     {messages.map(msg => (
@@ -347,7 +376,7 @@ function Zipline() {
                         <article id='control-panel'>
                             <h2>Control Panel</h2>
                             <h3>Actions</h3>
-                            <button>Leave</button>
+                            <button onClick={leaveRoom}>Leave</button>
                         </article>
                     </section>
                 )

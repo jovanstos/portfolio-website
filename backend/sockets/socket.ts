@@ -4,6 +4,8 @@ import crypto from "crypto";
 
 const rooms = new Map<string, RoomState>();
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 function emitErrorMessage(socket: Socket, message: string) {
     socket.emit("room:error-message", { message });
 }
@@ -12,14 +14,14 @@ export function initSockets(io: Server) {
     io.on("connection", (socket: Socket) => {
         socket.on("room:create", ({ roomID, publicKey }) => {
             if (!roomID || roomID.trim() === "") {
-                emitErrorMessage(socket, "ID must have at least one character or number")
+                emitErrorMessage(socket, "ID must be at least two characters or numbers")
                 return;
             }
 
             let room = rooms.get(roomID);
 
             if (!room) {
-                room = { pairingCode: generatePairingCode(), devices: new Map() };
+                room = { pairingCode: generatePairingCode(), devices: new Map(), transfers: new Map() };
                 rooms.set(roomID, room);
 
                 room.devices.set(socket.id, {
@@ -114,6 +116,16 @@ export function initSockets(io: Server) {
                 return
             }
 
+            if (meta?.size > MAX_FILE_SIZE) {
+                emitErrorMessage(socket, "File exceeds 5MB limit");
+                return;
+            }
+
+            room.transfers!.set(socket.id, {
+                bytesReceived: 0,
+                active: true,
+            });
+
             socket.to(roomID).emit("file:init", { meta });
         });
 
@@ -123,6 +135,31 @@ export function initSockets(io: Server) {
             if (!room) {
                 emitErrorMessage(socket, "ID entered was not found")
                 return
+            }
+
+            const transfer = room.transfers?.get(socket.id);
+
+            if (!transfer || !transfer.active) {
+                emitErrorMessage(socket, "No active file transfer or file exceeds 5MB limit");
+                return;
+            }
+
+            const payloadJson = JSON.stringify(payload);
+
+            const chunkSize = payload
+                ? payload.length
+                : Buffer.byteLength(payloadJson, 'utf8');
+
+            transfer.bytesReceived += chunkSize;
+
+            if (transfer.bytesReceived > MAX_FILE_SIZE) {
+                transfer.active = false;
+                room.transfers!.delete(socket.id);
+
+                emitErrorMessage(socket, "File upload exceeded 5MB limit");
+
+                socket.to(roomID).emit("file:abort");
+                return;
             }
 
             socket.to(roomID).emit("file:chunk", { payload });
@@ -136,8 +173,13 @@ export function initSockets(io: Server) {
                 return
             }
 
+            room.transfers?.delete(socket.id);
             socket.to(roomID).emit("file:complete");
         });
+
+        socket.on("leave", () => {
+            cleanupSocket(socket.id);
+        })
 
         socket.on("disconnect", () => {
             cleanupSocket(socket.id);
@@ -169,6 +211,8 @@ function generatePairingCode(): string {
 function cleanupSocket(socketId: string) {
     for (const [roomID, room] of rooms) {
         room.devices.delete(socketId);
+        room.transfers?.delete(socketId);
+
         if (room.devices.size === 0) rooms.delete(roomID);
     }
 }
