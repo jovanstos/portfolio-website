@@ -7,6 +7,7 @@ import Resume from './pages/Resume';
 import Projects from './pages/Projects';
 import Project from './pages/Project';
 import Zipline from './zipline/Zipline';
+import Converter from "./chimp_converter/Converter"
 import NotFound from './pages/NotFound';
 import Nav from "./components/Nav";
 import LightDarkToggle from "./components/LightDarkToggle";
@@ -25,7 +26,8 @@ function App() {
                 <Route path="/projects" element={<Projects title='All Projects' />} />
                 <Route path="/projects/id/:id" element={<Project />} />
                 <Route path="/projects/live/:id" element={<Project subHeading='An app for sharing text and files between two devices, but with encryption!' mainContent={<Zipline />} />} />
-                <Route path="/dev" element={<Zipline />} />
+                <Route path="/zipline" element={<Zipline />} />
+                <Route path="/converter" element={<Converter />} />
                 <Route path="/junk" element={<Projects title='Junk Yard' projectType="junk" subheading='All the treasures and trinkets' />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<NotFound />} />

@@ -10,6 +10,16 @@
   z-index: 1000;
 }
 
+.error-overlay{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 3vh;
+  z-index: 1000;
+}
+
 .popup-container {
   position: relative;
   background: var(--color-bg-accent);
@@ -19,6 +29,12 @@
   width: 90%;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   animation: popupFadeIn 0.2s ease-out;
+}
+
+.error-popup {
+  color: white;
+  background: rgb(231, 0, 0);
+  padding: 10px;
 }
 
 .popup-close {
@@ -31,8 +47,22 @@
   cursor: pointer;
 }
 
+.popup-close-error {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: var(--xlarge);
+  cursor: pointer;
+}
+
 .popup-close:hover {
   color: var(--color-accent);
+}
+
+.popup-close-error:hover {
+  color: rgb(180, 180, 180);
 }
 
 .popup-content {

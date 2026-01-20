@@ -8,6 +8,7 @@ import cors from "cors";
 
 import projectRoutes from "./routes/projectRoutes.js";
 import projectContentRoutes from "./routes/projectContentRoutes.js";
+import converterRoutes from "./routes/converterRoutes.js";
 import { initSockets } from "./sockets/socket.js";
 
 const app = express();
@@ -51,6 +52,7 @@ app.use(
 
 app.use("/api/projects", projectRoutes);
 app.use("/api/project-content", projectContentRoutes);
+app.use("/api/convert", converterRoutes);
 
 if (isProd) {
     const __filename = fileURLToPath(import.meta.url);

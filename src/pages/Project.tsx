@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
 import type { projectContent, project, projectProps } from "../types/project"
+import ErrorPopup from "../components/ErrorPopup";
 
 function Project({
     subHeading = "To have the best experience desktop is recommended.",
@@ -35,6 +36,7 @@ function Project({
     if (projectQuery.error || contentQuery.error) {
         return (
             <main id="project">
+                <ErrorPopup isError={projectQuery.isError} message={projectQuery.error} />
                 <p>Error loading project</p>
             </main>
         );

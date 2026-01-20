@@ -3,6 +3,7 @@ import MediumCard from "../cards/MediumCard";
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "../api/projects";
+import ErrorPopup from "../components/ErrorPopup";
 
 type ProjectsProps = {
     title?: string;
@@ -17,13 +18,14 @@ function Projects({
 }: ProjectsProps) {
     const navigate = useNavigate();
 
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading, error, isError } = useQuery({
         queryKey: ["projects", projectType],
         queryFn: getProjects,
     });
 
     return (
         <main id="projects">
+            <ErrorPopup isError={isError} message={error} />
             <div style={{ marginBottom: "50px", textAlign: "center" }}>
                 <h1>{title}</h1>
                 <p>{subheading}</p>
