@@ -70,7 +70,7 @@ function Resume() {
                             <p>Intern</p>
                             <p>Bartlett, IL</p>
                         </div>
-                        <p><mark>For more expernice dating back all the way to 2017 please reach out, and I will send you the full resume!</mark></p>
+                        <p>For more expernice dating back all the way to 2017 please reach out, and I will send you the full resume!</p>
                     </section>
                 </FadeInSection>
                 <FadeInSection>
