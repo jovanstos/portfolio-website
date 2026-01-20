@@ -1,5 +1,9 @@
-#about{
+#about-background{
   background-image: linear-gradient(to bottom right, #090a0f, #00052b);
+  padding: 50px;
+}
+
+#about{
   height: 100%;
   min-height: 90vh;
 }

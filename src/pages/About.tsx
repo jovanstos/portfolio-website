@@ -43,7 +43,7 @@ function About() {
     ];
 
     return (
-        <>
+        <div id="about-background">
             <Stars speed={5} />
             <main id="about">
                 <h1 style={{ color: "white", textAlign: "center", paddingTop: "50px" }}>About Me</h1>
@@ -89,7 +89,7 @@ function About() {
                     </section>
                 </FadeInSection>
             </main>
-        </>
+        </div>
     );
 }
 
