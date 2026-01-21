@@ -16,6 +16,7 @@ export interface projectContent {
 }
 
 export interface projectProps {
-    subHeading?: string
+    id?: number;
+    subHeading?: string;
     mainContent?: React.ReactNode | null;
 }

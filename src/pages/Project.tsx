@@ -8,10 +8,12 @@ import type { projectContent, project, projectProps } from "../types/project"
 import ErrorPopup from "../components/ErrorPopup";
 
 function Project({
+    id: propId,
     subHeading = "To have the best experience desktop is recommended.",
     mainContent = null
 }: projectProps) {
-    const { id } = useParams<{ id: string }>();
+    const { id: paramId } = useParams();
+    const id = propId || paramId;
 
     const projectQuery = useQuery<project>({
         queryKey: ["project", id!],

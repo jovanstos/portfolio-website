@@ -1,8 +1,31 @@
 #converter{
     display: flex;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
     background-color: var(--color-bg-accent);
+    padding: 15px;
     margin: 15px;
     border-radius: var(--radius-lg);
+}
+
+#img-holder{
+    margin-bottom: 15px;
+}
+
+.file-dropzone {
+    border: 2px dashed light-dark(black, white);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.file-dropzone.dragging {
+    border-color: #FFCB00;
+}
+
+#converter-options {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
 }
