@@ -34,6 +34,14 @@ function Project({
     }
 
     if (projectQuery.error || contentQuery.error) {
+        if (contentQuery.error) {
+            return (
+                <main id="project">
+                    <ErrorPopup isError={contentQuery.isError} message={contentQuery.error} />
+                    <p>Error loading project</p>
+                </main>
+            );
+        }
         return (
             <main id="project">
                 <ErrorPopup isError={projectQuery.isError} message={projectQuery.error} />
