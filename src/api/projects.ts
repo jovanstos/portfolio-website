@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { project } from "../types/project"
+import type { project } from "../types/projectTypes"
 
 export const getProjects = async ({
     queryKey,

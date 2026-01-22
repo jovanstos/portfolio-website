@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
-import type { projectContent, project, projectProps } from "../types/project"
+import type { projectContent, project, projectProps } from "../types/projectTypes"
 import ErrorPopup from "../components/ErrorPopup";
 
 function Project({

@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { verifyUsage } from "../jwt/jwt.js";
 import { pool } from '../database/connection.js'
 
 const router: Router = Router();
@@ -23,6 +24,10 @@ function parseLimit(limit?: string): number {
 }
 
 const getProjectsHandler = async (req: Request, res: Response) => {
+    const token = req.cookies.auth_token;
+
+    verifyUsage(token, res)
+
     try {
         const type = parseType(req.params.type);
         let limit = null
@@ -68,6 +73,10 @@ router.get('/all/:type/:limit', getProjectsHandler);
 
 router.get('/id/:id', async (req: Request, res: Response) => {
     const id = Number(req.params.id);
+    const token = req.cookies.auth_token;
+
+    verifyUsage(token, res)
+
 
     if (!Number.isInteger(id)) {
         return res.status(400).json({ message: 'Invalid ID' });

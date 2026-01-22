@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import type { FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { convertImage } from "../api/converter";
-import type { ImageFormat } from "../types/converter";
+import type { ImageFormat } from "../types/converterTypes";
 import ErrorPopup from "../components/ErrorPopup";
 
 function Converter() {

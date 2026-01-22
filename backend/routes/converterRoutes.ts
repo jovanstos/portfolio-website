@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import multer from "multer";
 import sharp from "sharp";
+import { verifyUsage } from "../jwt/jwt.js";
 
 const router: Router = Router();
 
@@ -20,6 +21,10 @@ router.post(
     "/",
     (req, res, next) => {
         upload.single("image")(req, res, (err) => {
+            const token = req.cookies.auth_token;
+
+            verifyUsage(token, res)
+
             if (err instanceof multer.MulterError) {
                 if (err.code === "LIMIT_FILE_SIZE") {
                     return res.status(413).json({
@@ -32,6 +37,10 @@ router.post(
         });
     },
     async (req: Request, res: Response) => {
+        const token = req.cookies.auth_token;
+
+        verifyUsage(token, res)
+
         try {
             const file = req.file;
             const { outputFormat } = req.body as { outputFormat?: OutputFormat };

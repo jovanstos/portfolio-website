@@ -1,5 +1,5 @@
 import "../styles/Card.css";
-import type { CardProps } from "../types/card";
+import type { CardProps } from "../types/cardTypes";
 
 export const internalProjectIDs = new Set<number>([0]);
 

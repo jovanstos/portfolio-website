@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { ImageFormat } from "../types/converter";
+import type { ImageFormat } from "../types/converterTypes";
 
 export interface ConvertImageParams {
     file: File;

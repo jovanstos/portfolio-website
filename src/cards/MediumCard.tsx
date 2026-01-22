@@ -1,5 +1,5 @@
 import "../styles/Card.css";
-import type { CardProps } from "../types/card";
+import type { CardProps } from "../types/cardTypes";
 import { internalProjectIDs } from "./LargeCard";
 
 function MediumCard({

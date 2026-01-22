@@ -2,7 +2,8 @@ import { useRef, useState, useEffect } from 'react';
 import { ImFolderUpload } from "react-icons/im";
 import { FaCopy, FaDownload } from "react-icons/fa";
 import Popup from "../components/Popup";
-import type { ChatMessage } from '../types/zipline';
+import type { ChatMessage } from '../types/ziplineTypes';
+import ErrorPopup from "../components/ErrorPopup";
 import { socket } from './socket';
 import {
     generateKeyPair,
@@ -30,6 +31,7 @@ function Zipline() {
     } | null>(null);
     const roomID = useRef<string>("");
 
+    const [isError, setIsError] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [roomSateID, setRoomSateId] = useState<string>("");
     const [pairingCode, setPairingCode] = useState<string>("");
@@ -112,6 +114,7 @@ function Zipline() {
 
         socket.on("room:error-message", ({ message }) => {
             setError(message)
+            setIsError(true)
         });
 
         return () => {
@@ -178,6 +181,7 @@ function Zipline() {
             setApproved(approved);
             setIsPopupOpen(true)
             setError("")
+            setIsError(false)
         });
     }
 
@@ -193,6 +197,7 @@ function Zipline() {
         socket.on("room:approved", () => {
             setApproved(true);
             setError("")
+            setIsError(false)
         });
     }
 
@@ -212,6 +217,7 @@ function Zipline() {
         });
 
         setError("")
+        setIsError(false)
     }
 
     async function sendMessage(text: string) {
@@ -230,6 +236,7 @@ function Zipline() {
 
         setMessageInput("");
         setError("")
+        setIsError(false)
     }
 
     async function sendFile(file: File) {
@@ -260,6 +267,7 @@ function Zipline() {
         ]);
 
         setError("")
+        setIsError(false)
     }
 
     function copyToClipboard(text: string) {
@@ -289,6 +297,7 @@ function Zipline() {
         setMessages([])
         setRoomSateId("")
         setError("")
+        setIsError(false)
     }
 
     return (
@@ -305,10 +314,10 @@ function Zipline() {
                 <br />
                 <p>All linked up? Once you close this you will no longer be able to see this information!</p>
             </Popup>
+            <ErrorPopup isError={isError} message={error} />
             {
                 !approved ? (
                     <section id="room-options">
-                        <h3 className='error'>{error}</h3>
                         <div id="create-room">
                             <h2 style={{ margin: "0px" }}>Host</h2>
                             <input type="text" value={roomSateID} onChange={handleRoomIDChange} placeholder="Create an ID" />
@@ -326,7 +335,6 @@ function Zipline() {
                     <section id='zipline-chat-section'>
                         <article id='chat-feed'>
                             <h2>Feed</h2>
-                            <h3 className='error'>{error}</h3>
                             <div id='message-feed'>
                                 <ul>
                                     {messages.map(msg => (

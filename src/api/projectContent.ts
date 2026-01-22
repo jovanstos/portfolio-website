@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { projectContent } from "../types/project"
+import type { projectContent } from "../types/projectTypes"
 
 export const getProjectContentByID = async ({ queryKey }: any): Promise<projectContent[]> => {
     const [, id] = queryKey;
