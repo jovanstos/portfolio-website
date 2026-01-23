@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev"
 
 export function signToken(
     payload: JwtPayload,
-    options: SignOptions = { expiresIn: "35s" }
+    options: SignOptions = { expiresIn: "40s" }
 ): string {
     return jwt.sign(payload, JWT_SECRET, options);
 }

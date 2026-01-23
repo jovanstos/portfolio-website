@@ -46,35 +46,6 @@ function setAuthCookie(res: any, token: string) {
     });
 }
 
-app.use((req, res, next) => {
-    const token = req.cookies.auth_token;
-
-    if (!token) {
-        const clientID = nanoid();
-        const newToken = signToken({ clientID });
-        setAuthCookie(res, newToken);
-        req.clientID = clientID;
-        return next();
-    }
-
-    try {
-        const payload = verifyToken(token) as { clientID: string, exp: number };
-        req.clientID = payload.clientID;
-
-        const now = Math.floor(Date.now() / 1000);
-        if (payload.exp - now < 5) {
-            const newToken = signToken({ clientID: payload.clientID });
-            setAuthCookie(res, newToken);
-        }
-
-        return next();
-    } catch (err) {
-        res.status(401).send("Unauthorized");
-
-        return next();
-    }
-});
-
 app.use(express.json());
 
 app.use(
@@ -100,6 +71,33 @@ if (isProd) {
         res.sendFile(path.join(clientDistPath, "index.html"));
     });
 }
+
+app.use((req, res, next) => {
+    const token = req.cookies.auth_token;
+
+    if (!token) {
+        const clientID = nanoid();
+        const newToken = signToken({ clientID });
+        setAuthCookie(res, newToken);
+        req.clientID = clientID;
+        return next();
+    }
+
+    try {
+        const payload = verifyToken(token) as { clientID: string, exp: number };
+        req.clientID = payload.clientID;
+
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp - now < 10) {
+            const newToken = signToken({ clientID: payload.clientID });
+            setAuthCookie(res, newToken);
+        }
+
+        return next();
+    } catch (err) {
+        return next();
+    }
+});
 
 initSockets(io);
 
