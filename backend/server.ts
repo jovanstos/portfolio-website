@@ -32,10 +32,6 @@ const io = new Server(server, {
     cors: corsOptions,
 });
 
-app.use(cors(corsOptions));
-
-app.use(cookieParser());
-
 function setAuthCookie(res: any, token: string) {
     res.cookie("auth_token", token, {
         httpOnly: true,
@@ -46,31 +42,9 @@ function setAuthCookie(res: any, token: string) {
     });
 }
 
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
-
-app.use(
-    "/api",
-    rateLimit({
-        windowMs: 60 * 1000,
-        max: 60,
-    })
-);
-
-app.use("/api/projects", projectRoutes);
-app.use("/api/project-content", projectContentRoutes);
-app.use("/api/convert", converterRoutes);
-
-if (isProd) {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const clientDistPath = path.join(__dirname, "..", "dist");
-
-    app.use(express.static(clientDistPath));
-
-    app.get("*", (_, res) => {
-        res.sendFile(path.join(clientDistPath, "index.html"));
-    });
-}
 
 app.use((req, res, next) => {
     const token = req.cookies.auth_token;
@@ -98,6 +72,30 @@ app.use((req, res, next) => {
         return next();
     }
 });
+
+app.use(
+    "/api",
+    rateLimit({
+        windowMs: 60 * 1000,
+        max: 60,
+    })
+);
+
+app.use("/api/projects", projectRoutes);
+app.use("/api/project-content", projectContentRoutes);
+app.use("/api/convert", converterRoutes);
+
+if (isProd) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const clientDistPath = path.join(__dirname, "..", "dist");
+
+    app.use(express.static(clientDistPath));
+
+    app.get("*", (_, res) => {
+        res.sendFile(path.join(clientDistPath, "index.html"));
+    });
+}
 
 initSockets(io);
 

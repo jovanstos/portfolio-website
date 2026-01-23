@@ -1,14 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../database/connection.js'
-import { verifyUsage } from "../jwt/jwt.js";
+import { requireAuth } from './auth.js';
 
 const router: Router = Router();
 
-router.get('/id/:id', async (req: Request, res: Response) => {
+router.get('/id/:id', requireAuth, async (req: Request, res: Response) => {
     const id = Number(req.params.id);
-    const token = req.cookies.auth_token;
-
-    verifyUsage(token, res)
 
     if (!Number.isInteger(id)) {
         return res.status(400).json({ message: 'Invalid ID' });

@@ -13,6 +13,16 @@ function Home() {
   return (
     <>
       <Hero />
+      <FadeInSection>
+        <div id="home-info">
+          <p id="home-info-text">
+            <b style={{
+              fontSize: "var(--xlarge)", color: "#FFCB00"
+            }}>Real quick, </b>
+            just a rundown of the site. The rocket ship in the top left is a spinable wheel with the navigation links. The sun/moon in the top right is to switch between light/dark mode. Also, this is a MEGA monolith app; it has multiple services and live projects. You can learn more about the app by going to the detailed explanation here: <a href="/" rel="noopener noreferrer">Project page.</a>
+          </p>
+        </div>
+      </FadeInSection>
       <main id="home">
         <section className="home-projects">
           <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center" }}>Featured Projects</h1>

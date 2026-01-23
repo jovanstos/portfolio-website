@@ -14,11 +14,3 @@ export function signToken(
 export function verifyToken(token: string): JwtPayload {
     return jwt.verify(token, JWT_SECRET) as JwtPayload;
 }
-
-export function verifyUsage(token: string, res: Response) {
-    try {
-        verifyToken(token) as { clientID: string };
-    } catch (err) {
-        res.status(401).send("Unauthorized");
-    }
-}

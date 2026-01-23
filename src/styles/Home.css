@@ -17,9 +17,22 @@
 }
 
 .home-projects {
-    padding-top: 15px;
     width: 100%;
     max-width: 1800px;
+}
+
+#home-info{
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 0px 0px 50px 50px;
+    margin-bottom: 20px;
+    background-color: var(--color-bg-accent);
+}
+
+#home-info-text{
+    margin: 10px 0px;
+    max-width: 1000px;
 }
 
 .card-holder{

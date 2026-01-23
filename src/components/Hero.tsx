@@ -202,14 +202,8 @@ function Hero() {
                         Location: Chicagoland Area
                     </h3>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-                        ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                        aliquip ex ea commodo consequat. Duis aute irure dolor in
-                        reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                        culpa qui officia deserunt mollit anim id est laborum.
-                        <a href="/about" rel="noopener noreferrer"> Click to learn more.</a>
+                        I turned my obsession into the ability to create solutions to real problems. A few years ago, I sold my car to be able to fund my education to become a software engineer. I had to used all the money I had. It was a risk I took to pursue my dreams. I know you've heard the same story a million times: "I love programming!" but it is a different for me. It's all I've ever wanted and have obsessed over. I am extremely driven, dedicated, and passionate about it. I bring that commitment to every line of code I write. I am a developer who views every "wall" as an opportunity to learn and improve, so I can build better software. If you would like to read more:
+                        <a href="/about" rel="noopener noreferrer"> Click here.</a>
                     </p>
                     <div style={{ marginTop: "10px" }}>
                         <button style={{ marginRight: "10px" }} className="primary-button contact-button" onClick={() => navigate("/contact")}>
