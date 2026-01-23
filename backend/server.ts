@@ -9,7 +9,7 @@ import projectRoutes from "./routes/projectRoutes.js";
 import projectContentRoutes from "./routes/projectContentRoutes.js";
 import converterRoutes from "./routes/converterRoutes.js";
 import { initSockets } from "./sockets/socket.js";
-import { signToken } from "./jwt/jwt.js";
+import { signToken, verifyToken } from "./jwt/jwt.js";
 import { nanoid } from 'nanoid';
 import cookieParser from "cookie-parser";
 
@@ -36,26 +36,43 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
+function setAuthCookie(res: any, token: string) {
+    res.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        // miliseconds * second * minutes * hours
+        maxAge: 1000 * 60 * 60 * 24,
+    });
+}
+
 app.use((req, res, next) => {
-    let token = req.cookies.auth_token;
+    const token = req.cookies.auth_token;
 
     if (!token) {
-        const newClientID = nanoid();
-
-        token = signToken({ clientID: newClientID });
-
-        res.cookie("auth_token", token, {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: isProd ? "strict" : "lax",
-            // miliseconds * second * minutes * hours
-            maxAge: 1000 * 30
-        });
-
-        console.log(`New client assigned: ${newClientID}`);
+        const clientID = nanoid();
+        const newToken = signToken({ clientID });
+        setAuthCookie(res, newToken);
+        req.clientID = clientID;
+        return next();
     }
 
-    next();
+    try {
+        const payload = verifyToken(token) as { clientID: string, exp: number };
+        req.clientID = payload.clientID;
+
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp - now < 5) {
+            const newToken = signToken({ clientID: payload.clientID });
+            setAuthCookie(res, newToken);
+        }
+
+        return next();
+    } catch (err) {
+        res.status(401).send("Unauthorized");
+
+        return next();
+    }
 });
 
 app.use(express.json());
