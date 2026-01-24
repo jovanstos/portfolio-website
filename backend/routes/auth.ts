@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../jwt/jwt.js";
 
+// This is used within all of the API requests to make sure the user has a valid auth token with JWT
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.auth_token;
 

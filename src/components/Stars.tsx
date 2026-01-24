@@ -17,11 +17,13 @@ type Star = {
 };
 
 export default function StarsCanvas({
+    // Parameters that can be changed to adjust how the stars are on screen
     density = 6000,
     maxRadius = 1.6,
     speed = 70,
     className = "",
 }: StarsCanvasProps) {
+    // Create a HTML canvas to use to create the stars on
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
@@ -37,11 +39,15 @@ export default function StarsCanvas({
         let h = 0;
         let dpr = 1;
 
+        // Function used to populate the canavs with the stars with the current space, width, and height...
+        // All of it being placed correctly and using math
         const resize = (): void => {
             const parent = canvas.parentElement;
             if (!parent) return;
 
+            // Bounding box
             const rect = parent.getBoundingClientRect();
+            // DPR: device pixel rattio
             dpr = Math.max(1, window.devicePixelRatio || 1);
 
             w = rect.width;
@@ -55,6 +61,7 @@ export default function StarsCanvas({
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             const count = Math.floor((w * h) / density);
+            // Create a array the size of the star count to fill in the dad for that star
             stars = Array.from({ length: count }, (): Star => ({
                 x: Math.random() * w,
                 y: Math.random() * h,
@@ -65,6 +72,7 @@ export default function StarsCanvas({
             }));
         };
 
+        // animate all of the stars to have the current look and movement
         const animate = (): void => {
             ctx.clearRect(0, 0, w, h);
 
@@ -89,6 +97,7 @@ export default function StarsCanvas({
             rafId = window.requestAnimationFrame(animate);
         };
 
+        // Run all of the proper functions to get it working and sisze correctly
         resize();
         animate();
         window.addEventListener("resize", resize);

@@ -4,12 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "../api/projects";
 import ErrorPopup from "../components/ErrorPopup";
-
-type ProjectsProps = {
-    title?: string;
-    projectType?: string;
-    subheading?: string;
-};
+import type { ProjectsProps } from "../types/projectTypes";
 
 function Projects({
     title,
@@ -18,6 +13,7 @@ function Projects({
 }: ProjectsProps) {
     const navigate = useNavigate();
 
+    // Get the data form the query and using map populate the page
     const { data, isLoading, error, isError } = useQuery({
         queryKey: ["projects", projectType],
         queryFn: getProjects,

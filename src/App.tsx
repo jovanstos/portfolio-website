@@ -24,9 +24,11 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/resume" element={<Resume />} />
                 <Route path="/projects" element={<Projects title='All Projects' />} />
+                {/* Projects have an id version which is a dead project and a live version which is a real time demo version*/}
                 <Route path="/projects/id/:id" element={<Project />} />
                 <Route path="/projects/live/1" element={<Project id={1} subHeading='An app for sharing text and files between two devices, but with encryption!' mainContent={<Zipline />} />} />
                 <Route path="/projects/live/2" element={<Project id={1} subHeading='An app for converting images to different formats since every other website sucks.' mainContent={<Converter />} />} />
+                {/* These are shortcut links to apps that are used frequently*/}
                 <Route path="/zipline" element={<Zipline />} />
                 <Route path="/converter" element={<Converter />} />
                 <Route path="/junk" element={<Projects title='Junk Yard' projectType="junk" subheading='All the treasures and trinkets' />} />

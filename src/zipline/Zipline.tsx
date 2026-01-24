@@ -20,6 +20,7 @@ import {
 import "../styles/Zipline.css";
 
 function Zipline() {
+    // Declaring all of refs
     const privateKeyRef = useRef<CryptoKey | null>(null);
     const publicKeyRef = useRef<CryptoKey | null>(null);
     const peerPublicKeyRef = useRef<CryptoKey | null>(null);
@@ -31,16 +32,21 @@ function Zipline() {
     } | null>(null);
     const roomID = useRef<string>("");
 
-    const [isError, setIsError] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
+    // Declaing all of the states
     const [roomSateID, setRoomSateId] = useState<string>("");
     const [pairingCode, setPairingCode] = useState<string>("");
+    // Error is set up this way so I can work with the error popup component
+    const [isError, setIsError] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const [approved, setApproved] = useState<boolean>(false);
     const [messageInput, setMessageInput] = useState<string>("");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
     useEffect(() => {
+        // All of the socket listners listening for key events
+
+        // Get RSA-OAEP key to use to send the session key
         socket.on("peer:public-key", async ({ publicKey }) => {
             const imported = await importPublicKey(publicKey);
             peerPublicKeyRef.current = imported;
@@ -50,6 +56,7 @@ function Zipline() {
             }
         });
 
+        // Get AES-GCM key to start the encyrpted chat
         socket.on("session:key", async ({ payload }) => {
             if (!privateKeyRef.current) return;
 
@@ -60,6 +67,8 @@ function Zipline() {
             sessionKeyRef.current = aesKey;
         });
 
+
+        // Get encrypted messages to decrypt and add to messages
         socket.on("msg:encrypted", async ({ payload }) => {
             if (!sessionKeyRef.current) return;
 
@@ -72,6 +81,8 @@ function Zipline() {
             ]);
         });
 
+
+        // Start the initial state to get a file
         socket.on("file:init", ({ meta }) => {
             incomingFileRef.current = {
                 meta,
@@ -79,6 +90,7 @@ function Zipline() {
             };
         });
 
+        // Receive chunks fo the file and add them
         socket.on("file:chunk", async ({ payload }) => {
             if (!sessionKeyRef.current || !incomingFileRef.current) return;
 
@@ -86,12 +98,15 @@ function Zipline() {
             incomingFileRef.current.chunks.push(new Uint8Array(decrypted));
         });
 
+
+        // Abort the file upload and set file ref ot null
         socket.on("file:abort", async () => {
             if (!sessionKeyRef.current || !incomingFileRef.current) return;
 
             incomingFileRef.current = null;
         });
 
+        // When the file upload is completed do the proper steps to create a new blob and show it
         socket.on("file:complete", () => {
             if (!incomingFileRef.current) return;
 
@@ -112,11 +127,13 @@ function Zipline() {
             incomingFileRef.current = null;
         });
 
+        // Handle any error messages
         socket.on("room:error-message", ({ message }) => {
             setError(message)
             setIsError(true)
         });
 
+        // Clean up
         return () => {
             socket.off("peer:public-key");
             socket.off("session:key");
@@ -127,6 +144,7 @@ function Zipline() {
         };
     }, []);
 
+    // A lot of these funtions below are self documenting
     const uid = () => crypto.randomUUID();
 
     function closePopup() {
@@ -239,6 +257,9 @@ function Zipline() {
         setIsError(false)
     }
 
+
+    // When sending a file set up chunk the file into the correct chunks and encrypt...
+    // ...then loop through and send each piece until complete
     async function sendFile(file: File) {
         if (!sessionKeyRef.current) return;
 
@@ -283,6 +304,7 @@ function Zipline() {
         URL.revokeObjectURL(url);
     }
 
+    // This is an ugly funcion but all it does it make the user leave then reset everything to default
     function leaveRoom() {
         socket.emit("leave")
 

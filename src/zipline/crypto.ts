@@ -1,3 +1,5 @@
+// All of these functions are self documenting
+// They are helpers used to handle the creation of the end 2 end encryption in zipline
 export async function generateKeyPair() {
     return crypto.subtle.generateKey(
         {
@@ -104,7 +106,7 @@ export async function aesDecrypt(
     const iv = Uint8Array.from(atob(encrypted.iv), (c) => c.charCodeAt(0));
     const data = Uint8Array.from(atob(encrypted.payload), (c) => c.charCodeAt(0));
 
-    // TypeScript-safe: use data.buffer
+    // Data.buffer must be used here because it's type script safe
     const decrypted = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
         key,

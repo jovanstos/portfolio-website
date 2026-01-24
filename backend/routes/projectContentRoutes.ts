@@ -4,6 +4,7 @@ import { requireAuth } from './auth.js';
 
 const router: Router = Router();
 
+// Gets the correct projects content by ID
 router.get('/id/:id', requireAuth, async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 

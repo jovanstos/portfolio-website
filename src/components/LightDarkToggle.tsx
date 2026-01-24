@@ -3,6 +3,8 @@ import { FaSun, FaMoon } from "react-icons/fa";
 
 type Theme = "light" | "dark";
 
+// Function for getting the users system preference if they want light or dark...
+// Also setting which scheme is perfered by the user so it saves on client side
 function getSystemTheme(): Theme {
     if (typeof window === "undefined") return "light";
 

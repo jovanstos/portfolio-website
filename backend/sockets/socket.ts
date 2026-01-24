@@ -4,12 +4,18 @@ import crypto from "crypto";
 
 const rooms = new Map<string, RoomState>();
 
+// 5 MB
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 function emitErrorMessage(socket: Socket, message: string) {
     socket.emit("room:error-message", { message });
 }
 
+/* 
+    This comment may be seen as a mistake since the script as first glance may look complex
+    but this code is very self documenting it has clear names for the functions and what it is doing
+    just reading any part you can clearly tell what the socket is addressing
+*/
 export function initSockets(io: Server) {
     io.on("connection", (socket: Socket) => {
         socket.on("room:create", ({ roomID, publicKey }) => {

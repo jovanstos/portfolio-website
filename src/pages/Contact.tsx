@@ -1,32 +1,13 @@
 import { useMemo, useState } from "react";
+import type {
+    ContactStatus,
+    ContactFormState,
+    TouchedState,
+    ErrorState,
+    ContactPayload,
+    ApiErrorResponse
+} from "../types/contactTypes"
 import "../styles/Contact.css";
-
-type ContactStatus = "idle" | "sending" | "success" | "error";
-
-type ContactFormState = {
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-    company: string; // honeypot
-};
-
-type TouchedState = Partial<Record<keyof ContactFormState, boolean>>;
-
-type ErrorState = Partial<Record<keyof Omit<ContactFormState, "company">, string>>;
-
-type ContactPayload = {
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-    userAgent?: string;
-    page?: string;
-};
-
-type ApiErrorResponse = {
-    message?: string;
-};
 
 const INITIAL: ContactFormState = {
     name: "",

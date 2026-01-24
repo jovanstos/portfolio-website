@@ -1,5 +1,7 @@
 import Stars from "../components/Stars";
 
+// Handles the 404
+
 function NotFound() {
     return (
         <div style={{ backgroundColor: "#13141c" }}>

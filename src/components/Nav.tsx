@@ -11,6 +11,8 @@ const LINKS = [
     { label: "Junk Yard", href: "/junk" },
 ];
 
+// Use basic geomatric math for a circle to find the proper angle form the center...
+// ... so the HTML elements can be placed in the correct spots
 function angleFromCenter(clientX: number, clientY: number, el: HTMLElement) {
     const r = el.getBoundingClientRect();
     const cx = r.left + r.width / 2;
@@ -28,18 +30,22 @@ export default function Nav() {
     const lastAngleRef = useRef(0);
 
     useEffect(() => {
+        // Know if the device is cable of hovering or not, mostly to tell if it's a phone user
         const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
         const update = () => setCanHover(mq.matches);
         update();
         mq.addEventListener?.("change", update);
+
         return () => mq.removeEventListener?.("change", update);
     }, []);
 
+    // Load up all of the items into memory using useMemo to optimize performance since this will be on every page
     const items = useMemo(() => {
         const step = 360 / LINKS.length;
         return LINKS.map((link, i) => ({ ...link, baseAngle: i * step }));
     }, []);
 
+    // Handle interaction form the users when touching the wheel and set the correct rotation
     function onWheelSpin(e: React.WheelEvent) {
         if (!open) return;
         e.preventDefault();
@@ -54,11 +60,13 @@ export default function Nav() {
         const target = e.target as HTMLElement;
         if (target.closest(".wheelItem")) return;
 
+        // Get the correct information for where the mouse is and if it's dragging and where
         draggingRef.current = true;
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         lastAngleRef.current = angleFromCenter(e.clientX, e.clientY, wheelRef.current);
     }
 
+    // If the pointer moves handle the math for the change and rotation of the circle
     function onPointerMove(e: React.PointerEvent) {
         if (!draggingRef.current || !wheelRef.current) return;
 
@@ -73,6 +81,7 @@ export default function Nav() {
         lastAngleRef.current = a;
     }
 
+    // Stop dragging once the user stops clicking
     function onPointerUp(e: React.PointerEvent) {
         draggingRef.current = false;
         try {

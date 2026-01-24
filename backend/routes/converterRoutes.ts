@@ -5,8 +5,10 @@ import { requireAuth } from './auth.js';
 
 const router: Router = Router();
 
+// 5 MB
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+// Use to storage the file and check if it's under 5 MB
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -14,9 +16,11 @@ const upload = multer({
     },
 });
 
+// Allowed formats for converting the image type
 const ALLOWED_FORMATS = ["png", "jpg", "jpeg", "webp", "gif"] as const;
 type OutputFormat = typeof ALLOWED_FORMATS[number];
 
+// Handles the post request of taking the image and converting it to the requested format
 router.post(
     "/",
     (req, res, next) => {

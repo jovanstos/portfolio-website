@@ -2,6 +2,8 @@ import "../styles/Card.css";
 import type { CardProps } from "../types/cardTypes";
 import { internalProjectIDs } from "./LargeCard";
 
+// Reusable cards used to show projects in different sizes
+
 function MediumCard({
     id = 1,
     title = "No Title Found",

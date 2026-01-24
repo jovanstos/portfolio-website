@@ -15,6 +15,8 @@ type TimelineProps = {
 export default function Timeline({ items }: TimelineProps) {
     const [openId, setOpenId] = useState<string | null>(null);
 
+    // The hook useMemo was used here because it can cache and memorize the results..
+    // ... to avoid having to run a render to improve performance when creating the timeline
     const enhancedItems = useMemo(() => {
         return items.map((item) => ({
             ...item,

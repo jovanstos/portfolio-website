@@ -1,5 +1,6 @@
 import { MdCancel } from "react-icons/md";
 import "../styles/Popup.css";
+// This is a simple reusable popup component
 
 interface PopupProps {
     isOpen: boolean;

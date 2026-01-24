@@ -1,9 +1,9 @@
 import jwt, { SignOptions } from "jsonwebtoken";
-import { Response } from "express";
 import type { JwtPayload } from "../types/jwtTypes.js"
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev"
 
+// Simple but important logic in handling the JWT logic creating and verificaiton
 export function signToken(
     payload: JwtPayload,
     options: SignOptions = { expiresIn: "40s" }

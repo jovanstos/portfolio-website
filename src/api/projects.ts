@@ -1,11 +1,11 @@
 import { api } from "./client";
-import type { project } from "../types/projectTypes"
+import type { Project } from "../types/projectTypes"
 
 export const getProjects = async ({
     queryKey,
 }: {
     queryKey: [string, string];
-}): Promise<project[]> => {
+}): Promise<Project[]> => {
     const [, type] = queryKey;
 
     const res = await api.get(`/projects/all/${type}`);
@@ -17,7 +17,7 @@ export const getLimitedProjects = async ({
     queryKey,
 }: {
     queryKey: [string, string, string];
-}): Promise<project[]> => {
+}): Promise<Project[]> => {
     const [, type, limit] = queryKey;
 
     const res = await api.get(`/projects/all/${type}/${limit}`);
@@ -25,7 +25,7 @@ export const getLimitedProjects = async ({
     return res.data;
 };
 
-export const getProjectByID = async ({ queryKey }: any): Promise<project> => {
+export const getProjectByID = async ({ queryKey }: any): Promise<Project> => {
     const [, id] = queryKey;
 
     const res = await api.get(`/projects/id/${id}`);

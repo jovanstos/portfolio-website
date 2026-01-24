@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
 import { Pool } from 'pg';
 
+// Dot env start
 dotenv.config();
 
+// Connection to the database
 export const pool = new Pool({
     host: process.env.PGHOST,
     port: Number(process.env.PGPORT),
@@ -14,6 +16,7 @@ export const pool = new Pool({
     },
 });
 
+// Testing the connection to confirm it's ready
 pool
     .query('SELECT 1')
     .then(() => console.log('Connected to database'))

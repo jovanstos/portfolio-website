@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { MdCancel } from "react-icons/md";
 import "../styles/Popup.css";
 
+// A popup that is for errors only that is premade to just take in the error message...
+// ... display the information then close it self with a timeout in use effect
+
 interface ErrorPopupProps {
     isError: boolean;
     message: string | Error | null;

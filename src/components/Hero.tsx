@@ -3,6 +3,7 @@ import Stars from "./Stars";
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from "react";
 
+// Handle the phases of the intro animation
 type Phase = "STAR_BURST" | "BADGE" | "FADE_TO_HERO" | "HERO";
 
 function Hero() {
@@ -16,6 +17,8 @@ function Hero() {
     const FADE_DURATION_MS = 50;
 
     useEffect(() => {
+        // This entire section can be summed with it handles the animation logic for the intro
+        // It uses math, canves, svgs to create what is seen on screen on the home page
         if (phase === "STAR_BURST") {
             const canvas = burstCanvasRef.current;
             if (!canvas) return;
@@ -26,6 +29,7 @@ function Hero() {
             let raf = 0;
             let start = performance.now();
 
+            // DPR: device pixel ratio
             const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
             const resize = () => {
@@ -79,6 +83,7 @@ function Hero() {
                 };
             });
 
+            // Draw the circle
             const draw = (now: number) => {
                 const t = now - start;
 
@@ -223,6 +228,7 @@ type CircleBadgeProps = {
     imageUrl: string;
 };
 
+// Create the circle badge this section WAS vibe coded/ ai coded since svg art is complex and has a sharp learning curve
 function CircleBadge({ topText, bottomText, imageUrl }: CircleBadgeProps) {
     return (
         <div className="circleBadge">

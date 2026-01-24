@@ -13,6 +13,8 @@ function Converter() {
     const [outputFormat, setOutputFormat] = useState<ImageFormat>("png");
     const [isDragging, setIsDragging] = useState(false);
 
+    // This the function for sending the image to the backend to be converted...
+    // ... useMutation is being used here because it's designed to handle the post request that this is
     const convertMutation = useMutation({
         mutationFn: convertImage,
         onSuccess: (blob) => {
@@ -38,6 +40,7 @@ function Converter() {
         },
     });
 
+    // These functions are self documenting
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 

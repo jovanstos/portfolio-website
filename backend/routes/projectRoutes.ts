@@ -4,9 +4,11 @@ import { pool } from '../database/connection.js'
 
 const router: Router = Router();
 
+// Projects in the database are stored as different types so they be displayed on the right pages
 const ALLOWED_TYPES = ['regular', 'junk', 'featured'] as const;
 type ProjectType = typeof ALLOWED_TYPES[number];
 
+// This is to parse the string to check if it's an allowed type, if not throw an error
 function parseType(type: string): ProjectType {
     if (!ALLOWED_TYPES.includes(type as ProjectType)) {
         throw new Error('Invalid type');
@@ -15,6 +17,7 @@ function parseType(type: string): ProjectType {
     return type as ProjectType;
 }
 
+// Put a limiter on how many projects can be pulled to stop API abuse
 function parseLimit(limit?: string): number {
     const n = Number(limit);
 
@@ -23,6 +26,7 @@ function parseLimit(limit?: string): number {
     return Math.min(n, 20);
 }
 
+// Handeles the logic fo how many projects are pulled and what type are to be pulled
 const getProjectsHandler = async (req: Request, res: Response) => {
     try {
         const type = parseType(req.params.type);
@@ -34,6 +38,7 @@ const getProjectsHandler = async (req: Request, res: Response) => {
 
         const conditions = ['projects.hidden = FALSE'];
 
+        // Handles changing the where clause conditions
         if (type === 'junk') conditions.push('projects.junk = TRUE');
         else if (type === 'featured') conditions.push('projects.featured = TRUE');
         else {
@@ -67,6 +72,7 @@ const getProjectsHandler = async (req: Request, res: Response) => {
 router.get('/all/:type', requireAuth, getProjectsHandler);
 router.get('/all/:type/:limit', requireAuth, getProjectsHandler);
 
+// Gets on project by ID
 router.get('/id/:id', requireAuth, async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 

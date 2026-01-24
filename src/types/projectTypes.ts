@@ -1,4 +1,4 @@
-export interface project {
+export interface Project {
     id: number;
     title: string;
     description: string;
@@ -7,7 +7,7 @@ export interface project {
     imageurl: string;
 }
 
-export interface projectContent {
+export interface ProjectContent {
     id: number;
     title: string;
     text: string;
@@ -15,8 +15,16 @@ export interface projectContent {
     imageurl: string;
 }
 
-export interface projectProps {
+// The interface used for ONE project
+export interface ProjectProps {
     id?: number;
     subHeading?: string;
     mainContent?: React.ReactNode | null;
 }
+
+// The type used for MANY projects
+export type ProjectsProps = {
+    title?: string;
+    projectType?: string;
+    subheading?: string;
+};
