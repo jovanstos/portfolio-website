@@ -322,6 +322,13 @@ function Zipline() {
         setIsError(false)
     }
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendMessage(messageInput);
+        }
+    };
+
     return (
         <section id="zipline-app">
             <Popup isOpen={isPopupOpen} onClose={closePopup}>
@@ -385,7 +392,9 @@ function Zipline() {
                             <div id='chat-input'>
                                 <input id='text-input' type="text"
                                     value={messageInput}
-                                    onChange={handleMessageInputChange} placeholder="Message..." />
+                                    onChange={handleMessageInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Message..." />
                                 <input
                                     type="file"
                                     ref={fileInputRef}
