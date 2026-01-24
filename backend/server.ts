@@ -10,6 +10,7 @@ import projectContentRoutes from "./routes/projectContentRoutes.js";
 import converterRoutes from "./routes/converterRoutes.js";
 import { initSockets } from "./sockets/socket.js";
 import { signToken, verifyToken } from "./jwt/jwt.js";
+import { decode } from "jsonwebtoken";
 import { nanoid } from 'nanoid';
 import cookieParser from "cookie-parser";
 
@@ -58,6 +59,7 @@ app.use((req, res, next) => {
         const newToken = signToken({ clientID });
         setAuthCookie(res, newToken);
         req.clientID = clientID;
+
         return next();
     }
 
@@ -73,7 +75,22 @@ app.use((req, res, next) => {
         }
 
         return next();
-    } catch (err) {
+    } catch (err: any) {
+        if (err.name === "TokenExpiredError") {
+            const payload = decode(token) as { clientID: string };
+
+            if (payload && payload.clientID) {
+                const newToken = signToken({ clientID: payload.clientID });
+                setAuthCookie(res, newToken);
+                req.clientID = payload.clientID;
+                return next();
+            }
+        }
+
+        const clientID = nanoid();
+        const newToken = signToken({ clientID });
+        setAuthCookie(res, newToken);
+        req.clientID = clientID;
         return next();
     }
 });
