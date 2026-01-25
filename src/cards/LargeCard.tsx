@@ -2,10 +2,9 @@ import "../styles/Card.css";
 import type { CardProps } from "../types/cardTypes";
 
 // Export out internal project ids so it is DRY and can be used else where
-export const internalProjectIDs = new Set<number>([0]);
+export const internalProjectIDs = new Set<number>([6]);
 
 // Reusable cards used to show projects in different sizes
-
 function LargeCard({
     id = 1,
     title = "No Title Found",

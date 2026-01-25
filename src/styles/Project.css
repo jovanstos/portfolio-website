@@ -9,8 +9,11 @@
     min-height: 90vh;
 }
 
-#main-project-img{
+#main-project-hero{
     margin-bottom: 30px;
+}
+
+#main-project-img{
     border: 5px solid var(--color-bg-accent);
     transition:
         border-color 0.2s ease,
@@ -30,6 +33,10 @@
 
 .project-h1{
     margin-bottom: 30px;
+}
+
+.project-h2{
+    margin-bottom: 15px;
 }
 
 .project-article {

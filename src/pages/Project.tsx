@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
-import type { ProjectContent, Project, ProjectProps } from "../types/projectTypes"
+import type { ProjectContent, ProjectData, ProjectProps } from "../types/projectTypes"
 import ErrorPopup from "../components/ErrorPopup";
 
 function Project({
@@ -17,7 +17,7 @@ function Project({
     const id = propId || paramId;
 
     // Queries to GET all the correct data
-    const projectQuery = useQuery<Project>({
+    const projectQuery = useQuery<ProjectData>({
         queryKey: ["project", id!],
         queryFn: getProjectByID,
         enabled: !!id,
@@ -58,22 +58,39 @@ function Project({
     const projectData: any = projectQuery.data;
     const contentData: any = contentQuery.data;
 
+    console.log(contentData);
+
     return (
         <main id="project">
             <h1>{projectData.title}</h1>
             <p style={{ marginBottom: "15px" }}>{subHeading}</p>
             {/* If it's a live project then the main content which is a react component should show, if now show the main photo*/}
-            {mainContent ? (
-                mainContent
-            ) : (
-                <img
-                    id="main-project-img"
-                    src={projectData.imageurl}
-                    alt={projectData.imagedescription}
-                    width="1000"
-                />
-            )}
+            <section id="main-project-hero">
+                {mainContent ? (
+                    mainContent
+                ) : (
+                    <img
+                        id="main-project-img"
+                        src={projectData.imageurl}
+                        alt={projectData.imagedescription}
+                        width="1000"
+                    />
+                )}
+                <a href={projectData.url} rel="noopener noreferrer" target="_blank">
+                    Project URL/Github
+                </a>
+            </section>
             <section className="project-content">
+                {projectData.description ? (
+                    <div style={{ marginBottom: "30px" }}>
+                        <h2>Project Description:</h2>
+                        <p>{projectData.description}</p>
+                    </div>
+                ) : (
+                    <>
+                    </>
+                )}
+                <h1 style={{ marginBottom: "20px" }}>Project Indepth Articles:</h1>
                 {contentData?.map((articleData: any) => {
                     const hasText = Boolean(articleData.text);
                     const hasImage = Boolean(articleData.imageurl);
@@ -81,9 +98,9 @@ function Project({
                     return (
                         <FadeInSection>
                             <article className="project-article" key={articleData.id}>
+                                <h2 className="project-h2">{articleData.title}</h2>
                                 {hasImage && (
                                     <>
-                                        <h2 className="project-h2">{articleData.title}</h2>
                                         <img
                                             src={articleData.imageurl}
                                             alt={articleData.imagedescription || ""}

@@ -20,7 +20,7 @@ router.get('/id/:id', requireAuth, async (req: Request, res: Response) => {
     images.description AS imageDescription,
     images.url AS imageUrl
     FROM project_content
-    JOIN images ON project_content.image_id = images.id
+    LEFT JOIN images ON project_content.image_id = images.id
     WHERE
     project_content.project_id = $1
     `;
