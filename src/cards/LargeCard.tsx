@@ -22,7 +22,7 @@ function LargeCard({
     return (
         <a className="card-a-tag" href={url} rel="noopener noreferrer">
             <article className="large-card card">
-                <img src={imgURL} alt={imgDescription} width={"300px"} />
+                <img src={imgURL} alt={imgDescription} width={"300px"} height={"200px"} />
                 <div>
                     <h2>{title}</h2>
                     <p>{description}</p>

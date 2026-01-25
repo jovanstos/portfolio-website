@@ -21,7 +21,7 @@ function SmallCard({
     return (
         <a className="card-a-tag" href={url} rel="noopener noreferrer">
             <article className="small-card card">
-                <img src={imgURL} alt={imgDescription} width={"200px"} />
+                <img src={imgURL} alt={imgDescription} width={"200px"} height={"150px"} />
             </article>
         </a>
     );
