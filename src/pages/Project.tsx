@@ -1,6 +1,6 @@
 import "../styles/Project.css";
 import FadeInSection from "../components/FadeInSection";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
@@ -15,6 +15,8 @@ function Project({
     const { id: paramId } = useParams();
     // If it's a live project tis part is important to get the correct ID
     const id = propId || paramId;
+
+    const navigate = useNavigate();
 
     // Queries to GET all the correct data
     const projectQuery = useQuery<ProjectData>({
@@ -115,6 +117,9 @@ function Project({
                     );
                 })}
             </section>
+            <button className="primary-button contact-button" onClick={() => navigate("/contact")}>
+                Contact Me
+            </button>
         </main>
     );
 }
