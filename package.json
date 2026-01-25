@@ -20,6 +20,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "^9.0.3",
+    "llvm-bindings": "^0.4.2",
     "multer": "^2.0.2",
     "nanoid": "^5.1.6",
     "pg": "^8.16.3",
