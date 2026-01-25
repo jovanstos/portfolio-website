@@ -4,11 +4,10 @@ WORKDIR /app
 
 # Install LLVM and build tools
 RUN apt-get update && apt-get install -y \
-    llvm-12-dev \
-    libclang-12-dev \
+    clang \
+    lld \
+    llvm \
     build-essential \
-    python3 \
-    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package files first to leverage Docker cache
@@ -33,8 +32,11 @@ RUN npm run build && npm run build-server
 FROM node:22-bookworm-slim AS production
 WORKDIR /app
 
-# Production needs the LLVM runtime libraries but not the full dev headers
-RUN apt-get update && apt-get install -y libllvm15 && rm -rf /var/lib/apt/lists/*
+# Production needs the binaries to actually perform the compilation
+RUN apt-get update && apt-get install -y \
+    clang \
+    lld \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy only the compiled code and production dependencies
 COPY --from=build-stage /app/dist ./dist
