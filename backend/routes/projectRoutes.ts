@@ -59,7 +59,7 @@ const getProjectsHandler = async (req: Request, res: Response) => {
         FROM projects
         JOIN images ON projects.image_id = images.id
         WHERE ${conditions.join(' AND ')}
-        LIMIT $1
+        LIMIT $1;
         `;
 
         const { rows } = await pool.query(query, [limit]);
@@ -91,7 +91,7 @@ router.get('/id/:id', requireAuth, async (req: Request, res: Response) => {
     FROM projects
     JOIN images ON projects.image_id = images.id
     WHERE projects.hidden = FALSE
-    AND projects.id = $1
+    AND projects.id = $1;
     `;
 
     const { rows } = await pool.query(query, [id]);

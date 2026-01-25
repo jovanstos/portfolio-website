@@ -23,6 +23,8 @@ router.get('/id/:id', requireAuth, async (req: Request, res: Response) => {
     LEFT JOIN images ON project_content.image_id = images.id
     WHERE
     project_content.project_id = $1
+    ORDER BY
+    project_content.id;
     `;
 
     const { rows } = await pool.query(query, [id]);
