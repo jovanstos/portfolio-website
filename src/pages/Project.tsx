@@ -60,8 +60,6 @@ function Project({
     const projectData: any = projectQuery.data;
     const contentData: any = contentQuery.data;
 
-    console.log(contentData);
-
     return (
         <main id="project">
             <h1>{projectData.title}</h1>

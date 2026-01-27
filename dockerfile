@@ -2,13 +2,22 @@
 FROM node:22-bookworm AS base
 WORKDIR /app
 
-# Install LLVM and build tools
+# 1. Allow pip to install globally in Debian Bookworm (Node 22)
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
+# Install LLVM, Python, and build tools
 RUN apt-get update && apt-get install -y \
     clang \
     lld \
     llvm \
+    llvm-dev \
     build-essential \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# 3. Install llvmlite
+RUN pip install llvmlite
 
 # Copy package files first to leverage Docker cache
 COPY package*.json ./
@@ -32,11 +41,20 @@ RUN npm run build && npm run build-server
 FROM node:22-bookworm-slim AS production
 WORKDIR /app
 
-# Production needs the binaries to actually perform the compilation
+# Re-declare the pip env var for production stage
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
+# Production needs Python and LLVM runtime libraries
+# Python/Pip must be reinstalled here because this stage starts fresh from 'slim'
 RUN apt-get update && apt-get install -y \
     clang \
     lld \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install llvmlite for production runtime
+RUN pip install llvmlite
 
 # Copy only the compiled code and production dependencies
 COPY --from=build-stage /app/dist ./dist
