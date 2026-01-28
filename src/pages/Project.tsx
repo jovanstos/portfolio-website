@@ -82,15 +82,15 @@ function Project({
             </section>
             <section className="project-content">
                 {projectData.description ? (
-                    <div style={{ marginBottom: "30px" }}>
-                        <h2>Project Description:</h2>
+                    <div className="project-description">
+                        <h1>Project Description:</h1>
                         <p>{projectData.description}</p>
                     </div>
                 ) : (
                     <>
                     </>
                 )}
-                <h1 style={{ marginBottom: "20px" }}>Project Indepth Articles:</h1>
+                <h1 style={{ marginBottom: "20px" }}>Indepth Project Articles:</h1>
                 {contentData?.map((articleData: any) => {
                     const hasText = Boolean(articleData.text);
                     const hasImage = Boolean(articleData.imageurl);

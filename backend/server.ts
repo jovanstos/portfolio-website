@@ -14,17 +14,6 @@ import { signToken, verifyToken } from "./jwt/jwt.js";
 import { decode } from "jsonwebtoken";
 import { nanoid } from 'nanoid';
 import cookieParser from "cookie-parser";
-import * as fs from 'fs/promises';
-
-async function createDirectory(path: string) {
-    try {
-        await fs.mkdir(path, { recursive: true });
-    } catch (err: any) {
-        console.error(`Error ensuring directory: ${err.message}`);
-    }
-}
-
-createDirectory('./temp');
 
 const app = express();
 const server = createServer(app);

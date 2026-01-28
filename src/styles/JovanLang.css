@@ -1,0 +1,114 @@
+#jovanlang-ide {
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  color: #fff;
+  width: 1000px;
+  height: 600px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #252526;
+  border-bottom: 1px solid #333;
+}
+
+.ide-header h1 {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #cccccc;
+}
+
+.run-button {
+  background-color: #0e639c;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.run-button:hover {
+  background-color: #1177bb;
+}
+
+.run-button:disabled {
+  background-color: #4a4a4a;
+  cursor: not-allowed;
+}
+
+.ide-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-pane {
+  flex: 1;
+  border-right: 1px solid #333;
+}
+
+.terminal-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+}
+
+.terminal-header {
+  padding: 10px;
+  background-color: #252526;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #333;
+  color: #888;
+}
+
+.terminal-content {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.log-line {
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+.log-info { color: #d4d4d4; }
+.log-error { color: #f48771; }
+.log-system { color: #4fc1ff; font-style: italic; opacity: 0.8; }
+
+.log-prefix {
+  user-select: none;
+  margin-right: 8px;
+  opacity: 0.5;
+}
+
+.terminal-placeholder {
+  color: #555;
+  font-style: italic;
+}
+
+@media screen and (max-width: 750px) {
+  #jovanlang-ide {
+    width: 300px;
+    height: 1000px;
+  }
+
+  .ide-workspace {
+    display: flex;
+    flex-direction: column;
+    overflow: block;
+  }
+}
