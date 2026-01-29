@@ -12,7 +12,7 @@ interface LogEntry {
 }
 
 function JovanLang() {
-    const [code, setCode] = useState<string>(`x = 10\nprint(x)\n\nfuncvan add(a):\n    return a + 5\n\nprint(add(x))`);
+    const [code, setCode] = useState<string>(`x = 10\nprint(x)\n\nfuncvan add(a):\n    return a + 5\n\nifvan(x < 15):\n    print("Less than 15!")\n\nprint(add(x))`);
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [isRunning, setIsRunning] = useState(false);
 

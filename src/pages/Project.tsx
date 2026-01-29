@@ -6,6 +6,7 @@ import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
 import type { ProjectContent, ProjectData, ProjectProps } from "../types/projectTypes"
 import ErrorPopup from "../components/ErrorPopup";
+import Markdown from 'react-markdown'
 
 function Project({
     id: propId,
@@ -109,7 +110,7 @@ function Project({
                                         <p style={{ textAlign: "center" }}>{!hasText ? articleData.imagedescription : ""}</p>
                                     </>
                                 )}
-                                {hasText && <p>{articleData.text}</p>}
+                                {hasText && <Markdown>{articleData.text}</Markdown>}
                             </article>
                         </FadeInSection>
                     );

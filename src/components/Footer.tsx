@@ -40,7 +40,7 @@ function Footer() {
                 </div>
                 <div>
                     <h1>Links</h1>
-                    <ul>
+                    <ul style={{ listStyleType: "none", margin: "0", padding: "0" }}>
                         {LINKS.map((link) => (
                             <li key={link.href}>
                                 <a

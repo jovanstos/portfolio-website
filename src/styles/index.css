@@ -266,12 +266,6 @@ footer > section > div {
   margin: 0px 10px;
 }
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
 #copyright {
   position: absolute;
   bottom: 10px;
