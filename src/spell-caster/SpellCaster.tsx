@@ -229,7 +229,7 @@ export default function SpellCaster() {
             <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }} />
             <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
             <div className="ui-overlay">
-                {uiState.status === 'ready' && <h3>🤏 Pinch The Dark Purple Dot to Cast</h3>}
+                {uiState.status === 'ready' && <h3>🤏 Pinch The Dark Purple Dot On Your Thumb To Cast</h3>}
                 {uiState.status === 'casting' && <h3 style={{ color: '#00ffff' }}>✨ Drawing...</h3>}
                 {uiState.status === 'cooldown' && (
                     <div className="spell-name" style={{ color: SPELL_REGISTRY[uiState.lastSpell!]?.color || 'white' }}>

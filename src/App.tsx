@@ -31,9 +31,9 @@ function App() {
                 <Route path="/projects/live/6" element={<Project id={6} subHeading='An app for sharing text and files between two devices, but with encryption!' mainContent={<Zipline />} />} />
                 <Route path="/projects/live/7" element={<Project id={7} subHeading='An app for converting images to different formats since every other website sucks.' mainContent={<Converter />} />} />
                 <Route path="/projects/live/8" element={<Project id={8} mainContent={<JovanLang />} />} />
+                <Route path="/projects/live/9" element={<Project id={9} mainContent={<SpellCaster />} />} />
                 {/* These are shortcut links to apps that are used frequently*/}
                 <Route path="/zipline" element={<Zipline />} />
-                <Route path="/spell" element={<SpellCaster />} />
                 <Route path="/converter" element={<Converter />} />
                 <Route path="/junk" element={<Projects title='Junk Yard' projectType="junk" subheading='All the treasures and trinkets' />} />
                 <Route path="/admin" element={<Admin />} />
