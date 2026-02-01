@@ -1,10 +1,9 @@
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
 import { useMutation } from "@tanstack/react-query";
-import { postCodeToCompiler } from "../api/python"; // Ensure this returns Promise<Blob>
+import { postCodeToCompiler } from "../api/python";
 import "../styles/JovanLang.css";
 
-// Type for our terminal logs
 interface LogEntry {
     id: number;
     message: string;
