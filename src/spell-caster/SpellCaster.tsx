@@ -100,11 +100,11 @@ export default function SpellCaster() {
 
         results.handedness.forEach((hand, index) => {
             const landmarks = results.landmarks[index];
-            if (hand[0].displayName === 'Right') {
+            if (hand[0].displayName === 'Left') {
                 cursorPosition = landmarks[8];
                 drawCursor(ctx, cursorPosition, 'cyan');
             }
-            if (hand[0].displayName === 'Left') {
+            if (hand[0].displayName === 'Right') {
                 const dist = Math.hypot(landmarks[4].x - landmarks[8].x, landmarks[4].y - landmarks[8].y);
                 const isPinching = dist < CONFIG.PINCH_THRESHOLD;
                 drawCursor(ctx, landmarks[4], isPinching ? '#c800ff' : '#62006b', isPinching ? 15 : 8);
