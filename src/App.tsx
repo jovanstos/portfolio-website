@@ -10,6 +10,7 @@ import Zipline from './zipline/Zipline';
 import Converter from "./chimp_converter/Converter"
 import JovanLang from './jovanlang/JovanLang';
 import SpellCaster from './spell-caster/SpellCaster';
+import PIM from './pim/Pim';
 import NotFound from './pages/NotFound';
 import Nav from "./components/Nav";
 import LightDarkToggle from "./components/LightDarkToggle";
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/projects/live/8" element={<Project id={8} mainContent={<JovanLang />} />} />
                 <Route path="/projects/live/9" element={<Project id={9} mainContent={<SpellCaster />} />} />
                 {/* These are shortcut links to apps that are used frequently*/}
+                <Route path="/pim" element={<PIM />} />
                 <Route path="/zipline" element={<Zipline />} />
                 <Route path="/converter" element={<Converter />} />
                 <Route path="/junk" element={<Projects title='Junk Yard' projectType="junk" subheading='All the treasures and trinkets' />} />
