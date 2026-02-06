@@ -1,3 +1,5 @@
-export function getNext5Days(currentStock: any) {
+import type { Stock } from "./Stock";
+
+export function simulateNextWeek(currentStock: Stock) {
     console.log("yo", currentStock);
 }
