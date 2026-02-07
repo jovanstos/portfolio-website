@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import Chart from 'react-apexcharts';
 import { Stock } from "./Stock";
 import { simulateNextWeek } from './stockAlgorithm';
@@ -17,11 +18,17 @@ if news good and 100 jumps
 
 // P.I.M. stands for predictive investment model
 function PIM() {
+    // Used for running the simulatoion as a dev since react when in strict mode reloads the component twice
+    const devStartUp = useRef<boolean>(false);
+
+    const [globalNews, setGlobalNews] = useState<number>(0);
+
     // High-growth tech: High price, moderate earnings = High P/E
     const stock1 = new Stock("NovaTech Robotics", 210.50, 450000000, 85, 75, 92);
 
     // Stable Utility: Lower price, consistent earnings = Low P/E
     const stock2 = new Stock("GreenGrid Energy", 45.20, 380000000, 30, 15, 20);
+
     // Volatile Biotech: High risk/volatility based on research news
     const stock3 = new Stock("BioPulse Pharma", 88.00, 120000000, 60, 90, 55);
 
@@ -31,7 +38,17 @@ function PIM() {
     // Penny Tech Startup: Low price and very low earnings, high buzz
     const stock5 =new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
 
-    simulateNextWeek(stock1);
+    useEffect(() => {        
+        if(!devStartUp.current){
+            simulateNextWeek(stock1, globalNews);
+            simulateNextWeek(stock2, globalNews);
+            simulateNextWeek(stock3, globalNews);
+            simulateNextWeek(stock4, globalNews);
+            simulateNextWeek(stock5, globalNews);
+            devStartUp.current = true;
+        }
+    }, [globalNews]);
+
 
     const seriesData: [number, number][] = [
         [new Date('2025-10-01').getTime(), 30],

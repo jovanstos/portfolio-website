@@ -67,6 +67,37 @@ export class Stock {
         this.movingAverage = newPrice - average;
     }
 
+    updateProjectedEarnings(globalNews: number) {
+        // Global News impact, economy is good/bad
+        // Global news (-1 to 1) affects projection by up to +/- 5%
+        let growthFactor = globalNews * 0.05; 
+
+        // Company News: Stronger impact
+        // Company news (-1 to 1) affects projection by up to +/- 10%
+        if (this.companyNews !== 0) {
+            growthFactor += this.companyNews * 0.10;
+        }
+
+        // Social Buzz: The "Hype"
+        // Normalize buzz (0-100) to a range of -5% to +5%
+        // If buzz is 50 (neutral), impact is 0. If 100, impact is +5%.
+        const buzzImpact = ((this.socialBuzz - 50) / 100) * 0.10; 
+        growthFactor += buzzImpact;
+
+        // Volatility: Random "Analyst Uncertainty"
+        // Higher volatility = wider random swings in projection
+        // A volatility of 80 adds a random +/- 4% variance
+        const uncertainty = (Math.random() - 0.5) * (this.volatility / 1000); 
+        growthFactor += uncertainty;
+
+        // Apply to Current Earnings
+        // It is floored at 0 because projected earnings shouldn't be negative revenue 
+        this.projectedEarnings = Math.max(0, this.currentEarnings * (1 + growthFactor));
+        
+        // Round for cleaner UI
+        this.projectedEarnings = Math.round(this.projectedEarnings);
+    }
+
     addData(newEntry: [number, number]) {
         this.currentPrice = newEntry[1];
         this.updatePE(); // Update P/E when price changes
