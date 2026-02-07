@@ -1,9 +1,22 @@
-import type { Stock } from "./Stock";
+import { Stock } from "./Stock";
 
 const START_DATE = new Date('2025-10-01').getTime();
 
 function rollChances(min:number, max:number) {
   return Math.random() * (max - min) + min;
+}
+
+function getMovingAverage(stock: Stock, days: number = 14): number {
+    // If not enough data, just return current price
+    if (stock.data.length < days) return stock.currentPrice;
+
+    // Slice the last 'days' entries
+    const recentHistory = stock.data.slice(-days);
+    
+    // Sum up the prices
+    const sum = recentHistory.reduce((acc, entry) => acc + entry[1], 0);
+    
+    return sum / recentHistory.length;
 }
 
 function handleEarnings(currentStock: Stock): number {
@@ -90,6 +103,27 @@ function getTrend(currentStock: Stock, globalNews: number) {
         randomNumberMax -= 0.05;
     }
 
+    // MEAN REVERSION Lik an Elastic Band to relax volatility
+    const movingAverage = getMovingAverage(currentStock, 14); // 14-Day MA
+    
+    // Calculate how far we are from the average
+    const deviation = currentStock.currentPrice / movingAverage; 
+
+    if (deviation > 1.15) {
+        // Price is 15% above average. It's "Overbought". Pull it down.
+        // We reduce the UP chance significantly.
+        randomNumberMax -= 0.35; 
+    } else if (deviation > 1.05) {
+        // Price is 5% above average. Minor resistance.
+        randomNumberMax -= 0.10;
+    } else if (deviation < 0.85) {
+        // Price is 15% below average. It's "Oversold". Bargain hunters step in.
+        randomNumberMax += 0.35;
+    } else if (deviation < 0.95) {
+        // Price is 5% below average. slight support.
+        randomNumberMax += 0.10;
+    }
+
     // Ensure we don't break the math with negative maxes
     if (randomNumberMax < 0.01) randomNumberMax = 0.01;
 
@@ -124,12 +158,15 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
     // Normal trading DAY
     else {
         
-        // Random daily fluctuation (0 to Max Volatility)
-        percentChange = Math.random() * volatilityPercent;
+        // Use a "cubic" random to bias towards smaller numbers
+        // Math.random() is linear. Math.pow(Math.random(), 3) biases heavily towards 0.
+        // This means most days are quiet, but rare days are big.
+        const biasedRandom = Math.pow(Math.random(), 2); 
+        
+        percentChange = biasedRandom * volatilityPercent;
 
-        // News Impact: Adds extra weight if news is significant
         if (Math.abs(globalNews) > 0 || Math.abs(currentStock.companyNews) > 0) {
-             percentChange += 0.02; // Add 2% movement potential for news
+             percentChange += 0.02; 
         }
     }
     
@@ -139,7 +176,63 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
     return percentChange;
 }
 
+function updateMarketPsychology(currentStock: Stock, percentChange: number, isEarnings: boolean) {
+    console.log("WEEK CHANGE", percentChange);
+    
+    // Convert decimal percentage to a readable number (e.g., 0.05 -> 5)
+    const moveMagnitude = Math.abs(percentChange * 100);
+    const isCrash = percentChange < -0.05; // Dropped more than 5%
+    const isRally = percentChange > 0.05;  // Gained more than 5%
+
+    // SOCIAL BUZZ
+    if (isCrash) {
+        // Panic!
+        // Drops 5 - 10 points depending on severity
+        currentStock.socialBuzz -= Math.floor(moveMagnitude * 1.5);
+    } else if (isRally) {
+        // FOMO! Everyone starts tweeting about it.
+        currentStock.socialBuzz += Math.floor(moveMagnitude * 1.2);
+    } else if (moveMagnitude < 1) {
+        // Boredom. If stock moves less than 1%, buzz decays slowly.
+        currentStock.socialBuzz -= 2;
+    }
+
+    // Earnings always generates chatter, regardless of outcome
+    if (isEarnings) {
+        currentStock.socialBuzz += 10;
+    }
+
+    // Clamp Buzz 0-100
+    currentStock.socialBuzz = Math.max(0, Math.min(100, currentStock.socialBuzz));
+
+
+    // Volume follows action. 
+    // If the move is big, volume spikes. If flat, volume fades.
+    if (moveMagnitude > 2) {
+        currentStock.volume += Math.floor(moveMagnitude * 2);
+    } else {
+        currentStock.volume -= 5; // Day traders leave boring stocks
+    }
+
+    // Clamp Volume 0-100
+    currentStock.volume = Math.max(0, Math.min(100, currentStock.volume));
+
+
+    // Volatility is "sticky". It rises fast on shock, drops slow on calm.
+    if (moveMagnitude > 4) {
+        // Shock event increases future risk
+        currentStock.volatility += 5;
+    } else if (moveMagnitude < 1) {
+        // Stability cools things down
+        currentStock.volatility -= 2;
+    }
+
+    // Clamp Volatility 0-100
+    currentStock.volatility = Math.max(0, Math.min(100, currentStock.volatility));
+}
+
 export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number) {
+    const startingPrice = currentStock.currentPrice;
     let earningsSurprise: number | null = null;
 
     // If data exists, start 1 day after the last entry. If not, use START_DATE
@@ -163,11 +256,14 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         nextDateCount = lastDate.getTime();
     }
 
-    for (let i = 0; i < 130; i++) {
+    
+    for (let i = 0; i < 7; i++) {
         let trend = "";
-        
+            
         if ((week % 3 == 0) && week > 0 && !earningsSurprise) {
             earningsSurprise = handleEarnings(currentStock);
+            console.log("EARNING PERC", earningsSurprise);
+            
             trend = earningsSurprise >= 0 ? "UP" : "DOWN";
         } else {
             trend = getTrend(currentStock, globalNews);
@@ -175,18 +271,27 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
 
         const percentChange = getChange(currentStock, trend, globalNews, earningsSurprise);
         const oldPrice = currentStock.currentPrice;
+        
         currentStock.currentPrice = oldPrice * (1 + percentChange);
+        
         currentStock.updateProjectedEarnings(globalNews);
 
         currentStock.addData([nextDateCount, currentStock.currentPrice]);
 
         const dateObj = new Date(nextDateCount);
-        
         dateObj.setDate(dateObj.getDate() + 1);
         nextDateCount = dateObj.getTime();
-
+        
         console.log(`--------------------------------`);
         console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);
         console.log(`PRICE: $${oldPrice.toFixed(2)} -> $${currentStock.currentPrice.toFixed(2)}`);
+        console.log(`STATS: Vol: ${currentStock.volume} | Buzz: ${currentStock.socialBuzz} | Risk: ${currentStock.volatility}`);
     }
+
+    let isEarningsDay = false;
+
+    if ((week % 3 == 0) && week > 0 && !earningsSurprise) isEarningsDay = true;
+
+    const percentChange = (currentStock.currentPrice - startingPrice) / startingPrice
+    updateMarketPsychology(currentStock, percentChange, isEarningsDay);
 }

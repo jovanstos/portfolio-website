@@ -15,8 +15,6 @@ export class Stock {
     volatility: number;
     // P/E (Price-to-Earings) Ratio usually 0-40
     pOverE: number;
-    // Moving Average, the distance betwene the current price and the average price
-    movingAverage: number;
     // Socail buzz from people 0 - 100, higher means more people care
     socialBuzz: number;
     // Company news cycle -1 - 1, -1 means terrible news, 1 means great, 0 means no news this week
@@ -47,7 +45,6 @@ export class Stock {
         // P/E calculation
         this.pOverE = eps !== 0 ? this.currentPrice / eps : 0;
 
-        this.movingAverage = 0;
         this.companyNews = 0;
         this.projectedEarnings = 0;
         this.data = [];
@@ -56,15 +53,6 @@ export class Stock {
     updatePE() {
         const eps = this.currentEarnings / this.totalShares;
         this.pOverE = eps !== 0 ? this.currentPrice / eps : 0;
-    }
-
-    updateMovingAverage(newPrice: number) {
-        let total = 0;
-        for (let i = 0; i < this.data.length; i++) {
-            total += this.data[i][1];
-        };
-        const average = this.data.length > 0 ? total / this.data.length : 0;
-        this.movingAverage = newPrice - average;
     }
 
     updateProjectedEarnings(globalNews: number) {
@@ -101,7 +89,6 @@ export class Stock {
     addData(newEntry: [number | undefined, number]) {
         this.currentPrice = newEntry[1];
         this.updatePE(); // Update P/E when price changes
-        this.updateMovingAverage(this.currentPrice);
         this.data.push(newEntry);
     }
 }
