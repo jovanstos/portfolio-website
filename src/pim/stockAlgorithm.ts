@@ -42,7 +42,7 @@ function handleEarnings(currentStock: Stock): number {
     return surprise;
 }
 
-function getTrend(currentStock: Stock, globalNews: number) {
+function getTrend(currentStock: Stock, globalNews: number): "UP" | "DOWN" {
     let randomNumberMax = 1;
 
     // NEWS & VOLUME INTERACTION
@@ -176,7 +176,7 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
     return percentChange;
 }
 
-function updateMarketPsychology(currentStock: Stock, percentChange: number, isEarnings: boolean) {
+function updateMarketPsychology(currentStock: Stock, percentChange: number, isEarnings: boolean): void {
     console.log("WEEK CHANGE", percentChange);
     
     // Convert decimal percentage to a readable number (e.g., 0.05 -> 5)
@@ -231,7 +231,7 @@ function updateMarketPsychology(currentStock: Stock, percentChange: number, isEa
     currentStock.volatility = Math.max(0, Math.min(100, currentStock.volatility));
 }
 
-export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number) {
+export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number): void {
     const startingPrice = currentStock.currentPrice;
     let earningsSurprise: number | null = null;
 
@@ -282,10 +282,10 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         dateObj.setDate(dateObj.getDate() + 1);
         nextDateCount = dateObj.getTime();
         
-        console.log(`--------------------------------`);
-        console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);
-        console.log(`PRICE: $${oldPrice.toFixed(2)} -> $${currentStock.currentPrice.toFixed(2)}`);
-        console.log(`STATS: Vol: ${currentStock.volume} | Buzz: ${currentStock.socialBuzz} | Risk: ${currentStock.volatility}`);
+        // console.log(`--------------------------------`);
+        // console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);
+        // console.log(`PRICE: $${oldPrice.toFixed(2)} -> $${currentStock.currentPrice.toFixed(2)}`);
+        // console.log(`STATS: Vol: ${currentStock.volume} | Buzz: ${currentStock.socialBuzz} | Risk: ${currentStock.volatility}`);
     }
 
     let isEarningsDay = false;

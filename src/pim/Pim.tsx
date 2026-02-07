@@ -3,6 +3,7 @@ import Chart from 'react-apexcharts';
 import { Stock } from "./Stock";
 import { simulateNextWeek } from './stockAlgorithm';
 import type { ApexOptions } from 'apexcharts';
+import { generateNewsValue } from './NewsAlgorithm';
 
 /*
 - Company News -1 - 1
@@ -82,6 +83,15 @@ function PIM() {
     }];
 
     function runSim(){
+        stock1.companyNews = generateNewsValue()
+
+        if(Math.random() > 0.75){
+            setGlobalNews(generateNewsValue());
+        }
+
+        console.log("COMAPNY NEWS:", stock1.companyNews);
+        console.log("GLOBAL NEWs:", globalNews);
+
         simulateNextWeek(week, stock1, globalNews);
         
         setSeriesData(stock1.data);
@@ -96,8 +106,8 @@ function PIM() {
                 options={options}
                 series={series}
                 type="area"
-                width={700}
-                height={700}
+                width={500}
+                height={500}
             />
             <button onClick={runSim}>Run Sim</button>
         </main>
