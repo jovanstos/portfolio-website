@@ -20,8 +20,10 @@ if news good and 100 jumps
 function PIM() {
     // Used for running the simulatoion as a dev since react when in strict mode reloads the component twice
     const devStartUp = useRef<boolean>(false);
+    const seriesData = useRef<[number | undefined, number][]>([[0, 0]]);
 
     const [globalNews, setGlobalNews] = useState<number>(0);
+    const [week, setWeek] = useState<number>(0);
 
     // High-growth tech: High price, moderate earnings = High P/E
     const stock1 = new Stock("NovaTech Robotics", 210.50, 450000000, 85, 75, 92);
@@ -40,25 +42,13 @@ function PIM() {
 
     useEffect(() => {        
         if(!devStartUp.current){
-            simulateNextWeek(stock1, globalNews);
-            simulateNextWeek(stock2, globalNews);
-            simulateNextWeek(stock3, globalNews);
-            simulateNextWeek(stock4, globalNews);
-            simulateNextWeek(stock5, globalNews);
+            simulateNextWeek(week, stock1, globalNews);
+            seriesData.current = stock1.data;
+            console.log(seriesData.current);
+            
             devStartUp.current = true;
         }
     }, [globalNews]);
-
-
-    const seriesData: [number, number][] = [
-        [new Date('2025-10-01').getTime(), 30],
-        [new Date('2025-10-02').getTime(), 35],
-        [new Date('2025-10-03').getTime(), 32],
-        [new Date('2025-10-04').getTime(), 40],
-        [new Date('2025-10-05').getTime(), 38],
-        [new Date('2025-10-06').getTime(), 45],
-        [new Date('2025-10-07').getTime(), 50]
-    ];
 
     const options: ApexOptions = {
         chart: {
@@ -102,7 +92,7 @@ function PIM() {
 
     const series = [{
         name: 'Investment Prediction',
-        data: seriesData
+        data: seriesData.current
     }];
 
     return (
@@ -110,8 +100,8 @@ function PIM() {
             options={options}
             series={series}
             type="area"
-            width={500}
-            height={320}
+            width={1000}
+            height={1000}
         />
     );
 }

@@ -1,9 +1,32 @@
 import type { Stock } from "./Stock";
 
-const START_DATE = new Date('2025-10-01');
+const START_DATE = new Date('2025-10-01').getTime();
 
 function rollChances(min:number, max:number) {
   return Math.random() * (max - min) + min;
+}
+
+function handleEarnings(currentStock: Stock): number {
+    // Calculate variance based on Volatility
+    // Higher volatility = higher chance of a massive miss or massive beat
+    // Volatility 10 = +/- 2% swing. Volatility 90 = +/- 18% swing
+    const volatilityFactor = (currentStock.volatility / 100) * 0.20; 
+    
+    // Randomize the actual earnings outcome
+    // Sstick closely to projected, but apply volatility
+    const variance = (Math.random() * (volatilityFactor * 2)) - volatilityFactor;
+    
+    // Calculate Actual Earnings
+    const actualEarnings = Math.floor(currentStock.projectedEarnings * (1 + variance));
+
+    // Calculate the "Surprise" (The % difference between Actual and Projected)
+    const surprise = (actualEarnings - currentStock.projectedEarnings) / currentStock.projectedEarnings;
+
+    // UPDATE THE STOCK OBJECT
+    currentStock.currentEarnings = actualEarnings;
+
+    // Return the surprise factor to calculate price movement
+    return surprise;
 }
 
 function getTrend(currentStock: Stock, globalNews: number) {
@@ -80,8 +103,90 @@ function getTrend(currentStock: Stock, globalNews: number) {
     return "DOWN";
 }
 
-export function simulateNextWeek(currentStock: Stock, globalNews: number) {
-    const trend = getTrend(currentStock, globalNews);
-    console.log(`COMAPNY ${currentStock.companyName} TREND: ${trend}`);
+function getChange(currentStock: Stock, trend: string, globalNews: number, earningsSurprise: number | null): number {
+    // BASE MOVEMENT: Determined by Volatility
+    // A stable stock (vol: 10) moves ~0.5% a day. A risky stock (vol: 90) moves ~4.5% a day.
+    let volatilityPercent = (currentStock.volatility / 100) * 0.05; 
+
+    let percentChange = 0;
+
+    // Earnings day 
+    if (earningsSurprise !== null) {
+        // We amplify the surprise based on Volume (High volume = bigger reaction).
+        const volumeAmplifier = 1 + (currentStock.volume / 100); 
+        
+        percentChange = Math.abs(earningsSurprise) * volumeAmplifier;
+
+        // Minimum drama: Earnings always cause at least a 2% move if volatility is non-zero
+        if (percentChange < 0.02 && currentStock.volatility > 0) percentChange = 0.02;
+
+    }
+    // Normal trading DAY
+    else {
+        
+        // Random daily fluctuation (0 to Max Volatility)
+        percentChange = Math.random() * volatilityPercent;
+
+        // News Impact: Adds extra weight if news is significant
+        if (Math.abs(globalNews) > 0 || Math.abs(currentStock.companyNews) > 0) {
+             percentChange += 0.02; // Add 2% movement potential for news
+        }
+    }
     
+    if (trend === "DOWN") {
+        return -percentChange;
+    }
+    return percentChange;
+}
+
+export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number) {
+    let earningsSurprise: number | null = null;
+
+    // If data exists, start 1 day after the last entry. If not, use START_DATE
+    let nextDateCount: number;
+    
+    if (currentStock.data.length === 0) {
+        nextDateCount = START_DATE;
+    } else {
+        // Safe access to the last element's date
+        const lastEntry = currentStock.data[currentStock.data.length - 1][0];
+
+        // Added this so typescript stops yelling at me
+        if(!lastEntry){
+            return
+        }
+
+        const lastDate = new Date(lastEntry);
+        
+        // Add 1 day to the last known date
+        lastDate.setDate(lastDate.getDate() + 1);
+        nextDateCount = lastDate.getTime();
+    }
+
+    for (let i = 0; i < 130; i++) {
+        let trend = "";
+        
+        if ((week % 3 == 0) && week > 0 && !earningsSurprise) {
+            earningsSurprise = handleEarnings(currentStock);
+            trend = earningsSurprise >= 0 ? "UP" : "DOWN";
+        } else {
+            trend = getTrend(currentStock, globalNews);
+        }
+
+        const percentChange = getChange(currentStock, trend, globalNews, earningsSurprise);
+        const oldPrice = currentStock.currentPrice;
+        currentStock.currentPrice = oldPrice * (1 + percentChange);
+        currentStock.updateProjectedEarnings(globalNews);
+
+        currentStock.addData([nextDateCount, currentStock.currentPrice]);
+
+        const dateObj = new Date(nextDateCount);
+        
+        dateObj.setDate(dateObj.getDate() + 1);
+        nextDateCount = dateObj.getTime();
+
+        console.log(`--------------------------------`);
+        console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);
+        console.log(`PRICE: $${oldPrice.toFixed(2)} -> $${currentStock.currentPrice.toFixed(2)}`);
+    }
 }

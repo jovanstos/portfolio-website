@@ -22,7 +22,7 @@ export class Stock {
     // Company news cycle -1 - 1, -1 means terrible news, 1 means great, 0 means no news this week
     companyNews: number;
     // Stock data
-    data: [number, number][];
+    data: [number | undefined, number][];
 
     constructor(
         companyName: string,
@@ -61,7 +61,7 @@ export class Stock {
     updateMovingAverage(newPrice: number) {
         let total = 0;
         for (let i = 0; i < this.data.length; i++) {
-            total += this.data[i][0];
+            total += this.data[i][1];
         };
         const average = this.data.length > 0 ? total / this.data.length : 0;
         this.movingAverage = newPrice - average;
@@ -98,7 +98,7 @@ export class Stock {
         this.projectedEarnings = Math.round(this.projectedEarnings);
     }
 
-    addData(newEntry: [number, number]) {
+    addData(newEntry: [number | undefined, number]) {
         this.currentPrice = newEntry[1];
         this.updatePE(); // Update P/E when price changes
         this.updateMovingAverage(this.currentPrice);
