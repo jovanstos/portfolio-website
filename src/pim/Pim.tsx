@@ -33,7 +33,11 @@ const stock5 =new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
 // P.I.M. stands for predictive investment model
 function PIM() {
     // Used for running the simulatoion as a dev since react when in strict mode reloads the component twice
-    const [seriesData, setSeriesData] = useState<[number | undefined, number][]>([[0, 0]]);
+    const [seriesData1, setSeriesData1] = useState<[number | undefined, number][]>([[0, 0]]);
+    const [seriesData2, setSeriesData2] = useState<[number | undefined, number][]>([[0, 0]]);
+    const [seriesData3, setSeriesData3] = useState<[number | undefined, number][]>([[0, 0]]);
+    const [seriesData4, setSeriesData4] = useState<[number | undefined, number][]>([[0, 0]]);
+    const [seriesData5, setSeriesData5] = useState<[number | undefined, number][]>([[0, 0]]);
     const [globalNews, setGlobalNews] = useState<number>(0);
     const [week, setWeek] = useState<number>(0);
 
@@ -77,24 +81,62 @@ function PIM() {
         }
     };
 
-    const series = [{
+    const series1 = [{
         name: 'Investment Prediction',
-        data: seriesData
+        data: seriesData1
+    }];
+
+     const series2 = [{
+        name: 'Investment Prediction',
+        data: seriesData2
+    }];
+
+    const series3 = [{
+        name: 'Investment Prediction',
+        data: seriesData3
+    }];
+
+    const series4 = [{
+        name: 'Investment Prediction',
+        data: seriesData4
+    }];
+
+    const series5 = [{
+        name: 'Investment Prediction',
+        data: seriesData5
     }];
 
     function runSim(){
+        console.log(`-------------------WEEK: ${week}--------------------`);
+        
         stock1.companyNews = generateNewsValue()
+        stock2.companyNews = generateNewsValue()
+        stock3.companyNews = generateNewsValue()
+        stock4.companyNews = generateNewsValue()
+        stock5.companyNews = generateNewsValue()
 
         if(Math.random() > 0.75){
             setGlobalNews(generateNewsValue());
         }
 
-        console.log("COMAPNY NEWS:", stock1.companyNews);
-        console.log("GLOBAL NEWs:", globalNews);
-
-        simulateNextWeek(week, stock1, globalNews);
+        console.log("GLOBAL NEWS:", globalNews);
         
-        setSeriesData(stock1.data);
+        console.log("COMAPNY NEWS 1:", stock1.companyNews);
+        simulateNextWeek(week, stock1, globalNews);
+        console.log("COMAPNY NEWS 2:", stock2.companyNews);
+        simulateNextWeek(week, stock2, globalNews);
+        console.log("COMAPNY NEWS 3:", stock3.companyNews);
+        simulateNextWeek(week, stock3, globalNews);
+        console.log("COMAPNY NEWS 4:", stock4.companyNews);
+        simulateNextWeek(week, stock4, globalNews);
+        console.log("COMAPNY NEWS 5:", stock5.companyNews);
+        simulateNextWeek(week, stock5, globalNews);
+        
+        setSeriesData1(stock1.data);
+        setSeriesData2(stock2.data);
+        setSeriesData3(stock3.data);
+        setSeriesData4(stock4.data);
+        setSeriesData5(stock5.data);
 
         setWeek(prev => prev + 1); 
     }
@@ -102,13 +144,43 @@ function PIM() {
     return (
         <main>
             <h1>Week {week}</h1>
-            <Chart
-                options={options}
-                series={series}
-                type="area"
-                width={500}
-                height={500}
-            />
+            <div style={{display: "flex"}}>
+                <Chart
+                    options={options}
+                    series={series1}
+                    type="area"
+                    width={500}
+                    height={500}
+                />
+                <Chart
+                    options={options}
+                    series={series2}
+                    type="area"
+                    width={500}
+                    height={500}
+                />
+                <Chart
+                    options={options}
+                    series={series3}
+                    type="area"
+                    width={500}
+                    height={500}
+                />
+                <Chart
+                    options={options}
+                    series={series4}
+                    type="area"
+                    width={500}
+                    height={500}
+                />
+                <Chart
+                    options={options}
+                    series={series5}
+                    type="area"
+                    width={500}
+                    height={500}
+                />
+            </div>
             <button onClick={runSim}>Run Sim</button>
         </main>
     );

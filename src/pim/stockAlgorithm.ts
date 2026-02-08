@@ -1,17 +1,17 @@
 import { Stock } from "./Stock";
 
-const START_DATE = new Date('2025-10-01').getTime();
+const START_DATE = new Date('2025-01-01').getTime();
 
 function rollChances(min:number, max:number) {
   return Math.random() * (max - min) + min;
 }
 
-function getMovingAverage(stock: Stock, days: number = 14): number {
+function getMovingAverage(currentStock: Stock, days: number = 21): number {
     // If not enough data, just return current price
-    if (stock.data.length < days) return stock.currentPrice;
+    if (currentStock.data.length < days) return currentStock.currentPrice;
 
     // Slice the last 'days' entries
-    const recentHistory = stock.data.slice(-days);
+    const recentHistory = currentStock.data.slice(-days);
     
     // Sum up the prices
     const sum = recentHistory.reduce((acc, entry) => acc + entry[1], 0);
@@ -20,29 +20,47 @@ function getMovingAverage(stock: Stock, days: number = 14): number {
 }
 
 function handleEarnings(currentStock: Stock): number {
-    // Calculate variance based on Volatility
-    // Higher volatility = higher chance of a massive miss or massive beat
-    // Volatility 10 = +/- 2% swing. Volatility 90 = +/- 18% swing
-    const volatilityFactor = (currentStock.volatility / 100) * 0.20; 
-    
-    // Randomize the actual earnings outcome
-    // Sstick closely to projected, but apply volatility
-    const variance = (Math.random() * (volatilityFactor * 2)) - volatilityFactor;
-    
-    // Calculate Actual Earnings
-    const actualEarnings = Math.floor(currentStock.projectedEarnings * (1 + variance));
+    // Get stock growth over the last 3 weeks
+    const recentHistory = currentStock.data.slice(-42);
+    const startPrice = recentHistory.length > 0 ? recentHistory[0][1] : currentStock.currentPrice;
+    const stockGains = (currentStock.currentPrice - startPrice) / startPrice;
+
+    // Base chance is 60% because 60% of stocks in real life beat it
+    let beatProbability = 0.60 + stockGains;
+
+    // Can't have a perfect chance of beating and must at least have 15% chance
+    beatProbability = Math.max(0.15, Math.min(0.95, beatProbability));
+
+    // If random number is LESS than our win chance, stock wins.
+    const isBeat = Math.random() < beatProbability;
+
+    // Get the volatility of the stock, turn it into a perctange with variance of 3%
+    const volatilityLowEnd = Math.max(((currentStock.volatility -3) / 1000), 0.03)
+    const volatilityHighEnd = Math.max(((currentStock.volatility +3) / 1000), 0.05)
+    const variancePercent = rollChances(volatilityLowEnd, volatilityHighEnd);
+
+    console.log("VOLL", variancePercent, currentStock.volatility);
+        
+    let actualEarnings;
+    if (isBeat) {
+        console.log(`EARNINGS BEAT! (Prob: ${beatProbability.toFixed(2)})`);
+        actualEarnings = currentStock.projectedEarnings * (1 + variancePercent);
+    } else {
+        console.log(`EARNINGS MISS! (Prob: ${beatProbability.toFixed(2)})`);
+        actualEarnings = currentStock.projectedEarnings * (1 - variancePercent);
+    }
+
+    actualEarnings = Math.floor(actualEarnings);
+    currentStock.currentEarnings = actualEarnings;
 
     // Calculate the "Surprise" (The % difference between Actual and Projected)
     const surprise = (actualEarnings - currentStock.projectedEarnings) / currentStock.projectedEarnings;
-
-    // UPDATE THE STOCK OBJECT
-    currentStock.currentEarnings = actualEarnings;
 
     // Return the surprise factor to calculate price movement
     return surprise;
 }
 
-function getTrend(currentStock: Stock, globalNews: number): "UP" | "DOWN" {
+function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean): "UP" | "DOWN" {
     let randomNumberMax = 1;
 
     // NEWS & VOLUME INTERACTION
@@ -52,8 +70,13 @@ function getTrend(currentStock: Stock, globalNews: number): "UP" | "DOWN" {
 
     const volumeModifier = currentStock.volume / 100; // 0.0 to 1.0
 
-    // Check for "Crash" conditions
+    // Check for "Crash" "or "Rally" conditions, also a 1% chance to not follow the trend
     if ((globalNews == -1 || currentStock.companyNews == -1) && Math.random() < 0.99) {
+        // If news is terrible, Volume accelerates the crash Panic Sell
+        return "DOWN"; 
+    }
+
+    if ((globalNews == 1 || currentStock.companyNews == 1) && Math.random() < 0.99) {
         // If news is terrible, Volume accelerates the crash Panic Sell
         return "DOWN"; 
     } 
@@ -98,37 +121,42 @@ function getTrend(currentStock: Stock, globalNews: number): "UP" | "DOWN" {
     } else if (currentStock.socialBuzz > 50) {
         // Healthy attention
         randomNumberMax += 0.10;
-    } else if (currentStock.socialBuzz < 20) {
+    } else if (currentStock.socialBuzz < 15) {
         // "Dead" stock. No one cares, so it drifts down.
         randomNumberMax -= 0.05;
+    } else {
+        randomNumberMax += 0.05;
     }
 
-    // MEAN REVERSION Lik an Elastic Band to relax volatility
-    const movingAverage = getMovingAverage(currentStock, 14); // 14-Day MA
+    // When there is an earnings the average doesn't matter
+    if(!earningsWeek){
+        // MEAN REVERSION Lik an Elastic Band to relax volatility
+        const movingAverage = getMovingAverage(currentStock, 21); // 21-Day MA
+        
+        // Calculate how far we are from the average
+        const deviation = currentStock.currentPrice / movingAverage; 
     
-    // Calculate how far we are from the average
-    const deviation = currentStock.currentPrice / movingAverage; 
-
-    if (deviation > 1.15) {
-        // Price is 15% above average. It's "Overbought". Pull it down.
-        // We reduce the UP chance significantly.
-        randomNumberMax -= 0.35; 
-    } else if (deviation > 1.05) {
-        // Price is 5% above average. Minor resistance.
-        randomNumberMax -= 0.10;
-    } else if (deviation < 0.85) {
-        // Price is 15% below average. It's "Oversold". Bargain hunters step in.
-        randomNumberMax += 0.35;
-    } else if (deviation < 0.95) {
-        // Price is 5% below average. slight support.
-        randomNumberMax += 0.10;
+        if (deviation > 1.15) {
+            // Price is 15% above average. It's "Overbought". Pull it down.
+            // We reduce the UP chance significantly.
+            randomNumberMax -= 0.35; 
+        } else if (deviation > 1.05) {
+            // Price is 5% above average. Minor resistance.
+            randomNumberMax -= 0.10;
+        } else if (deviation < 0.85) {
+            // Price is 15% below average. It's "Oversold". Bargain hunters step in.
+            randomNumberMax += 0.35;
+        } else if (deviation < 0.95) {
+            // Price is 5% below average. slight support.
+            randomNumberMax += 0.10;
+        }
     }
 
     // Ensure we don't break the math with negative maxes
     if (randomNumberMax < 0.01) randomNumberMax = 0.01;
 
     const stocksRoll = rollChances(0, randomNumberMax);
-    
+   
     // If the weighted roll beats a raw random chance, we go UP.
     if (stocksRoll > Math.random()) {
         return "UP";
@@ -141,13 +169,14 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
     // BASE MOVEMENT: Determined by Volatility
     // A stable stock (vol: 10) moves ~0.5% a day. A risky stock (vol: 90) moves ~4.5% a day.
     let volatilityPercent = (currentStock.volatility / 100) * 0.05; 
+    const volumeModifier = currentStock.volume / 100;
 
     let percentChange = 0;
 
     // Earnings day 
     if (earningsSurprise !== null) {
         // We amplify the surprise based on Volume (High volume = bigger reaction).
-        const volumeAmplifier = 1 + (currentStock.volume / 100); 
+        const volumeAmplifier = 1 + volumeModifier; 
         
         percentChange = Math.abs(earningsSurprise) * volumeAmplifier;
 
@@ -157,27 +186,59 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
     }
     // Normal trading DAY
     else {
-        
         // Use a "cubic" random to bias towards smaller numbers
         // Math.random() is linear. Math.pow(Math.random(), 3) biases heavily towards 0.
         // This means most days are quiet, but rare days are big.
-        const biasedRandom = Math.pow(Math.random(), 2); 
-        
+        const biasedRandom = Math.pow(Math.random(), 3);
+
         percentChange = biasedRandom * volatilityPercent;
 
-        if (Math.abs(globalNews) > 0 || Math.abs(currentStock.companyNews) > 0) {
-             percentChange += 0.02; 
+        if(trend == "UP"){
+            if (globalNews > 0) {
+                let newsValue = globalNews + volumeModifier;
+    
+                newsValue = newsValue * 0.2 / 100
+    
+                percentChange += + newsValue
+            }
+
+            if(currentStock.companyNews > 0){
+                let newsValue = (currentStock.companyNews + volumeModifier) ;
+
+                newsValue = newsValue * 0.2 / 100
+
+                percentChange += + newsValue
+            }
+            
+        } else {
+            if (globalNews < 0){
+                let newsValue = globalNews - volumeModifier;
+    
+                newsValue = newsValue * 0.2 / 100
+    
+                percentChange += + newsValue
+            }
+
+            if(currentStock.companyNews < 0){
+                let newsValue = (currentStock.companyNews - volumeModifier) ;
+
+                newsValue = newsValue * 0.2 / 100
+
+                percentChange += + newsValue
+            }
         }
     }
     
     if (trend === "DOWN") {
+        // console.log("DAILY CHANGE", -percentChange * 100);
         return -percentChange;
     }
+    // console.log("DAILY CHANGE", percentChange * 100);
     return percentChange;
 }
 
 function updateMarketPsychology(currentStock: Stock, percentChange: number, isEarnings: boolean): void {
-    console.log("WEEK CHANGE", percentChange);
+    console.log("WEEKLY CHANGE", percentChange * 100);
     
     // Convert decimal percentage to a readable number (e.g., 0.05 -> 5)
     const moveMagnitude = Math.abs(percentChange * 100);
@@ -205,13 +266,14 @@ function updateMarketPsychology(currentStock: Stock, percentChange: number, isEa
     // Clamp Buzz 0-100
     currentStock.socialBuzz = Math.max(0, Math.min(100, currentStock.socialBuzz));
 
-
     // Volume follows action. 
     // If the move is big, volume spikes. If flat, volume fades.
-    if (moveMagnitude > 2) {
+    if (moveMagnitude > 1.5) {
         currentStock.volume += Math.floor(moveMagnitude * 2);
+    }  else if (moveMagnitude > 0.75){
+        currentStock.volume += 5 // Stable growth
     } else {
-        currentStock.volume -= 5; // Day traders leave boring stocks
+        currentStock.volume -= 3; // Day traders leave boring stocks
     }
 
     // Clamp Volume 0-100
@@ -232,8 +294,10 @@ function updateMarketPsychology(currentStock: Stock, percentChange: number, isEa
 }
 
 export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number): void {
+    const EARNINGS_WEEK = 6
     const startingPrice = currentStock.currentPrice;
-    let earningsSurprise: number | null = null;
+
+    let weeklyEarningsSurprise: number | null = null;
 
     // If data exists, start 1 day after the last entry. If not, use START_DATE
     let nextDateCount: number;
@@ -245,9 +309,7 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         const lastEntry = currentStock.data[currentStock.data.length - 1][0];
 
         // Added this so typescript stops yelling at me
-        if(!lastEntry){
-            return
-        }
+        if(!lastEntry) return
 
         const lastDate = new Date(lastEntry);
         
@@ -258,29 +320,40 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
 
     
     for (let i = 0; i < 7; i++) {
+        let isEarningsDay = false;
         let trend = "";
+
+        let todaySurprise: number | null = null;
             
-        if ((week % 3 == 0) && week > 0 && !earningsSurprise) {
-            earningsSurprise = handleEarnings(currentStock);
-            console.log("EARNING PERC", earningsSurprise);
+        if ((week % EARNINGS_WEEK == 0) && week > 0 && !weeklyEarningsSurprise) {
+            weeklyEarningsSurprise = handleEarnings(currentStock);
+
+            todaySurprise = weeklyEarningsSurprise; 
             
-            trend = earningsSurprise >= 0 ? "UP" : "DOWN";
+            console.log("EARNING PERC", weeklyEarningsSurprise);
+            isEarningsDay = true;
+            trend = weeklyEarningsSurprise >= 0 ? "UP" : "DOWN";
         } else {
-            trend = getTrend(currentStock, globalNews);
+            if(week % EARNINGS_WEEK == 0 && week > 0){
+                trend = getTrend(currentStock, globalNews, true);
+            } else {
+                trend = getTrend(currentStock, globalNews, false);
+            }
         }
 
-        const percentChange = getChange(currentStock, trend, globalNews, earningsSurprise);
+        const percentChange = getChange(currentStock, trend, globalNews, todaySurprise);
+        
         const oldPrice = currentStock.currentPrice;
-        
         currentStock.currentPrice = oldPrice * (1 + percentChange);
-        
         currentStock.updateProjectedEarnings(globalNews);
-
         currentStock.addData([nextDateCount, currentStock.currentPrice]);
 
         const dateObj = new Date(nextDateCount);
         dateObj.setDate(dateObj.getDate() + 1);
         nextDateCount = dateObj.getTime();
+
+        // If there's an earnings the changes are radical so market must adjust
+        if(isEarningsDay) updateMarketPsychology(currentStock, percentChange, isEarningsDay);
         
         // console.log(`--------------------------------`);
         // console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);
@@ -288,10 +361,10 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         // console.log(`STATS: Vol: ${currentStock.volume} | Buzz: ${currentStock.socialBuzz} | Risk: ${currentStock.volatility}`);
     }
 
-    let isEarningsDay = false;
+    let wasEarningsWeek = false;
+    if ((week % EARNINGS_WEEK == 0) && week > 0) wasEarningsWeek = true;
 
-    if ((week % 3 == 0) && week > 0 && !earningsSurprise) isEarningsDay = true;
-
-    const percentChange = (currentStock.currentPrice - startingPrice) / startingPrice
-    updateMarketPsychology(currentStock, percentChange, isEarningsDay);
+    const totalWeeklyChange = (currentStock.currentPrice - startingPrice) / startingPrice;
+    console.log("PRICE", currentStock.currentPrice);
+    updateMarketPsychology(currentStock, totalWeeklyChange, wasEarningsWeek);
 }
