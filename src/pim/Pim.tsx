@@ -126,10 +126,10 @@ function PIM() {
         console.log(`-------------------WEEK: ${week}--------------------`);
         
         stock1.companyNews = generateNewsValue()
-        // stock2.companyNews = generateNewsValue()
-        // stock3.companyNews = generateNewsValue()
-        // stock4.companyNews = generateNewsValue()
-        // stock5.companyNews = generateNewsValue()
+        stock2.companyNews = generateNewsValue()
+        stock3.companyNews = generateNewsValue()
+        stock4.companyNews = generateNewsValue()
+        stock5.companyNews = generateNewsValue()
 
         const globalNewsChance = Math.random()
 
@@ -139,24 +139,24 @@ function PIM() {
             setGlobalNews(generateNewsValue());
         }
 
-        // console.log("GLOBAL NEWS:", globalNews);
+        console.log("GLOBAL NEWS:", globalNews);
         
-        // console.log("COMAPNY NEWS 1:", stock1.companyNews);
+        console.log("COMAPNY NEWS 1:", stock1.companyNews);
         simulateNextWeek(week, stock1, globalNews);
-        // console.log("COMAPNY NEWS 2:", stock2.companyNews);
-        // simulateNextWeek(week, stock2, globalNews);
-        // console.log("COMAPNY NEWS 3:", stock3.companyNews);
-        // simulateNextWeek(week, stock3, globalNews);
-        // console.log("COMAPNY NEWS 4:", stock4.companyNews);
-        // simulateNextWeek(week, stock4, globalNews);
-        // console.log("COMAPNY NEWS 5:", stock5.companyNews);
-        // simulateNextWeek(week, stock5, globalNews);
+        console.log("COMAPNY NEWS 2:", stock2.companyNews);
+        simulateNextWeek(week, stock2, globalNews);
+        console.log("COMAPNY NEWS 3:", stock3.companyNews);
+        simulateNextWeek(week, stock3, globalNews);
+        console.log("COMAPNY NEWS 4:", stock4.companyNews);
+        simulateNextWeek(week, stock4, globalNews);
+        console.log("COMAPNY NEWS 5:", stock5.companyNews);
+        simulateNextWeek(week, stock5, globalNews);
         
-        // setSeriesData1(stock1.data);
-        // setSeriesData2(stock2.data);
-        // setSeriesData3(stock3.data);
-        // setSeriesData4(stock4.data);
-        // setSeriesData5(stock5.data);
+        setSeriesData1(stock1.data);
+        setSeriesData2(stock2.data);
+        setSeriesData3(stock3.data);
+        setSeriesData4(stock4.data);
+        setSeriesData5(stock5.data);
 
         setWeek(prev => prev + 1); 
     }
@@ -165,7 +165,7 @@ function PIM() {
         <main>
             <h1>Week {week}</h1>
             <div style={{display: "flex"}}>
-                {/* <Chart
+                <Chart
                     options={options}
                     series={series1}
                     type="area"
@@ -199,7 +199,7 @@ function PIM() {
                     type="area"
                     width={500}
                     height={500}
-                /> */}
+                />
             </div>
             <button onClick={runSim}>Run Sim</button>
             <button

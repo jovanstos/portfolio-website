@@ -259,10 +259,8 @@ function updateMarketPsychology(currentStock: Stock, percentChange: number, isEa
 
     // Volume follows action. 
     // If the move is big, volume spikes. If flat, volume fades.
-    if (moveMagnitude > 1.5) {
+    if (moveMagnitude > 2) {
         currentStock.volume += Math.floor(moveMagnitude * 2);
-    }  else if (moveMagnitude > 0.75){
-        currentStock.volume += 5 // Stable growth
     } else {
         currentStock.volume -= 3; // Day traders leave boring stocks
     }
