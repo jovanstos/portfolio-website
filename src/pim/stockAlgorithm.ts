@@ -38,15 +38,11 @@ function handleEarnings(currentStock: Stock): number {
     const volatilityLowEnd = Math.max(((currentStock.volatility -3) / 1000), 0.03)
     const volatilityHighEnd = Math.max(((currentStock.volatility +3) / 1000), 0.05)
     const variancePercent = rollChances(volatilityLowEnd, volatilityHighEnd);
-
-    console.log("VOLL", variancePercent, currentStock.volatility);
         
     let actualEarnings;
     if (isBeat) {
-        console.log(`EARNINGS BEAT! (Prob: ${beatProbability.toFixed(2)})`);
         actualEarnings = currentStock.projectedEarnings * (1 + variancePercent);
     } else {
-        console.log(`EARNINGS MISS! (Prob: ${beatProbability.toFixed(2)})`);
         actualEarnings = currentStock.projectedEarnings * (1 - variancePercent);
     }
 
@@ -165,7 +161,7 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
     return "DOWN";
 }
 
-function getChange(currentStock: Stock, trend: string, globalNews: number, earningsSurprise: number | null): number {
+function getChange(currentStock: Stock, trend: string, globalNews: number, earningsSurprise: number | null): number {    
     // BASE MOVEMENT: Determined by Volatility
     // A stable stock (vol: 10) moves ~0.5% a day. A risky stock (vol: 90) moves ~4.5% a day.
     let volatilityPercent = (currentStock.volatility / 100) * 0.05; 
@@ -191,50 +187,46 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
         // This means most days are quiet, but rare days are big.
         const biasedRandom = Math.pow(Math.random(), 3);
 
-        percentChange = biasedRandom * volatilityPercent;
+        percentChange = biasedRandom * volatilityPercent
 
         if(trend == "UP"){
             if (globalNews > 0) {
                 let newsValue = globalNews + volumeModifier;
     
-                newsValue = newsValue * 0.2 / 100
+                newsValue = newsValue * 0.5 / 100
     
-                percentChange += + newsValue
+                percentChange += newsValue
             }
 
             if(currentStock.companyNews > 0){
                 let newsValue = (currentStock.companyNews + volumeModifier) ;
 
-                newsValue = newsValue * 0.2 / 100
+                newsValue = newsValue * 0.5 / 100
 
-                percentChange += + newsValue
+                percentChange += newsValue
             }
             
         } else {
             if (globalNews < 0){
                 let newsValue = globalNews - volumeModifier;
     
-                newsValue = newsValue * 0.2 / 100
+                newsValue = newsValue * 0.5 / 100
     
-                percentChange += + newsValue
+                percentChange += newsValue
             }
 
             if(currentStock.companyNews < 0){
                 let newsValue = (currentStock.companyNews - volumeModifier) ;
 
-                newsValue = newsValue * 0.2 / 100
+                newsValue = newsValue * 0.5 / 100
 
-                percentChange += + newsValue
+                percentChange += newsValue
             }
         }
     }
     
-    if (trend === "DOWN") {
-        // console.log("DAILY CHANGE", -percentChange * 100);
-        return -percentChange;
-    }
-    // console.log("DAILY CHANGE", percentChange * 100);
-    return percentChange;
+    // Sometimes percentage can be negative
+    return Math.abs(percentChange);
 }
 
 function updateMarketPsychology(currentStock: Stock, percentChange: number, isEarnings: boolean): void {
@@ -344,7 +336,12 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         const percentChange = getChange(currentStock, trend, globalNews, todaySurprise);
         
         const oldPrice = currentStock.currentPrice;
-        currentStock.currentPrice = oldPrice * (1 + percentChange);
+        if(trend == "DOWN"){            
+            currentStock.currentPrice = oldPrice - (oldPrice * percentChange);
+        } else {
+            currentStock.currentPrice = oldPrice + (oldPrice * percentChange);
+        }
+        
         currentStock.updateProjectedEarnings(globalNews);
         currentStock.addData([nextDateCount, currentStock.currentPrice]);
 

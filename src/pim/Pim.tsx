@@ -115,7 +115,11 @@ function PIM() {
         stock4.companyNews = generateNewsValue()
         stock5.companyNews = generateNewsValue()
 
-        if(Math.random() > 0.75){
+        const globalNewsChance = Math.random()
+
+        if(globalNews !== 0 && globalNewsChance > 0.4){
+            setGlobalNews(generateNewsValue());
+        }else if(globalNewsChance > 0.75){
             setGlobalNews(generateNewsValue());
         }
 
