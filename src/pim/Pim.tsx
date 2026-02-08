@@ -1,19 +1,11 @@
 import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { Stock } from "./Stock";
-import { simulateNextWeek } from './stockAlgorithm';
 import type { ApexOptions } from 'apexcharts';
+import { simulateNextWeek } from './stockAlgorithm';
 import { generateNewsValue } from './NewsAlgorithm';
-
-/*
-- Company News -1 - 1
-- Global News -1 - 1
-- Momentum Volume brought 70 > too much buying < 30 too little buying 0-100
-- Social Buzz 0 - 100. 100 many people talking 0 no one cares. If news bad and 100 tanks
-if news good and 100 jumps
-- Volatility Risk 0-100 Per Stock How much does it swing. 100 could go up 25% down 25% 0 1-3% changes
-- P/E (Price-to-Earings) Ratio 0-100. 100 price is high earings low, 0 price cheap earings high
-*/
+import { getTrainingData } from './LSTMDataGen';
+import { Parser } from '@json2csv/plainjs';
 
 // High-growth tech: High price, moderate earnings = High P/E
 const stock1 = new Stock("NovaTech Robotics", 210.50, 450000000, 85, 75, 92);
@@ -32,7 +24,6 @@ const stock5 =new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
 
 // P.I.M. stands for predictive investment model
 function PIM() {
-    // Used for running the simulatoion as a dev since react when in strict mode reloads the component twice
     const [seriesData1, setSeriesData1] = useState<[number | undefined, number][]>([[0, 0]]);
     const [seriesData2, setSeriesData2] = useState<[number | undefined, number][]>([[0, 0]]);
     const [seriesData3, setSeriesData3] = useState<[number | undefined, number][]>([[0, 0]]);
@@ -106,14 +97,39 @@ function PIM() {
         data: seriesData5
     }];
 
+    function downloadCSV() {
+        const data = getTrainingData()
+        
+        try {
+        const parser = new Parser();
+        const csv = parser.parse(data);
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a temporary link element to trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'LSTM_training_data.csv');
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        } catch (err) {
+        console.error("CSV Export Error:", err);
+        }
+    };
+
     function runSim(){
         console.log(`-------------------WEEK: ${week}--------------------`);
         
         stock1.companyNews = generateNewsValue()
-        stock2.companyNews = generateNewsValue()
-        stock3.companyNews = generateNewsValue()
-        stock4.companyNews = generateNewsValue()
-        stock5.companyNews = generateNewsValue()
+        // stock2.companyNews = generateNewsValue()
+        // stock3.companyNews = generateNewsValue()
+        // stock4.companyNews = generateNewsValue()
+        // stock5.companyNews = generateNewsValue()
 
         const globalNewsChance = Math.random()
 
@@ -123,24 +139,24 @@ function PIM() {
             setGlobalNews(generateNewsValue());
         }
 
-        console.log("GLOBAL NEWS:", globalNews);
+        // console.log("GLOBAL NEWS:", globalNews);
         
-        console.log("COMAPNY NEWS 1:", stock1.companyNews);
+        // console.log("COMAPNY NEWS 1:", stock1.companyNews);
         simulateNextWeek(week, stock1, globalNews);
-        console.log("COMAPNY NEWS 2:", stock2.companyNews);
-        simulateNextWeek(week, stock2, globalNews);
-        console.log("COMAPNY NEWS 3:", stock3.companyNews);
-        simulateNextWeek(week, stock3, globalNews);
-        console.log("COMAPNY NEWS 4:", stock4.companyNews);
-        simulateNextWeek(week, stock4, globalNews);
-        console.log("COMAPNY NEWS 5:", stock5.companyNews);
-        simulateNextWeek(week, stock5, globalNews);
+        // console.log("COMAPNY NEWS 2:", stock2.companyNews);
+        // simulateNextWeek(week, stock2, globalNews);
+        // console.log("COMAPNY NEWS 3:", stock3.companyNews);
+        // simulateNextWeek(week, stock3, globalNews);
+        // console.log("COMAPNY NEWS 4:", stock4.companyNews);
+        // simulateNextWeek(week, stock4, globalNews);
+        // console.log("COMAPNY NEWS 5:", stock5.companyNews);
+        // simulateNextWeek(week, stock5, globalNews);
         
-        setSeriesData1(stock1.data);
-        setSeriesData2(stock2.data);
-        setSeriesData3(stock3.data);
-        setSeriesData4(stock4.data);
-        setSeriesData5(stock5.data);
+        // setSeriesData1(stock1.data);
+        // setSeriesData2(stock2.data);
+        // setSeriesData3(stock3.data);
+        // setSeriesData4(stock4.data);
+        // setSeriesData5(stock5.data);
 
         setWeek(prev => prev + 1); 
     }
@@ -149,7 +165,7 @@ function PIM() {
         <main>
             <h1>Week {week}</h1>
             <div style={{display: "flex"}}>
-                <Chart
+                {/* <Chart
                     options={options}
                     series={series1}
                     type="area"
@@ -183,9 +199,13 @@ function PIM() {
                     type="area"
                     width={500}
                     height={500}
-                />
+                /> */}
             </div>
             <button onClick={runSim}>Run Sim</button>
+            <button
+                onClick={downloadCSV}>
+                Download CSV
+            </button>
         </main>
     );
 }

@@ -1,12 +1,13 @@
 import { Stock } from "./Stock";
 
 const START_DATE = new Date('2025-01-01').getTime();
+const EARNINGS_WEEK = 6
 
 function rollChances(min:number, max:number) {
   return Math.random() * (max - min) + min;
 }
 
-function getMovingAverage(currentStock: Stock, days: number = 21): number {
+function getMovingAverage(currentStock: Stock, days: number): number {
     // If not enough data, just return current price
     if (currentStock.data.length < days) return currentStock.currentPrice;
 
@@ -20,8 +21,8 @@ function getMovingAverage(currentStock: Stock, days: number = 21): number {
 }
 
 function handleEarnings(currentStock: Stock): number {
-    // Get stock growth over the last 3 weeks
-    const recentHistory = currentStock.data.slice(-42);
+    // Get stock growth over the last weeks since last earnings, 7 is the days
+    const recentHistory = currentStock.data.slice(-(EARNINGS_WEEK * 7));
     const startPrice = recentHistory.length > 0 ? recentHistory[0][1] : currentStock.currentPrice;
     const stockGains = (currentStock.currentPrice - startPrice) / startPrice;
 
@@ -126,8 +127,8 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
 
     // When there is an earnings the average doesn't matter
     if(!earningsWeek){
-        // MEAN REVERSION Lik an Elastic Band to relax volatility
-        const movingAverage = getMovingAverage(currentStock, 21); // 21-Day MA
+        // MEAN REVERSION Lik an Elastic Band to relax volatility, 3 weeks * 7 days = 21
+        const movingAverage = getMovingAverage(currentStock, -21);
         
         // Calculate how far we are from the average
         const deviation = currentStock.currentPrice / movingAverage; 
@@ -230,8 +231,6 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
 }
 
 function updateMarketPsychology(currentStock: Stock, percentChange: number, isEarnings: boolean): void {
-    console.log("WEEKLY CHANGE", percentChange * 100);
-    
     // Convert decimal percentage to a readable number (e.g., 0.05 -> 5)
     const moveMagnitude = Math.abs(percentChange * 100);
     const isCrash = percentChange < -0.05; // Dropped more than 5%
@@ -285,8 +284,7 @@ function updateMarketPsychology(currentStock: Stock, percentChange: number, isEa
     currentStock.volatility = Math.max(0, Math.min(100, currentStock.volatility));
 }
 
-export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number): void {
-    const EARNINGS_WEEK = 6
+export function simulateNextWeek(week: number, currentStock: Stock, globalNews: number): number {
     const startingPrice = currentStock.currentPrice;
 
     let weeklyEarningsSurprise: number | null = null;
@@ -301,7 +299,7 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         const lastEntry = currentStock.data[currentStock.data.length - 1][0];
 
         // Added this so typescript stops yelling at me
-        if(!lastEntry) return
+        if(!lastEntry) return 0
 
         const lastDate = new Date(lastEntry);
         
@@ -322,7 +320,6 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
 
             todaySurprise = weeklyEarningsSurprise; 
             
-            console.log("EARNING PERC", weeklyEarningsSurprise);
             isEarningsDay = true;
             trend = weeklyEarningsSurprise >= 0 ? "UP" : "DOWN";
         } else {
@@ -362,6 +359,7 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
     if ((week % EARNINGS_WEEK == 0) && week > 0) wasEarningsWeek = true;
 
     const totalWeeklyChange = (currentStock.currentPrice - startingPrice) / startingPrice;
-    console.log("PRICE", currentStock.currentPrice);
     updateMarketPsychology(currentStock, totalWeeklyChange, wasEarningsWeek);
+
+    return totalWeeklyChange
 }
