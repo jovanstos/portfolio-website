@@ -3,8 +3,8 @@ import { Stock } from "./Stock";
 const START_DATE = new Date('2025-01-01').getTime();
 const EARNINGS_WEEK = 6
 
-function rollChances(min:number, max:number) {
-  return Math.random() * (max - min) + min;
+function rollChances(min: number, max: number) {
+    return Math.random() * (max - min) + min;
 }
 
 function getMovingAverage(currentStock: Stock, days: number): number {
@@ -13,10 +13,10 @@ function getMovingAverage(currentStock: Stock, days: number): number {
 
     // Slice the last 'days' entries
     const recentHistory = currentStock.data.slice(-days);
-    
+
     // Sum up the prices
     const sum = recentHistory.reduce((acc, entry) => acc + entry[1], 0);
-    
+
     return sum / recentHistory.length;
 }
 
@@ -36,10 +36,10 @@ function handleEarnings(currentStock: Stock): number {
     const isBeat = Math.random() < beatProbability;
 
     // Get the volatility of the stock, turn it into a perctange with variance of 3%
-    const volatilityLowEnd = Math.max(((currentStock.volatility -3) / 1000), 0.03)
-    const volatilityHighEnd = Math.max(((currentStock.volatility +3) / 1000), 0.05)
+    const volatilityLowEnd = Math.max(((currentStock.volatility - 3) / 1000), 0.03)
+    const volatilityHighEnd = Math.max(((currentStock.volatility + 3) / 1000), 0.05)
     const variancePercent = rollChances(volatilityLowEnd, volatilityHighEnd);
-        
+
     let actualEarnings;
     if (isBeat) {
         actualEarnings = currentStock.projectedEarnings * (1 + variancePercent);
@@ -67,17 +67,22 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
 
     const volumeModifier = currentStock.volume / 100; // 0.0 to 1.0
 
-    // Check for "Crash" "or "Rally" conditions, also a 1% chance to not follow the trend
-    if ((globalNews == -1 || currentStock.companyNews == -1) && Math.random() < 0.99) {
+    // Check for "Crash" "or "Rally" conditions
+    if (globalNews <= -0.75 && currentStock.companyNews < 0) {
         // If news is terrible, Volume accelerates the crash Panic Sell
-        return "DOWN"; 
+        return "DOWN";
     }
 
-    if ((globalNews == 1 || currentStock.companyNews == 1) && Math.random() < 0.99) {
+    if ((globalNews == 1 || currentStock.companyNews == 1)) {
         // If news is terrible, Volume accelerates the crash Panic Sell
-        return "DOWN"; 
-    } 
-    
+        return "DOWN";
+    }
+
+    // If P/E is massive (Bubble) and Social Buzz the bubble pops.
+    if (currentStock.pOverE > 60 && currentStock.socialBuzz < 20) {
+        return "DOWN";
+    }
+
     // Normal News Logic
     if (globalNews != 0) {
         // If news is positive, Volume helps it go higher. If negative, Volume pulls it lower.
@@ -86,8 +91,8 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
     }
 
     if (currentStock.companyNews != 0) {
-        const amplifiedCompanyNews = currentStock.companyNews > 0 
-            ? (currentStock.companyNews + volumeModifier) 
+        const amplifiedCompanyNews = currentStock.companyNews > 0
+            ? (currentStock.companyNews + volumeModifier)
             : (currentStock.companyNews - volumeModifier);
         randomNumberMax += amplifiedCompanyNews * 0.15;
     }
@@ -95,7 +100,7 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
     // P/E
     // "Value" stocks (Low P/E) have a safety net.
     // "Bubble" stocks (High P/E) have gravity pulling them down.
-    
+
     if (currentStock.pOverE < 5) {
         randomNumberMax -= 0.15; // Junk status, very risky
     } else if (currentStock.pOverE < 15) {
@@ -111,10 +116,10 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
     // SOCIAL BUZZ
     // High buzz can overpower bad P/E ratios
     // Low buzz means the stock is "invisible" and hard to move up.
-    
+
     if (currentStock.socialBuzz > 80) {
         // "To The Moon" Logic: Massive hype
-        randomNumberMax += 0.25; 
+        randomNumberMax += 0.25;
     } else if (currentStock.socialBuzz > 50) {
         // Healthy attention
         randomNumberMax += 0.10;
@@ -126,17 +131,17 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
     }
 
     // When there is an earnings the average doesn't matter
-    if(!earningsWeek){
+    if (!earningsWeek) {
         // MEAN REVERSION Lik an Elastic Band to relax volatility, 3 weeks * 7 days = 21
         const movingAverage = getMovingAverage(currentStock, -21);
-        
+
         // Calculate how far we are from the average
-        const deviation = currentStock.currentPrice / movingAverage; 
-    
+        const deviation = currentStock.currentPrice / movingAverage;
+
         if (deviation > 1.15) {
             // Price is 15% above average. It's "Overbought". Pull it down.
             // We reduce the UP chance significantly.
-            randomNumberMax -= 0.35; 
+            randomNumberMax -= 0.35;
         } else if (deviation > 1.05) {
             // Price is 5% above average. Minor resistance.
             randomNumberMax -= 0.10;
@@ -149,11 +154,25 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
         }
     }
 
-    // Ensure we don't break the math with negative maxes
-    if (randomNumberMax < 0.01) randomNumberMax = 0.01;
+    // If max is under 0.01 then it's trending down
+    if (randomNumberMax < 0.01) {
+        return "DOWN";
+    }
 
-    const stocksRoll = rollChances(0, randomNumberMax);
-   
+    let freshTrendScore = randomNumberMax;
+
+    // Mix with previous momentum to create smooth trends
+    const effectiveScore = (freshTrendScore * 0.7) + (currentStock.momentum * 0.3);
+
+    // Update Momentum for next week decay it slightly towards neutral
+    if (effectiveScore > 0.5) {
+        currentStock.momentum = Math.min(currentStock.momentum + 0.1, 1.0);
+    } else {
+        currentStock.momentum = Math.max(currentStock.momentum - 0.1, -1.0);
+    }
+
+    const stocksRoll = rollChances(0, effectiveScore);
+
     // If the weighted roll beats a raw random chance, we go UP.
     if (stocksRoll > Math.random()) {
         return "UP";
@@ -162,10 +181,10 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
     return "DOWN";
 }
 
-function getChange(currentStock: Stock, trend: string, globalNews: number, earningsSurprise: number | null): number {    
+function getChange(currentStock: Stock, trend: string, globalNews: number, earningsSurprise: number | null): number {
     // BASE MOVEMENT: Determined by Volatility
     // A stable stock (vol: 10) moves ~0.5% a day. A risky stock (vol: 90) moves ~4.5% a day.
-    let volatilityPercent = (currentStock.volatility / 100) * 0.05; 
+    let volatilityPercent = (currentStock.volatility / 100) * 0.05;
     const volumeModifier = currentStock.volume / 100;
 
     let percentChange = 0;
@@ -173,8 +192,8 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
     // Earnings day 
     if (earningsSurprise !== null) {
         // We amplify the surprise based on Volume (High volume = bigger reaction).
-        const volumeAmplifier = 1 + volumeModifier; 
-        
+        const volumeAmplifier = 1 + volumeModifier;
+
         percentChange = Math.abs(earningsSurprise) * volumeAmplifier;
 
         // Minimum drama: Earnings always cause at least a 2% move if volatility is non-zero
@@ -186,38 +205,38 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
         // Use a "cubic" random to bias towards smaller numbers
         // Math.random() is linear. Math.pow(Math.random(), 3) biases heavily towards 0.
         // This means most days are quiet, but rare days are big.
-        const biasedRandom = Math.pow(Math.random(), 3);
+        const biasedRandom = Math.pow(Math.random(), 1.5);
 
         percentChange = biasedRandom * volatilityPercent
 
-        if(trend == "UP"){
+        if (trend == "UP") {
             if (globalNews > 0) {
                 let newsValue = globalNews + volumeModifier;
-    
-                newsValue = newsValue * 0.5 / 100
-    
-                percentChange += newsValue
-            }
-
-            if(currentStock.companyNews > 0){
-                let newsValue = (currentStock.companyNews + volumeModifier) ;
 
                 newsValue = newsValue * 0.5 / 100
 
                 percentChange += newsValue
             }
-            
+
+            if (currentStock.companyNews > 0) {
+                let newsValue = (currentStock.companyNews + volumeModifier);
+
+                newsValue = newsValue * 0.5 / 100
+
+                percentChange += newsValue
+            }
+
         } else {
-            if (globalNews < 0){
+            if (globalNews < 0) {
                 let newsValue = globalNews - volumeModifier;
-    
+
                 newsValue = newsValue * 0.5 / 100
-    
+
                 percentChange += newsValue
             }
 
-            if(currentStock.companyNews < 0){
-                let newsValue = (currentStock.companyNews - volumeModifier) ;
+            if (currentStock.companyNews < 0) {
+                let newsValue = (currentStock.companyNews - volumeModifier);
 
                 newsValue = newsValue * 0.5 / 100
 
@@ -225,7 +244,14 @@ function getChange(currentStock: Stock, trend: string, globalNews: number, earni
             }
         }
     }
-    
+
+    // FORCE MOVEMENT
+    // If the stock is moving, make it move at least 0.5%. 
+    // Small movments make the AI/ML model stuck at predicting
+    if (percentChange < 0.005 && currentStock.volatility > 20) {
+        percentChange = rollChances(0.005, 0.015);
+    }
+
     // Sometimes percentage can be negative
     return Math.abs(percentChange);
 }
@@ -289,7 +315,7 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
 
     // If data exists, start 1 day after the last entry. If not, use START_DATE
     let nextDateCount: number;
-    
+
     if (currentStock.data.length === 0) {
         nextDateCount = START_DATE;
     } else {
@@ -297,31 +323,31 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         const lastEntry = currentStock.data[currentStock.data.length - 1][0];
 
         // Added this so typescript stops yelling at me
-        if(!lastEntry) return 0
+        if (!lastEntry) return 0
 
         const lastDate = new Date(lastEntry);
-        
+
         // Add 1 day to the last known date
         lastDate.setDate(lastDate.getDate() + 1);
         nextDateCount = lastDate.getTime();
     }
 
-    
+
     for (let i = 0; i < 7; i++) {
         let isEarningsDay = false;
         let trend = "";
 
         let todaySurprise: number | null = null;
-            
+
         if ((week % EARNINGS_WEEK == 0) && week > 0 && !weeklyEarningsSurprise) {
             weeklyEarningsSurprise = handleEarnings(currentStock);
 
-            todaySurprise = weeklyEarningsSurprise; 
-            
+            todaySurprise = weeklyEarningsSurprise;
+
             isEarningsDay = true;
             trend = weeklyEarningsSurprise >= 0 ? "UP" : "DOWN";
         } else {
-            if(week % EARNINGS_WEEK == 0 && week > 0){
+            if (week % EARNINGS_WEEK == 0 && week > 0) {
                 trend = getTrend(currentStock, globalNews, true);
             } else {
                 trend = getTrend(currentStock, globalNews, false);
@@ -329,14 +355,14 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         }
 
         const percentChange = getChange(currentStock, trend, globalNews, todaySurprise);
-        
+
         const oldPrice = currentStock.currentPrice;
-        if(trend == "DOWN"){            
+        if (trend == "DOWN") {
             currentStock.currentPrice = oldPrice - (oldPrice * percentChange);
         } else {
             currentStock.currentPrice = oldPrice + (oldPrice * percentChange);
         }
-        
+
         currentStock.updateProjectedEarnings(globalNews);
         currentStock.addData([nextDateCount, currentStock.currentPrice]);
 
@@ -345,8 +371,8 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
         nextDateCount = dateObj.getTime();
 
         // If there's an earnings the changes are radical so market must adjust
-        if(isEarningsDay) updateMarketPsychology(currentStock, percentChange, isEarningsDay);
-        
+        if (isEarningsDay) updateMarketPsychology(currentStock, percentChange, isEarningsDay);
+
         // console.log(`--------------------------------`);
         // console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);
         // console.log(`PRICE: $${oldPrice.toFixed(2)} -> $${currentStock.currentPrice.toFixed(2)}`);

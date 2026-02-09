@@ -4,7 +4,7 @@ import { Stock } from "./Stock";
 import type { ApexOptions } from 'apexcharts';
 import { simulateNextWeek } from './stockAlgorithm';
 import { generateNewsValue } from './NewsAlgorithm';
-import { getTrainingData } from './LSTMDataGen';
+import { getTrainingData } from './PIMDataGen';
 import { Parser } from '@json2csv/plainjs';
 
 // High-growth tech: High price, moderate earnings = High P/E
@@ -110,7 +110,7 @@ function PIM() {
         // Create a temporary link element to trigger download
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'LSTM_training_data.csv');
+        link.setAttribute('download', 'PIM_training_data.csv');
         document.body.appendChild(link);
         link.click();
         

@@ -17,6 +17,8 @@ export class Stock {
     pOverE: number;
     // Socail buzz from people 0 - 100, higher means more people care
     socialBuzz: number;
+    // The stocks price momentum
+    momentum: number;
     // Company news cycle -1 - 1, -1 means terrible news, 1 means great, 0 means no news this week
     companyNews: number;
     // Stock data
@@ -29,7 +31,7 @@ export class Stock {
         volume: number,
         volatility: number,
         socialBuzz: number) {
-        
+
         this.companyName = companyName;
         this.currentPrice = currentPrice;
         this.currentEarnings = currentEarnings;
@@ -41,10 +43,11 @@ export class Stock {
 
         // Calculate Earnings Per Share
         const eps = this.currentEarnings / this.totalShares;
-        
+
         // P/E calculation
         this.pOverE = eps !== 0 ? this.currentPrice / eps : 0;
 
+        this.momentum = 0;
         this.companyNews = 0;
         this.projectedEarnings = 0;
         this.data = [];
@@ -58,7 +61,7 @@ export class Stock {
     updateProjectedEarnings(globalNews: number) {
         // Global News impact, economy is good/bad
         // Global news (-1 to 1) affects projection by up to +/- 5%
-        let growthFactor = globalNews * 0.05; 
+        let growthFactor = globalNews * 0.05;
 
         // Company News: Stronger impact
         // Company news (-1 to 1) affects projection by up to +/- 10%
@@ -69,19 +72,19 @@ export class Stock {
         // Social Buzz: The "Hype"
         // Normalize buzz (0-100) to a range of -5% to +5%
         // If buzz is 50 (neutral), impact is 0. If 100, impact is +5%.
-        const buzzImpact = ((this.socialBuzz - 50) / 100) * 0.10; 
+        const buzzImpact = ((this.socialBuzz - 50) / 100) * 0.10;
         growthFactor += buzzImpact;
 
         // Volatility: Random "Analyst Uncertainty"
         // Higher volatility = wider random swings in projection
         // A volatility of 80 adds a random +/- 4% variance
-        const uncertainty = (Math.random() - 0.5) * (this.volatility / 1000); 
+        const uncertainty = (Math.random() - 0.5) * (this.volatility / 1000);
         growthFactor += uncertainty;
 
         // Apply to Current Earnings
         // It is floored at 0 because projected earnings shouldn't be negative revenue 
         this.projectedEarnings = Math.max(0, this.currentEarnings * (1 + growthFactor));
-        
+
         // Round for cleaner UI
         this.projectedEarnings = Math.round(this.projectedEarnings);
     }
