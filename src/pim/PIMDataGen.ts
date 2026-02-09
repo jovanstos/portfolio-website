@@ -4,7 +4,7 @@ import { generateNewsValue } from './NewsAlgorithm';
 import type { StockData } from "../types/pimTypes";
 
 const BOUNDS = {
-    priceChange: { min: -0.3, max: 0.3 },
+    priceChange: { min: -0.4, max: 0.7 },
     news: { min: -1, max: 1 },
     momentum: { min: -1, max: 1 },
     volume: { min: 0, max: 100 },

@@ -86,7 +86,7 @@ callback = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=Tr
 
 history = model.fit(
     X_train, y_train,
-    epochs=25, # How many times to go through the data
+    epochs=32, # How many times to go through the data
     batch_size=26,  # How many rows to process at once
     validation_data=(X_test, y_test),
     verbose=1,

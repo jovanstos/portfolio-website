@@ -60,22 +60,22 @@ function handleEarnings(currentStock: Stock): number {
 function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean): "UP" | "DOWN" {
     let randomNumberMax = 1;
 
-    // NEWS & VOLUME INTERACTION
-    // Real World Logic: Volume amplifies News.
-    // Good News + High Volume = Massive Rally.
-    // Bad News + High Volume = Panic Selling.
-
-    const volumeModifier = currentStock.volume / 100; // 0.0 to 1.0
-
     // Check for "Crash" "or "Rally" conditions
     if (globalNews <= -0.75 && currentStock.companyNews < 0) {
-        // If news is terrible, Volume accelerates the crash Panic Sell
+        return "DOWN";
+    }
+
+    if (globalNews >= 0.75 && currentStock.companyNews > 0) {
+        return "UP";
+    }
+
+    // Down comes first because horrible news is always something people listen to instead of good
+    if ((globalNews == -1 || currentStock.companyNews == -1)) {
         return "DOWN";
     }
 
     if ((globalNews == 1 || currentStock.companyNews == 1)) {
-        // If news is terrible, Volume accelerates the crash Panic Sell
-        return "DOWN";
+        return "UP";
     }
 
     // If P/E is massive (Bubble) and Social Buzz the bubble pops.
@@ -83,18 +83,27 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
         return "DOWN";
     }
 
+    // News And Volume interaction
+    // Volume amplifies News.
+    // Good News + High Volume = Massive Rally.
+    // Bad News + High Volume = Panic Selling.
+
+    const volumeModifier = currentStock.volume / 100; // 0.0 to 1.0
+
     // Normal News Logic
     if (globalNews != 0) {
         // If news is positive, Volume helps it go higher. If negative, Volume pulls it lower.
         const amplifiedNews = globalNews > 0 ? (globalNews + volumeModifier) : (globalNews - volumeModifier);
-        randomNumberMax += amplifiedNews * 0.25;
+
+        randomNumberMax += amplifiedNews;
     }
 
     if (currentStock.companyNews != 0) {
         const amplifiedCompanyNews = currentStock.companyNews > 0
             ? (currentStock.companyNews + volumeModifier)
             : (currentStock.companyNews - volumeModifier);
-        randomNumberMax += amplifiedCompanyNews * 0.15;
+
+        randomNumberMax += amplifiedCompanyNews;
     }
 
     // P/E
@@ -105,6 +114,8 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
         randomNumberMax -= 0.15; // Junk status, very risky
     } else if (currentStock.pOverE < 15) {
         randomNumberMax += 0.05; // Safe Value buy
+    } else if (currentStock.pOverE < 25) {
+        randomNumberMax += 0.10; // Solid
     } else if (currentStock.pOverE < 45) {
         randomNumberMax += 0.20; // Growth Momentum
     } else if (currentStock.pOverE < 60) {
@@ -127,7 +138,7 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
         // "Dead" stock. No one cares, so it drifts down.
         randomNumberMax -= 0.05;
     } else {
-        randomNumberMax += 0.05;
+        randomNumberMax -= 0.02;
     }
 
     // When there is an earnings the average doesn't matter
