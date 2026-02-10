@@ -8,3 +8,11 @@ export const postCodeToCompiler = async (usersScript: string): Promise<Blob> => 
 
     return res.data;
 };
+
+export const postDataToPIM = async (stockData: number[]): Promise<number[]> => {
+    const res = await api.post("/python/pim",
+        { data: stockData },
+    );
+
+    return res.data
+};

@@ -4,8 +4,12 @@ import { Stock } from "./Stock";
 import type { ApexOptions } from 'apexcharts';
 import { simulateNextWeek } from './stockAlgorithm';
 import { generateNewsValue } from './NewsAlgorithm';
-import { getTrainingData } from './PIMDataGen';
-import { Parser } from '@json2csv/plainjs';
+import { useMutation } from "@tanstack/react-query";
+import { postDataToPIM } from "../api/python";
+import { formatStockData } from './PIMDataGen';
+// Only used when deving
+// import { Parser } from '@json2csv/plainjs';
+// import { getTrainingData } from './PIMDataGen';
 
 // High-growth tech: High price, moderate earnings = High P/E
 const stock1 = new Stock("NovaTech Robotics", 210.50, 450000000, 85, 75, 92);
@@ -97,48 +101,24 @@ function PIM() {
         data: seriesData5
     }];
 
-    function downloadCSV() {
-        const data = getTrainingData()
-        
-        try {
-        const parser = new Parser();
-        const csv = parser.parse(data);
-        
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        
-        // Create a temporary link element to trigger download
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'PIM_training_data.csv');
-        document.body.appendChild(link);
-        link.click();
-        
-        // Cleanup
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        } catch (err) {
-        console.error("CSV Export Error:", err);
-        }
+    const PIMMutation = useMutation({
+        mutationFn: postDataToPIM,
+        onSuccess: async (data: number[]) => {
+            console.log("DID IT", data[0]);
+        },
+        onError: (error: any) => {
+            const msg = error instanceof Error ? error.message : "Unknown error occurred";
+            console.error(msg);
+        },
+    });
+
+    const handleRun = () => {
+        PIMMutation.mutate(formatStockData(stock1, globalNews, week));
     };
 
     function runSim(){
         console.log(`-------------------WEEK: ${week}--------------------`);
         
-        stock1.companyNews = generateNewsValue()
-        stock2.companyNews = generateNewsValue()
-        stock3.companyNews = generateNewsValue()
-        stock4.companyNews = generateNewsValue()
-        stock5.companyNews = generateNewsValue()
-
-        const globalNewsChance = Math.random()
-
-        if(globalNews !== 0 && globalNewsChance > 0.4){
-            setGlobalNews(generateNewsValue());
-        }else if(globalNewsChance > 0.75){
-            setGlobalNews(generateNewsValue());
-        }
-
         console.log("GLOBAL NEWS:", globalNews);
         
         console.log("COMAPNY NEWS 1:", stock1.companyNews);
@@ -158,11 +138,52 @@ function PIM() {
         setSeriesData4(stock4.data);
         setSeriesData5(stock5.data);
 
-        setWeek(prev => prev + 1); 
+        setWeek(prev => prev + 1);
+
+        stock1.companyNews = generateNewsValue()
+        stock2.companyNews = generateNewsValue()
+        stock3.companyNews = generateNewsValue()
+        stock4.companyNews = generateNewsValue()
+        stock5.companyNews = generateNewsValue()
+
+        const globalNewsChance = Math.random()
+
+        if(globalNews !== 0 && globalNewsChance > 0.4){
+            setGlobalNews(generateNewsValue());
+        }else if(globalNewsChance > 0.75){
+            setGlobalNews(generateNewsValue());
+        }
     }
+
+    // Only used when deving
+    // function downloadCSV() {
+    //     const data = getTrainingData()
+        
+    //     try {
+    //         const parser = new Parser();
+    //         const csv = parser.parse(data);
+            
+    //         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    //         const url = URL.createObjectURL(blob);
+            
+    //         // Create a temporary link element to trigger download
+    //         const link = document.createElement('a');
+    //         link.href = url;
+    //         link.setAttribute('download', 'PIM_training_data.csv');
+    //         document.body.appendChild(link);
+    //         link.click();
+            
+    //         // Cleanup
+    //         document.body.removeChild(link);
+    //         URL.revokeObjectURL(url);
+    //     } catch (err) {
+    //         console.error("CSV Export Error:", err);
+    //     }
+    // };
 
     return (
         <main>
+            <h1>Prediction Investment Model</h1>
             <h1>Week {week}</h1>
             <div style={{display: "flex"}}>
                 <Chart
@@ -202,10 +223,7 @@ function PIM() {
                 />
             </div>
             <button onClick={runSim}>Run Sim</button>
-            <button
-                onClick={downloadCSV}>
-                Download CSV
-            </button>
+            <button onClick={handleRun}>Call API</button>
         </main>
     );
 }

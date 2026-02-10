@@ -53,6 +53,40 @@ function createRandomStock(id: number): Stock {
     );
 }
 
+export function formatStockData(currentStock: Stock, globalNews: number, week: number): number[]{
+
+    let isEarningsWeek = 0
+
+    if (week % 6 === 0 && week !== 0) {
+        isEarningsWeek = 1;
+    }
+
+    const data = [
+        // Use linearNormalize for centered data (-1 to 1)
+        // globalNews
+        linearNormalize(globalNews, BOUNDS.news.min, BOUNDS.news.max),
+        // companyNews
+        linearNormalize(currentStock.companyNews, BOUNDS.news.min, BOUNDS.news.max),
+        // momentum
+        linearNormalize(currentStock.momentum, BOUNDS.news.min, BOUNDS.news.max),
+
+        // Use logNormalize for magnitude data (0 to 100)
+        // volume
+        logNormalize(currentStock.volume, BOUNDS.volume.min, BOUNDS.volume.max),
+        // volatility
+        logNormalize(currentStock.volatility, BOUNDS.volatility.min, BOUNDS.volatility.max),
+        // pOverE
+        logNormalize(currentStock.pOverE, BOUNDS.pOverE.min, BOUNDS.pOverE.max),
+        // socialBuzz
+        logNormalize(currentStock.socialBuzz, BOUNDS.socialBuzz.min, BOUNDS.socialBuzz.max),
+
+        // isEarningsWeek
+        isEarningsWeek,
+    ];
+
+    return data
+}
+
 export function getTrainingData() {
     const TOTAL_EPISODES = 400; // 400 games * 26 weeks = 10,400 data points
     const WEEKS_PER_GAME = 26;

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { requireAuth } from './auth.js';
-import { compileUserCode } from '../utils/pythonRunner.js';
+import { compileUserCode, runPIMClassifier } from '../utils/pythonRunner.js';
 
 const router: Router = Router();
 
@@ -24,6 +24,30 @@ router.post('/compile', requireAuth, async (req: Request, res: Response) => {
     } catch (error: any) {
         res.status(500).json({
             error: "Compilation Error",
+            details: error.message
+        });
+    }
+});
+
+router.post('/pim', requireAuth, async (req: Request, res: Response) => {
+    try {
+        // Getting the code in the body
+        const { data } = req.body;
+        console.log("HALLO", data);
+
+        if (!data) {
+            return res.status(400).json({ error: "No data provided" });
+        }
+
+        // Runing the model
+        const prediction = await runPIMClassifier(data);
+
+        // Send the prediction back
+        res.send(prediction[0]);
+
+    } catch (error: any) {
+        res.status(500).json({
+            error: "Model Error",
             details: error.message
         });
     }

@@ -2,6 +2,7 @@ import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 import { nanoid } from 'nanoid';
+import { log } from 'console';
 
 /**
  * Compiles source code string to WASM binary buffer.
@@ -58,4 +59,50 @@ export const compileUserCode = async (sourceCode: string): Promise<Buffer> => {
             console.error("Cleanup error", e);
         }
     }
+};
+
+/**
+ * Runs the PIM classifier model via a spawned Python process.
+ * @param data - Array of numbers to classify (e.g. [0.5, 0.1, 100, 0.2, 15, 2])
+ */
+export const runPIMClassifier = async (data: number[]): Promise<any> => {
+    console.log("WE GOT IT", data);
+    
+    const pythonScriptPath = path.join(process.cwd(), 'python/PIM.py');
+    const pythonCommand = 'python3';
+
+    return new Promise((resolve, reject) => {
+        const pyProcess = spawn(pythonCommand, [
+            pythonScriptPath, 
+            JSON.stringify(data)
+        ]);
+
+        let stdoutData = '';
+        let stderrData = '';
+
+        pyProcess.stdout.on('data', (data) => {
+            stdoutData += data.toString();
+        });
+
+        pyProcess.stderr.on('data', (data) => {
+            stderrData += data.toString();
+        });
+
+        pyProcess.on('close', (code) => {
+            if (code !== 0) {
+                return reject(new Error(`Python Error: ${stderrData}`));
+            }
+
+            try {
+                const result = JSON.parse(stdoutData);
+                if (result.error) {
+                    reject(new Error(result.error));
+                } else {
+                    resolve(result.prediction);
+                }
+            } catch (e) {
+                reject(new Error(`Failed to parse Python output: ${stdoutData}`));
+            }
+        });
+    });
 };
