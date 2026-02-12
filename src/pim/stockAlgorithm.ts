@@ -1,6 +1,7 @@
 import { Stock } from "./Stock";
 
 const START_DATE = new Date('2025-01-01').getTime();
+const DAYS_IN_WEEK = 5
 const EARNINGS_WEEK = 6
 
 function rollChances(min: number, max: number) {
@@ -21,8 +22,8 @@ function getMovingAverage(currentStock: Stock, days: number): number {
 }
 
 function handleEarnings(currentStock: Stock): number {
-    // Get stock growth over the last weeks since last earnings, 7 is the days
-    const recentHistory = currentStock.data.slice(-(EARNINGS_WEEK * 7));
+    // Get stock growth over the last weeks since last earnings, 5 is the days
+    const recentHistory = currentStock.data.slice(-(EARNINGS_WEEK * DAYS_IN_WEEK));
     const startPrice = recentHistory.length > 0 ? recentHistory[0][1] : currentStock.currentPrice;
     const stockGains = (currentStock.currentPrice - startPrice) / startPrice;
 
@@ -143,8 +144,8 @@ function getTrend(currentStock: Stock, globalNews: number, earningsWeek: boolean
 
     // When there is an earnings the average doesn't matter
     if (!earningsWeek) {
-        // MEAN REVERSION Lik an Elastic Band to relax volatility, 3 weeks * 7 days = 21
-        const movingAverage = getMovingAverage(currentStock, -21);
+        // MEAN REVERSION Lik an Elastic Band to relax volatility, 3 weeks * 5 days
+        const movingAverage = getMovingAverage(currentStock, -(3 * DAYS_IN_WEEK));
 
         // Calculate how far we are from the average
         const deviation = currentStock.currentPrice / movingAverage;
@@ -344,7 +345,7 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
     }
 
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < DAYS_IN_WEEK; i++) {
         let isEarningsDay = false;
         let trend = "";
 
