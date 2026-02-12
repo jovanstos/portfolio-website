@@ -2,9 +2,6 @@ import { useState } from 'react';
 import { Stock } from "./Stock";
 import { simulateNextWeek } from './stockAlgorithm';
 import { generateNewsValue } from './NewsAlgorithm';
-import { useMutation } from "@tanstack/react-query";
-import { postDataToPIM } from "../api/python";
-import { formatStockData } from './PIMDataUtils';
 import StockComponent from './StockComponent';
 import "../styles/PIM.css";
 // Only used when deving
@@ -30,21 +27,6 @@ const stock5 = new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
 function PIM() {
     const [globalNews, setGlobalNews] = useState<number>(0);
     const [week, setWeek] = useState<number>(0);
-
-    const PIMMutation = useMutation({
-        mutationFn: postDataToPIM,
-        onSuccess: async (data: number[]) => {
-            console.log("DID IT", data[0]);
-        },
-        onError: (error: any) => {
-            const msg = error instanceof Error ? error.message : "Unknown error occurred";
-            console.error(msg);
-        },
-    });
-
-    const handleRun = () => {
-        PIMMutation.mutate(formatStockData(stock1, globalNews, week));
-    };
 
     function runSim() {
         console.log(`-------------------WEEK: ${week}--------------------`);
@@ -117,7 +99,6 @@ function PIM() {
                 <StockComponent stock={stock5} color='#008FFB' globalNews={globalNews} week={week} />
             </div>
             <button onClick={runSim}>Run Sim</button>
-            <button onClick={handleRun}>Call API</button>
         </main>
     );
 }
