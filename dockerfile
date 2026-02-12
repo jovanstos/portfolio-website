@@ -2,7 +2,7 @@
 FROM node:22-bookworm AS base
 WORKDIR /app
 
-# 1. Allow pip to install globally in Debian Bookworm (Node 22)
+# Allow pip to install globally in Debian Bookworm (Node 22)
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install LLVM, Python, and build tools
@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Install llvmlite
-RUN pip install llvmlite
+# Install python libraries
+RUN pip install llvmlite tensorflow
 
 # Copy package files first to leverage Docker cache
 COPY package*.json ./
@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install llvmlite for production runtime
-RUN pip install llvmlite
+RUN pip install llvmlite tensorflow
 
 # Copy only the compiled code and production dependencies
 COPY --from=build-stage /app/dist ./dist

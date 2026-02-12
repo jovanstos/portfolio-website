@@ -344,7 +344,7 @@ export function simulateNextWeek(week: number, currentStock: Stock, globalNews: 
     }
 
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 5; i++) {
         let isEarningsDay = false;
         let trend = "";
 

@@ -53,7 +53,7 @@ function createRandomStock(id: number): Stock {
     );
 }
 
-export function formatStockData(currentStock: Stock, globalNews: number, week: number): number[]{
+export function formatStockData(currentStock: Stock, globalNews: number, week: number): number[] {
 
     let isEarningsWeek = 0
 
@@ -139,4 +139,9 @@ export function getTrainingData() {
     }
 
     return data;
+}
+
+export function handlePIMPrediction(prediction: number[]): string {
+    console.log(prediction);
+    return "yo"
 }
