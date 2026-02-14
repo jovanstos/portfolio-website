@@ -1,85 +1,84 @@
-#PIM{
-    background-color: #0B0E11;
-    color: light-dark(black, white);
-    border-radius: var(--radius-lg);
-    padding: 15px;
-    max-width: 1200px;
-    border: 5px solid black;
+#PIM {
+  background-color: #0b0e11;
+  color: light-dark(black, white);
+  border-radius: var(--radius-lg);
+  padding: 15px;
+  max-width: 1200px;
+  border: 5px solid black;
 }
 
-#PIM-game{
-    display: flex;
-    margin: 20px 0px;
+#PIM-game {
+  display: flex;
+  margin: 20px 0px;
 }
 
-#PIM-nav{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #06060a;
-    padding: 25px;
-    border-radius: var(--radius-lg);
+#PIM-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #06060a;
+  padding: 25px;
+  border-radius: var(--radius-lg);
 }
 
-#PIM-nav > button{
-    margin: 5px;
+#PIM-nav > button {
+  margin: 5px;
 }
 
-#stocks-holder{
-    background-color: #030303;
-    padding: 10px;
-    overflow: scroll;
-    max-height: 500px;
-    margin: 0px 15px;
+#stocks-holder {
+  background-color: #030303;
+  padding: 10px;
+  overflow: scroll;
+  max-height: 500px;
+  margin: 0px 15px;
 }
 
 .stock {
-    background-color: #030303;
-    padding: 10px;
+  background-color: #030303;
+  padding: 10px;
 }
 
 .stock > * {
-    color: white;
+  color: white;
 }
 
 .stock > button {
-    color: light-dark(black, white);
+  color: light-dark(black, white);
 }
 
 .stock-chart {
-    color: black;
+  color: black;
 }
 
-#players{
-    color: white;
-    overflow: scroll;
-    max-height: 500px;
+#players {
+  color: white;
+  overflow: scroll;
+  max-height: 500px;
 }
 
-.player-card{
-    background-color: #06060a;
-    padding: 10px;
-    border-radius: var(--radius-lg);
-    margin-top: 5px;
-    margin-right: 20px;
+.player-card {
+  background-color: #06060a;
+  padding: 10px;
+  border-radius: var(--radius-lg);
+  margin-top: 5px;
+  margin-right: 20px;
 }
 
-.player-card > *{
-    color: white;
+.player-card > * {
+  color: white;
 }
 
-.player-profile > *{
-    display: inline;
+.player-profile > * {
+  display: inline;
 }
 
-.player-profile{
-    padding: 10px;
+.player-profile {
+  padding: 10px;
 }
 
-
-.player-img{
-    height: 35px;
-    width: 35px;
-    border-radius: 100%;
-    margin-right: 10px;
+.player-img {
+  height: 35px;
+  width: 35px;
+  border-radius: 100%;
+  margin-right: 10px;
 }

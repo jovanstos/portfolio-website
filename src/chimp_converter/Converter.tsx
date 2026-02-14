@@ -7,124 +7,126 @@ import type { ImageFormat } from "../types/converterTypes";
 import ErrorPopup from "../components/ErrorPopup";
 
 function Converter() {
-    const [file, setFile] = useState<File | null>(null);
-    const [isError, setIsError] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string>("");
-    const [outputFormat, setOutputFormat] = useState<ImageFormat>("png");
-    const [isDragging, setIsDragging] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [outputFormat, setOutputFormat] = useState<ImageFormat>("png");
+  const [isDragging, setIsDragging] = useState(false);
 
-    // This the function for sending the image to the backend to be converted...
-    // ... useMutation is being used here because it's designed to handle the post request that this is
-    const convertMutation = useMutation({
-        mutationFn: convertImage,
-        onSuccess: (blob) => {
-            setIsError(false);
-            setErrorMessage("");
+  // This the function for sending the image to the backend to be converted...
+  // ... useMutation is being used here because it's designed to handle the post request that this is
+  const convertMutation = useMutation({
+    mutationFn: convertImage,
+    onSuccess: (blob) => {
+      setIsError(false);
+      setErrorMessage("");
 
-            const originalName = file?.name.split(".")[0]
+      const originalName = file?.name.split(".")[0];
 
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `${originalName}.${outputFormat}`;
-            link.click();
-            URL.revokeObjectURL(url);
-        },
-        onError: (error: any) => {
-            setIsError(true);
-            if (error instanceof Error) {
-                setErrorMessage(error.message);
-            } else {
-                setErrorMessage("An unexpected error occurred.");
-            }
-        },
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${originalName}.${outputFormat}`;
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (error: any) => {
+      setIsError(true);
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
+    },
+  });
+
+  // These functions are self documenting
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!file) {
+      setIsError(true);
+      setErrorMessage("Please select a file to convert.");
+      return;
+    }
+
+    convertMutation.mutate({
+      file,
+      outputFormat,
     });
+  };
 
-    // These functions are self documenting
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+  const handleFile = (newFile: File) => {
+    setFile(newFile);
+    setIsError(false);
+    setErrorMessage("");
+  };
 
-        if (!file) {
-            setIsError(true);
-            setErrorMessage("Please select a file to convert.");
-            return;
-        }
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  }, []);
 
-        convertMutation.mutate({
-            file,
-            outputFormat,
-        });
-    };
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
-    const handleFile = (newFile: File) => {
-        setFile(newFile);
-        setIsError(false);
-        setErrorMessage("");
-    };
+  const handleDragLeave = () => setIsDragging(false);
 
-    const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setIsDragging(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0]);
-        }
-    }, []);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = () => setIsDragging(false);
-
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            handleFile(e.target.files[0]);
-        }
-    };
-
-    return (
-        <section id="converter">
-            <ErrorPopup isError={isError} message={errorMessage} />
-            <div id="img-holder">
-                <img src="/chimp.gif" width={"100px"} alt="One black and gray chimpanze running" />
-            </div>
-            <form onSubmit={handleSubmit}>
-                <div
-                    className={`file-dropzone ${isDragging ? "dragging" : ""}`}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onClick={() => document.getElementById("fileInput")?.click()}
-                >
-                    {file ? file.name : "Click or drag a file here"}
-                </div>
-                <input
-                    type="file"
-                    id="fileInput"
-                    style={{ display: "none" }}
-                    onChange={handleFileSelect}
-                />
-                <div id="converter-options">
-                    <select
-                        value={outputFormat}
-                        onChange={(e) =>
-                            setOutputFormat(e.target.value as ImageFormat)
-                        }
-                    >
-                        <option value="png">PNG</option>
-                        <option value="jpg">JPG</option>
-                        <option value="jpeg">JPEG</option>
-                        <option value="webp">WEBP</option>
-                        <option value="gif">GIF</option>
-                    </select>
-                    <button type="submit" disabled={convertMutation.isPending}>
-                        {convertMutation.isPending ? "Converting..." : "Convert"}
-                    </button>
-                </div>
-            </form>
-        </section>
-    );
+  return (
+    <section id="converter">
+      <ErrorPopup isError={isError} message={errorMessage} />
+      <div id="img-holder">
+        <img
+          src="/chimp.gif"
+          width={"100px"}
+          alt="One black and gray chimpanze running"
+        />
+      </div>
+      <form onSubmit={handleSubmit}>
+        <div
+          className={`file-dropzone ${isDragging ? "dragging" : ""}`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => document.getElementById("fileInput")?.click()}
+        >
+          {file ? file.name : "Click or drag a file here"}
+        </div>
+        <input
+          type="file"
+          id="fileInput"
+          style={{ display: "none" }}
+          onChange={handleFileSelect}
+        />
+        <div id="converter-options">
+          <select
+            value={outputFormat}
+            onChange={(e) => setOutputFormat(e.target.value as ImageFormat)}
+          >
+            <option value="png">PNG</option>
+            <option value="jpg">JPG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="webp">WEBP</option>
+            <option value="gif">GIF</option>
+          </select>
+          <button type="submit" disabled={convertMutation.isPending}>
+            {convertMutation.isPending ? "Converting..." : "Convert"}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
 }
 
 export default Converter;

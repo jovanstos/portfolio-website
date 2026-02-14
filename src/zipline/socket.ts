@@ -1,4 +1,4 @@
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
 // This script just starts socket
 
@@ -8,5 +8,5 @@ import { io } from 'socket.io-client';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || undefined;
 
 export const socket = io(SOCKET_URL, {
-    autoConnect: true
+  autoConnect: true,
 });

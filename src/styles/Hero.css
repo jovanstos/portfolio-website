@@ -1,4 +1,4 @@
-.hero{
+.hero {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -35,7 +35,7 @@
 }
 
 /* Burst phase */
-.burstCanvas{
+.burstCanvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -56,8 +56,14 @@
 }
 
 @keyframes badgePop {
-  from { transform: scale(0.92); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .circleSvg {
@@ -81,7 +87,7 @@
 }
 
 /* Hero phase */
-.realHeroMuted{
+.realHeroMuted {
   opacity: 0;
   pointer-events: none;
 }
@@ -105,12 +111,30 @@
 }
 
 @keyframes heroFadeInSteps {
-  0%   { font-size: 0.50rem; opacity: 0; }
-  20%  { font-size: 0.60rem; opacity: 0.2; }
-  40%  { font-size: 0.70rem; opacity: 0.4; }
-  60%  { font-size: 0.80rem; opacity: 0.6; }
-  80%  { font-size: 0.90rem; opacity: 0.8; }
-  100% { font-size: medium; opacity: 1; }
+  0% {
+    font-size: 0.5rem;
+    opacity: 0;
+  }
+  20% {
+    font-size: 0.6rem;
+    opacity: 0.2;
+  }
+  40% {
+    font-size: 0.7rem;
+    opacity: 0.4;
+  }
+  60% {
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+  80% {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  100% {
+    font-size: medium;
+    opacity: 1;
+  }
 }
 
 /* Wave text CSS*/
@@ -125,9 +149,9 @@
 }
 
 @media screen and (max-width: 750px) {
-    .realHero{
-        margin-top: 50px;
-    }
+  .realHero {
+    margin-top: 50px;
+  }
 }
 
 @keyframes wave {

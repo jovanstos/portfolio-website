@@ -26,7 +26,7 @@
   /* Colors */
   --color-bg: light-dark(white, #13141c);
   --color-text: light-dark(black, white);
-  --color-bg-accent: light-dark(#D9DCED, #0b0c12);
+  --color-bg-accent: light-dark(#d9dced, #0b0c12);
   --color-bg-daccent: light-dark(#c3c6d5, #06060a);
   --color-accent: #3b82f6;
 
@@ -70,8 +70,12 @@
 }
 
 /* For light and dark mode */
-html.light { color-scheme: light; }
-html.dark  { color-scheme: dark; }
+html.light {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
 
 html,
 body {
@@ -83,7 +87,7 @@ body {
   margin: 0;
   min-width: 100vw;
   min-height: 100vh;
-  
+
   color: var(--color-text);
   line-height: var(--lh-normal);
 }
@@ -161,7 +165,9 @@ button {
   font-size: var(--medium);
   border-radius: var(--radius-md);
   font-weight: 500;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 /* Primary Button */
@@ -236,16 +242,28 @@ button {
 }
 
 @keyframes shake {
-  0% { rotate: 0deg; }
-  2% { rotate: 5deg;}
-  4% { rotate: -5deg; }
-  6% { rotate: 5deg; }
-  6.66% { rotate: 0deg; }
-  100% { rotate: 0deg;}
+  0% {
+    rotate: 0deg;
+  }
+  2% {
+    rotate: 5deg;
+  }
+  4% {
+    rotate: -5deg;
+  }
+  6% {
+    rotate: 5deg;
+  }
+  6.66% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 0deg;
+  }
 }
 
 /* Footer CSS */
-footer{
+footer {
   background-color: var(--color-accent);
   padding: 15px;
   height: 100%;
@@ -275,7 +293,7 @@ footer > section > div {
 
 /* Light Dark Toggle CSS */
 
-#lightDarkToggle{
+#lightDarkToggle {
   cursor: pointer;
   position: fixed;
   top: 25px;
@@ -285,7 +303,7 @@ footer > section > div {
 
 /* Not found Page CSS */
 
-#not-found{
+#not-found {
   display: flex;
   flex-direction: column;
   justify-content: center;

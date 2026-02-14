@@ -1,5 +1,5 @@
 import "../styles/Home.css";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import Hero from "../components/Hero";
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
@@ -7,7 +7,6 @@ import SmallCard from "../cards/SmallCard";
 import FadeInSection from "../components/FadeInSection";
 
 function Home() {
-
   const navigate = useNavigate();
 
   return (
@@ -16,16 +15,30 @@ function Home() {
       <FadeInSection>
         <div id="home-info">
           <p id="home-info-text">
-            <b style={{
-              fontSize: "var(--xlarge)", color: "#FFCB00"
-            }}>Real quick, </b>
-            just a rundown of the site. The rocket ship in the top left is a spinable wheel with the navigation links. The sun/moon in the top right is to switch between light/dark mode. Also, this is a MEGA monolith app; it has multiple services and live projects. You can learn more about the app by going to the detailed explanation here: <a href="/" rel="noopener noreferrer">Project page.</a>
+            <b
+              style={{
+                fontSize: "var(--xlarge)",
+                color: "#FFCB00",
+              }}
+            >
+              Real quick,{" "}
+            </b>
+            just a rundown of the site. The rocket ship in the top left is a
+            spinable wheel with the navigation links. The sun/moon in the top
+            right is to switch between light/dark mode. Also, this is a MEGA
+            monolith app; it has multiple services and live projects. You can
+            learn more about the app by going to the detailed explanation here:{" "}
+            <a href="/" rel="noopener noreferrer">
+              Project page.
+            </a>
           </p>
         </div>
       </FadeInSection>
       <main id="home">
         <section className="home-projects">
-          <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center" }}>Featured Projects</h1>
+          <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center" }}>
+            Featured Projects
+          </h1>
           <p style={{ fontSize: "var(--medium)", textAlign: "center" }}>
             Some of my favorites
           </p>
@@ -41,7 +54,15 @@ function Home() {
             </FadeInSection>
           </div>
           <FadeInSection>
-            <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center", marginTop: "var(--space-md)" }}>All Projects</h1>
+            <h1
+              style={{
+                fontSize: "var(--xxlarge)",
+                textAlign: "center",
+                marginTop: "var(--space-md)",
+              }}
+            >
+              All Projects
+            </h1>
             <p style={{ fontSize: "var(--medium)", textAlign: "center" }}>
               Some more great ones
             </p>
@@ -51,22 +72,43 @@ function Home() {
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button className="primary-button" onClick={() => navigate("/projects")}>See more</button>
+                <button
+                  className="primary-button"
+                  onClick={() => navigate("/projects")}
+                >
+                  See more
+                </button>
               </div>
             </FadeInSection>
           </FadeInSection>
           <FadeInSection>
-            <h1 style={{ fontSize: "var(--xxlarge)", textAlign: "center", marginTop: "var(--space-md)" }}>Junk Yard</h1>
+            <h1
+              style={{
+                fontSize: "var(--xxlarge)",
+                textAlign: "center",
+                marginTop: "var(--space-md)",
+              }}
+            >
+              Junk Yard
+            </h1>
             <p style={{ fontSize: "var(--medium)", textAlign: "center" }}>
               Just some treasures and trinkets
             </p>
-            <div style={{ marginBottom: "var(--space-md)" }} className="card-holder">
+            <div
+              style={{ marginBottom: "var(--space-md)" }}
+              className="card-holder"
+            >
               <SmallCard />
               <SmallCard />
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <button className="primary-button" onClick={() => navigate("/junk")}>See more</button>
+                <button
+                  className="primary-button"
+                  onClick={() => navigate("/junk")}
+                >
+                  See more
+                </button>
               </div>
             </FadeInSection>
           </FadeInSection>
