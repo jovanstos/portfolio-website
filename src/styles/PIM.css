@@ -1,5 +1,10 @@
 #PIM{
-    background-color: var(--color-bg-accent);
+    background-color: #0B0E11;
+    color: light-dark(black, white);
+    border-radius: var(--radius-lg);
+    padding: 15px;
+    max-width: 1200px;
+    border: 5px solid black;
 }
 
 #PIM-game{
@@ -13,15 +18,23 @@
     align-items: center;
     background-color: #06060a;
     padding: 25px;
+    border-radius: var(--radius-lg);
 }
 
 #PIM-nav > button{
     margin: 5px;
 }
 
+#stocks-holder{
+    background-color: #030303;
+    padding: 10px;
+    overflow: scroll;
+    max-height: 500px;
+    margin: 0px 15px;
+}
+
 .stock {
-    border: 2px solid black;
-    background-color: #0B0E11;
+    background-color: #030303;
     padding: 10px;
 }
 
@@ -35,4 +48,38 @@
 
 .stock-chart {
     color: black;
+}
+
+#players{
+    color: white;
+    overflow: scroll;
+    max-height: 500px;
+}
+
+.player-card{
+    background-color: #06060a;
+    padding: 10px;
+    border-radius: var(--radius-lg);
+    margin-top: 5px;
+    margin-right: 20px;
+}
+
+.player-card > *{
+    color: white;
+}
+
+.player-profile > *{
+    display: inline;
+}
+
+.player-profile{
+    padding: 10px;
+}
+
+
+.player-img{
+    height: 35px;
+    width: 35px;
+    border-radius: 100%;
+    margin-right: 10px;
 }

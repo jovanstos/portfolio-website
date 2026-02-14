@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Stock } from "./Stock";
+import { Stock } from "./classes/Stock";
 import { simulateNextWeek } from './stockAlgorithm';
 import { generateNewsValue } from './NewsAlgorithm';
-import StockComponent from './StockComponent';
+import StockComponent from './utils/StockComponent';
+import PlayerCard from './utils/PlayerCard';
 import "../styles/PIM.css";
 // Only used when deving
 // import { Parser } from '@json2csv/plainjs';
@@ -80,20 +81,29 @@ function PIM() {
 
     return (
         <main id='PIM'>
-            <h1>Prediction Investment Model</h1>
-            <h1>Week {week}</h1>
+            <h1 style={{ color: "white" }}>Prediction Investment Model</h1>
+            <h1 style={{ color: "white" }}>Week {week}/26</h1>
             <section id='PIM-game'>
                 <div id='PIM-nav'>
+                    <h2 style={{ color: "white" }}>Menu</h2>
                     <button>Stocks</button>
                     <button>News</button>
-                    <button>Your Stats</button>
+                    <button>Your Assets</button>
                 </div>
                 <div id='stocks-holder'>
-                    <StockComponent stock={stock1} color='#008FFB' globalNews={globalNews} week={week} />
-                    <StockComponent stock={stock2} color='#fbc000' globalNews={globalNews} week={week} />
-                    <StockComponent stock={stock3} color='#fb004f' globalNews={globalNews} week={week} />
-                    <StockComponent stock={stock4} color='#5400fb' globalNews={globalNews} week={week} />
-                    <StockComponent stock={stock5} color='#fb6000' globalNews={globalNews} week={week} />
+                    <StockComponent stock={stock1} color='#008FFB' globalNews={globalNews} week={week} width={550} height={150} />
+                    <StockComponent stock={stock2} color='#fbc000' globalNews={globalNews} week={week} width={550} height={150} />
+                    <StockComponent stock={stock3} color='#fb004f' globalNews={globalNews} week={week} width={550} height={150} />
+                    <StockComponent stock={stock4} color='#5400fb' globalNews={globalNews} week={week} width={550} height={150} />
+                    <StockComponent stock={stock5} color='#fb6000' globalNews={globalNews} week={week} width={550} height={150} />
+                </div>
+                <div id='players'>
+                    <h2 style={{ color: "white" }}>Players</h2>
+                    <PlayerCard playerName="Player 1" playerIMG='placeholder.webp' stock={stock1} color='#008FFB' width={200} height={100} />
+                    <PlayerCard playerName="Player 1" playerIMG='placeholder.webp' stock={stock1} color='#008FFB' width={200} height={100} />
+                    <PlayerCard playerName="Player 1" playerIMG='placeholder.webp' stock={stock1} color='#008FFB' width={200} height={100} />
+                    <PlayerCard playerName="Player 1" playerIMG='placeholder.webp' stock={stock1} color='#008FFB' width={200} height={100} />
+                    <PlayerCard playerName="Player 1" playerIMG='placeholder.webp' stock={stock1} color='#008FFB' width={200} height={100} />
                 </div>
             </section>
             <button onClick={runSim}>Run Sim</button>

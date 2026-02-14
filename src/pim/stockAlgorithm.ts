@@ -1,4 +1,4 @@
-import { Stock } from "./Stock";
+import { Stock } from "./classes/Stock";
 
 const START_DATE = new Date('2025-01-01').getTime();
 const DAYS_IN_WEEK = 5

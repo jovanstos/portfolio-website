@@ -1,4 +1,4 @@
-import { Stock } from "./Stock";
+import { Stock } from "./classes/Stock";
 import { simulateNextWeek } from './stockAlgorithm';
 import { generateNewsValue } from './NewsAlgorithm';
 import type { StockData } from "../types/pimTypes";
