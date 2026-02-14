@@ -1,11 +1,38 @@
-/* .stock > *{
-    color: black;
-} */
+#PIM{
+    background-color: var(--color-bg-accent);
+}
+
+#PIM-game{
+    display: flex;
+    margin: 20px 0px;
+}
+
+#PIM-nav{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #06060a;
+    padding: 25px;
+}
+
+#PIM-nav > button{
+    margin: 5px;
+}
+
+.stock {
+    border: 2px solid black;
+    background-color: #0B0E11;
+    padding: 10px;
+}
+
+.stock > * {
+    color: white;
+}
+
+.stock > button {
+    color: light-dark(black, white);
+}
 
 .stock-chart {
     color: black;
-}
-
-.stocks-holder{
-    display: flex;
 }

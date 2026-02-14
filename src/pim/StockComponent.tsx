@@ -76,16 +76,14 @@ function StockComponent({
 
     return (
         <section className='stock'>
-            <h2>{stock.companyName}</h2>
-            <p>Global News: {globalNews}</p>
-            <p>Company News: {stock.companyNews}</p>
+            <h3>{stock.companyName}</h3>
             <div className='stock-chart'>
                 <Chart
                     options={options}
                     series={series}
                     type="area"
-                    width={500}
-                    height={250}
+                    width={550}
+                    height={150}
                 />
             </div>
             <button onClick={askPIM}>Ask PIM</button>

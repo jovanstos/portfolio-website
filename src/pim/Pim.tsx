@@ -29,19 +29,10 @@ function PIM() {
     const [week, setWeek] = useState<number>(0);
 
     function runSim() {
-        console.log(`-------------------WEEK: ${week}--------------------`);
-
-        console.log("GLOBAL NEWS:", globalNews);
-
-        console.log("COMAPNY NEWS 1:", stock1.companyNews);
         simulateNextWeek(week, stock1, globalNews);
-        console.log("COMAPNY NEWS 2:", stock2.companyNews);
         simulateNextWeek(week, stock2, globalNews);
-        console.log("COMAPNY NEWS 3:", stock3.companyNews);
         simulateNextWeek(week, stock3, globalNews);
-        console.log("COMAPNY NEWS 4:", stock4.companyNews);
         simulateNextWeek(week, stock4, globalNews);
-        console.log("COMAPNY NEWS 5:", stock5.companyNews);
         simulateNextWeek(week, stock5, globalNews);
 
         setWeek(prev => prev + 1);
@@ -91,13 +82,20 @@ function PIM() {
         <main id='PIM'>
             <h1>Prediction Investment Model</h1>
             <h1>Week {week}</h1>
-            <div className='stocks-holder'>
-                <StockComponent stock={stock1} color='#008FFB' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock2} color='#fbc000' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock3} color='#fb004f' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock4} color='#5400fb' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock5} color='#fb6000' globalNews={globalNews} week={week} />
-            </div>
+            <section id='PIM-game'>
+                <div id='PIM-nav'>
+                    <button>Stocks</button>
+                    <button>News</button>
+                    <button>Your Stats</button>
+                </div>
+                <div id='stocks-holder'>
+                    <StockComponent stock={stock1} color='#008FFB' globalNews={globalNews} week={week} />
+                    <StockComponent stock={stock2} color='#fbc000' globalNews={globalNews} week={week} />
+                    <StockComponent stock={stock3} color='#fb004f' globalNews={globalNews} week={week} />
+                    <StockComponent stock={stock4} color='#5400fb' globalNews={globalNews} week={week} />
+                    <StockComponent stock={stock5} color='#fb6000' globalNews={globalNews} week={week} />
+                </div>
+            </section>
             <button onClick={runSim}>Run Sim</button>
         </main>
     );
