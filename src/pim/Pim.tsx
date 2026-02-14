@@ -4,6 +4,7 @@ import { simulateNextWeek } from "./stockAlgorithm";
 import { generateNewsValue } from "./NewsAlgorithm";
 import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
+import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
 import "../styles/PIM.css";
 // Only used when deving
 // import { Parser } from '@json2csv/plainjs';
@@ -81,14 +82,24 @@ function PIM() {
 
   return (
     <main id="PIM">
-      <h1 style={{ color: "white" }}>Prediction Investment Model</h1>
-      <h1 style={{ color: "white" }}>Week {week}/26</h1>
+      <h1 style={{ color: "white" }}>
+        P.I.M (Prediction Investment Model) Game
+      </h1>
+      <h1 style={{ color: "white" }}>Week: {week}/26</h1>
+      <h2 style={{ color: "white" }}>Assets: $0</h2>
       <section id="PIM-game">
         <div id="PIM-nav">
           <h2 style={{ color: "white" }}>Menu</h2>
-          <button>Stocks</button>
-          <button>News</button>
-          <button>Your Assets</button>
+          <button className="pim-button">
+            <FaChartLine />
+            <span>Stock</span>
+          </button>
+          <button className="pim-button">
+            <FaNewspaper /> News
+          </button>
+          <button className="pim-button">
+            <FaMoneyBill /> Your Assets
+          </button>
         </div>
         <div id="stocks-holder">
           <StockComponent
@@ -136,41 +147,33 @@ function PIM() {
           <h2 style={{ color: "white" }}>Players</h2>
           <PlayerCard
             playerName="Player 1"
-            playerIMG="placeholder.webp"
+            playerIMG="player-profile.webp"
             stock={stock1}
-            color="#008FFB"
+            color="white"
             width={200}
             height={100}
           />
           <PlayerCard
-            playerName="Player 1"
-            playerIMG="placeholder.webp"
+            playerName="Preston Blackwell"
+            playerIMG="preston-profile.webp"
             stock={stock1}
-            color="#008FFB"
+            color="white"
             width={200}
             height={100}
           />
           <PlayerCard
-            playerName="Player 1"
-            playerIMG="placeholder.webp"
+            playerName="Randy Random"
+            playerIMG="randy-profile.webp"
             stock={stock1}
-            color="#008FFB"
+            color="white"
             width={200}
             height={100}
           />
           <PlayerCard
-            playerName="Player 1"
-            playerIMG="placeholder.webp"
+            playerName="Granny"
+            playerIMG="grandma-profile.webp"
             stock={stock1}
-            color="#008FFB"
-            width={200}
-            height={100}
-          />
-          <PlayerCard
-            playerName="Player 1"
-            playerIMG="placeholder.webp"
-            stock={stock1}
-            color="#008FFB"
+            color="white"
             width={200}
             height={100}
           />

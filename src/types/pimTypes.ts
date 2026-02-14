@@ -26,6 +26,7 @@ export type StockChartProps = {
   color: string;
   width: number;
   height: number;
+  tooltip: boolean;
 };
 
 export type PlayerProps = {

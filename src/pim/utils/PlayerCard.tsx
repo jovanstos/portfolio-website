@@ -22,7 +22,13 @@ function PlayerCard({
       </div>
       <p>This Week: </p>
       <p>Overall: </p>
-      <StockChart stock={stock} color={color} width={width} height={height} />
+      <StockChart
+        stock={stock}
+        color={color}
+        width={width}
+        height={height}
+        tooltip={false}
+      />
     </div>
   );
 }

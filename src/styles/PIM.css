@@ -13,16 +13,35 @@
 }
 
 #PIM-nav {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   background-color: #06060a;
   padding: 25px;
   border-radius: var(--radius-lg);
 }
 
-#PIM-nav > button {
+.pim-button {
+  display: block;
   margin: 5px;
+}
+
+.pim-button > * {
+  display: inline;
+  margin-left: 5px;
+}
+
+.pim-buy-button {
+  background-color: #00ff88;
+}
+
+.pim-buy-button:hover {
+  background-color: #00c569;
+}
+
+.pim-sell-button {
+  background-color: #ff3b61;
+}
+
+.pim-sell-button:hover {
+  background-color: #d53051;
 }
 
 #stocks-holder {
@@ -77,8 +96,9 @@
 }
 
 .player-img {
-  height: 35px;
-  width: 35px;
+  height: 45px;
+  width: 45px;
   border-radius: 100%;
+  border: 2px solid #00ff88;
   margin-right: 10px;
 }

@@ -3,7 +3,22 @@ import type { StockChartProps } from "../../types/pimTypes";
 import type { ApexOptions } from "apexcharts";
 import "../../styles/PIM.css";
 
-function StockChart({ stock, color, width, height }: StockChartProps) {
+function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
+  let optionToolTip = {};
+
+  if (tooltip) {
+    optionToolTip = {
+      shared: false,
+      y: {
+        formatter: function (val: number) {
+          return val.toFixed(0);
+        },
+      },
+    };
+  } else {
+    optionToolTip = { enabled: false };
+  }
+
   const options: ApexOptions = {
     colors: [color],
     chart: {
@@ -36,15 +51,10 @@ function StockChart({ stock, color, width, height }: StockChartProps) {
         text: "Price",
       },
     },
-    tooltip: {
-      shared: false,
-      y: {
-        formatter: function (val: number) {
-          return val.toFixed(0);
-        },
-      },
-    },
+    tooltip: optionToolTip,
   };
+
+  console.log(options);
 
   const series = [
     {
