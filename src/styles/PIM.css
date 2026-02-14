@@ -1,3 +1,11 @@
 /* .stock > *{
     color: black;
 } */
+
+.stock-chart {
+    color: black;
+}
+
+.stocks-holder{
+    display: flex;
+}

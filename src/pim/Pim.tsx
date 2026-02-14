@@ -91,12 +91,12 @@ function PIM() {
         <main id='PIM'>
             <h1>Prediction Investment Model</h1>
             <h1>Week {week}</h1>
-            <div style={{ display: "flex" }}>
+            <div className='stocks-holder'>
                 <StockComponent stock={stock1} color='#008FFB' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock2} color='#008FFB' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock3} color='#008FFB' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock4} color='#008FFB' globalNews={globalNews} week={week} />
-                <StockComponent stock={stock5} color='#008FFB' globalNews={globalNews} week={week} />
+                <StockComponent stock={stock2} color='#fbc000' globalNews={globalNews} week={week} />
+                <StockComponent stock={stock3} color='#fb004f' globalNews={globalNews} week={week} />
+                <StockComponent stock={stock4} color='#5400fb' globalNews={globalNews} week={week} />
+                <StockComponent stock={stock5} color='#fb6000' globalNews={globalNews} week={week} />
             </div>
             <button onClick={runSim}>Run Sim</button>
         </main>
