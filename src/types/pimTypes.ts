@@ -40,7 +40,8 @@ export type PlayerProps = {
 
 export type newsObject = {
   text: string;
-  type: "global" | "company";
+  type: "Global" | "Company";
   company: string;
-  severity: number;
+  severity: string;
+  week: number;
 };

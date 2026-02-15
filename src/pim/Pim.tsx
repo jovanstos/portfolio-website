@@ -6,6 +6,7 @@ import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
 import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
 import type { newsObject } from "../types/pimTypes";
+import FadeInSection from "../components/FadeInSection";
 import "../styles/PIM.css";
 // Only used when deving
 // import { Parser } from '@json2csv/plainjs';
@@ -34,9 +35,10 @@ function PIM() {
   const [newsFeed, setNewsFeed] = useState<newsObject[]>([
     {
       text: "This is the news feed, here you will see any news stories!",
-      type: "global",
+      type: "Global",
       company: "N/A",
-      severity: 0,
+      severity: "netural",
+      week: 0,
     },
   ]);
   const [globalNews, setGlobalNews] = useState<number>(0);
@@ -51,9 +53,10 @@ function PIM() {
       if (s.companyNews !== 0) {
         newEntries.push({
           text: `${s.companyName} announces record profits!`,
-          type: "company",
+          type: "Company",
           company: s.companyName,
-          severity: s.companyNews,
+          severity: s.companyNews > 0 ? "positive" : "negative",
+          week: week,
         });
       }
     });
@@ -69,9 +72,10 @@ function PIM() {
       if (newVal !== 0) {
         newEntries.push({
           text: "Global News",
-          type: "global",
+          type: "Global",
           company: "N/A",
-          severity: newVal,
+          severity: newVal > 0 ? "positive" : "negative",
+          week: week,
         });
       }
     }
@@ -99,23 +103,22 @@ function PIM() {
         return (
           <>
             <h1 style={{ color: "white" }}>Market News Feed</h1>
-            <div className="news-list">
-              {newsFeed.map((news, index) => (
+            {newsFeed.map((news, index) => (
+              <FadeInSection>
                 <div
                   key={index}
                   className={`news-item severity-${news.severity}`}
                 >
                   <p className="news-text">{news.text}</p>
-                  <span className="news-type">
-                    TYPE: {news.type.toUpperCase()}
-                  </span>
+                  <span>Week: {news.week} </span>
+                  <span className="news-type">Type: {news.type}</span>
                 </div>
-              ))}
-            </div>
+              </FadeInSection>
+            ))}
           </>
         );
       case "assets":
-        return <h1 style={{ color: "white" }}>Assets</h1>;
+        return <h1 style={{ color: "white" }}>Your Assets</h1>;
       case "stock":
       default:
         return (

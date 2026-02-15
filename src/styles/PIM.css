@@ -67,6 +67,28 @@
   }
 }
 
+.news-item {
+  border: 2px solid white;
+  border-bottom: none;
+  padding: 5px;
+}
+
+.news-text {
+  font-size: var(--large);
+}
+
+.severity-positive {
+  background-color: #00c569;
+}
+
+.severity-negative {
+  background-color: #d53051;
+}
+
+.severity-netural {
+  border-bottom: 2px solid white;
+}
+
 .stock {
   background-color: #030303;
   padding: 10px;
