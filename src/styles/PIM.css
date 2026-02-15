@@ -29,19 +29,19 @@
 }
 
 .pim-buy-button {
-  background-color: #00ff88;
-}
-
-.pim-buy-button:hover {
   background-color: #00c569;
 }
 
+.pim-buy-button:hover {
+  background-color: #00ff88;
+}
+
 .pim-sell-button {
-  background-color: #ff3b61;
+  background-color: #d53051;
 }
 
 .pim-sell-button:hover {
-  background-color: #d53051;
+  background-color: #ff3b61;
 }
 
 .pim-content-holder {
@@ -104,6 +104,24 @@
 
 .stock-chart {
   color: black;
+}
+
+.stock-table {
+  border-collapse: collapse;
+}
+
+.stock-td,
+.stock-th {
+  border: 1px solid white;
+  padding: 5px;
+}
+
+.stock-th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #1d1d1d;
+  color: white;
 }
 
 #players {

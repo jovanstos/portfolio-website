@@ -47,8 +47,6 @@ function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
     },
   };
 
-  console.log(options);
-
   const series = [
     {
       name: `${stock.companyName} Stock`,

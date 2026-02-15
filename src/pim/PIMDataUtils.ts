@@ -187,3 +187,23 @@ export function handlePIMPrediction(prediction: number[]): string {
   console.log(prediction);
   return "yo";
 }
+
+export function formatNumber(num: number): string {
+  if (num === 0) return "0";
+
+  const lookups = [
+    { value: 1e12, symbol: "T" },
+    { value: 1e9, symbol: "B" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e3, symbol: "k" },
+  ];
+
+  const item = lookups.find((item) => Math.abs(num) >= item.value);
+
+  if (item) {
+    const formatted = (num / item.value).toFixed(2).replace(/\.0$/, "");
+    return formatted + item.symbol;
+  }
+
+  return num.toString();
+}
