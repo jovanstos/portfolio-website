@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Stock } from "./classes/Stock";
 import { simulateNextWeek } from "./stockAlgorithm";
-import { generateNewsValue } from "./NewsAlgorithm";
+import { generateNewsValue } from "./newsAlgorithm";
 import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
 import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
@@ -104,11 +104,8 @@ function PIM() {
           <>
             <h1 style={{ color: "white" }}>Market News Feed</h1>
             {newsFeed.map((news, index) => (
-              <FadeInSection>
-                <div
-                  key={index}
-                  className={`news-item severity-${news.severity}`}
-                >
+              <FadeInSection key={index}>
+                <div className={`news-item severity-${news.severity}`}>
                   <p className="news-text">{news.text}</p>
                   <span>Week: {news.week} </span>
                   <span className="news-type">Type: {news.type}</span>

@@ -1,6 +1,6 @@
 import { Stock } from "./classes/Stock";
 import { simulateNextWeek } from "./stockAlgorithm";
-import { generateNewsValue } from "./NewsAlgorithm";
+import { generateNewsValue } from "./newsAlgorithm";
 import type { StockData } from "../types/pimTypes";
 
 const BOUNDS = {

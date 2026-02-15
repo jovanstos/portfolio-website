@@ -38,6 +38,12 @@ export type PlayerProps = {
   height: number;
 };
 
+export type playerStock = {
+  stockName: string;
+  buyPrice: number;
+  shares: number;
+};
+
 export type newsObject = {
   text: string;
   type: "Global" | "Company";
