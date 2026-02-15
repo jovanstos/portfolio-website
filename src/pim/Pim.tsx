@@ -5,6 +5,7 @@ import { generateNewsValue } from "./NewsAlgorithm";
 import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
 import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
+import type { newsObject } from "../types/pimTypes";
 import "../styles/PIM.css";
 // Only used when deving
 // import { Parser } from '@json2csv/plainjs';
@@ -27,8 +28,58 @@ const stock5 = new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
 
 // P.I.M. stands for predictive investment model
 function PIM() {
+  const [activeView, setActiveView] = useState<"stock" | "news" | "assets">(
+    "stock",
+  );
+  const [newsFeed, setNewsFeed] = useState<newsObject[]>([
+    {
+      text: "This is the news feed, here you will see any news stories!",
+      type: "global",
+      company: "N/A",
+      severity: 0,
+    },
+  ]);
   const [globalNews, setGlobalNews] = useState<number>(0);
   const [week, setWeek] = useState<number>(0);
+
+  function handleNewsCycle() {
+    const stocks = [stock1, stock2, stock3, stock4, stock5];
+    const newEntries: newsObject[] = [];
+
+    stocks.forEach((s) => {
+      s.companyNews = generateNewsValue();
+      if (s.companyNews !== 0) {
+        newEntries.push({
+          text: `${s.companyName} announces record profits!`,
+          type: "company",
+          company: s.companyName,
+          severity: s.companyNews,
+        });
+      }
+    });
+
+    const globalNewsChance = Math.random();
+    if (
+      (globalNews !== 0 && globalNewsChance > 0.4) ||
+      globalNewsChance > 0.75
+    ) {
+      const newVal = generateNewsValue();
+      setGlobalNews(newVal);
+
+      if (newVal !== 0) {
+        newEntries.push({
+          text: "Global News",
+          type: "global",
+          company: "N/A",
+          severity: newVal,
+        });
+      }
+    }
+
+    if (newEntries.length > 0) {
+      setNewsFeed((prev) => [...newEntries, ...prev]);
+    }
+  }
 
   function runSim() {
     simulateNextWeek(week, stock1, globalNews);
@@ -39,20 +90,80 @@ function PIM() {
 
     setWeek((prev) => prev + 1);
 
-    stock1.companyNews = generateNewsValue();
-    stock2.companyNews = generateNewsValue();
-    stock3.companyNews = generateNewsValue();
-    stock4.companyNews = generateNewsValue();
-    stock5.companyNews = generateNewsValue();
-
-    const globalNewsChance = Math.random();
-
-    if (globalNews !== 0 && globalNewsChance > 0.4) {
-      setGlobalNews(generateNewsValue());
-    } else if (globalNewsChance > 0.75) {
-      setGlobalNews(generateNewsValue());
-    }
+    handleNewsCycle();
   }
+
+  const renderContent = () => {
+    switch (activeView) {
+      case "news":
+        return (
+          <>
+            <h1 style={{ color: "white" }}>Market News Feed</h1>
+            <div className="news-list">
+              {newsFeed.map((news, index) => (
+                <div
+                  key={index}
+                  className={`news-item severity-${news.severity}`}
+                >
+                  <p className="news-text">{news.text}</p>
+                  <span className="news-type">
+                    TYPE: {news.type.toUpperCase()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        );
+      case "assets":
+        return <h1 style={{ color: "white" }}>Assets</h1>;
+      case "stock":
+      default:
+        return (
+          <>
+            <StockComponent
+              stock={stock1}
+              color="#008FFB"
+              globalNews={globalNews}
+              week={week}
+              width={550}
+              height={150}
+            />
+            <StockComponent
+              stock={stock2}
+              color="#fbc000"
+              globalNews={globalNews}
+              week={week}
+              width={550}
+              height={150}
+            />
+            <StockComponent
+              stock={stock3}
+              color="#fb004f"
+              globalNews={globalNews}
+              week={week}
+              width={550}
+              height={150}
+            />
+            <StockComponent
+              stock={stock4}
+              color="#5400fb"
+              globalNews={globalNews}
+              week={week}
+              width={550}
+              height={150}
+            />
+            <StockComponent
+              stock={stock5}
+              color="#fb6000"
+              globalNews={globalNews}
+              week={week}
+              width={550}
+              height={150}
+            />
+          </>
+        );
+    }
+  };
 
   // Only used when deving
   // function downloadCSV() {
@@ -90,58 +201,28 @@ function PIM() {
       <section id="PIM-game">
         <div id="PIM-nav">
           <h2 style={{ color: "white" }}>Menu</h2>
-          <button className="pim-button">
+          <button
+            className={`pim-button ${activeView === "stock" ? "active" : ""}`}
+            onClick={() => setActiveView("stock")}
+          >
             <FaChartLine />
             <span>Stock</span>
           </button>
-          <button className="pim-button">
+          <button
+            className={`pim-button ${activeView === "news" ? "active" : ""}`}
+            onClick={() => setActiveView("news")}
+          >
             <FaNewspaper /> News
           </button>
-          <button className="pim-button">
+          <button
+            className={`pim-button ${activeView === "assets" ? "active" : ""}`}
+            onClick={() => setActiveView("assets")}
+          >
             <FaMoneyBill /> Your Assets
           </button>
         </div>
-        <div id="stocks-holder">
-          <StockComponent
-            stock={stock1}
-            color="#008FFB"
-            globalNews={globalNews}
-            week={week}
-            width={550}
-            height={150}
-          />
-          <StockComponent
-            stock={stock2}
-            color="#fbc000"
-            globalNews={globalNews}
-            week={week}
-            width={550}
-            height={150}
-          />
-          <StockComponent
-            stock={stock3}
-            color="#fb004f"
-            globalNews={globalNews}
-            week={week}
-            width={550}
-            height={150}
-          />
-          <StockComponent
-            stock={stock4}
-            color="#5400fb"
-            globalNews={globalNews}
-            week={week}
-            width={550}
-            height={150}
-          />
-          <StockComponent
-            stock={stock5}
-            color="#fb6000"
-            globalNews={globalNews}
-            week={week}
-            width={550}
-            height={150}
-          />
+        <div className="pim-content-holder" key={activeView}>
+          {renderContent()}
         </div>
         <div id="players">
           <h2 style={{ color: "white" }}>Players</h2>

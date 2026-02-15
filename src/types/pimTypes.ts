@@ -37,3 +37,10 @@ export type PlayerProps = {
   width: number;
   height: number;
 };
+
+export type newsObject = {
+  text: string;
+  type: "global" | "company";
+  company: string;
+  severity: number;
+};
