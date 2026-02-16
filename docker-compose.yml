@@ -26,6 +26,9 @@ services:
       target: ${NODE_ENV:-production}
     env_file:
       - .env
+    volumes:
+      - .:/app
+      - /app/node_modules # Prevents host modules from overwriting container modules
     ports:
       - "80:3000"
     environment:
