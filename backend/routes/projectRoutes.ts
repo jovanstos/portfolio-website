@@ -32,7 +32,7 @@ const getProjectsHandler = async (req: Request, res: Response) => {
     const typeParam = req.params.type as string;
     const limitParam = req.params.limit as string | undefined;
 
-    const type = parseType(req.params.type);
+    const type = parseType(typeParam);
     // Default limit
     let limit: number = 5;
 
