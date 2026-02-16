@@ -20,4 +20,8 @@ ReadMe under construction
 
 docker compose up
 
+.env production and remove VITE_SOCKET_URL CLIENT_ORIGIN
+
+uncommet dev to dev
+
 export NODE_ENV=production && docker compose build
