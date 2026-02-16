@@ -1,5 +1,7 @@
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getProjects } from "../api/projects";
 import Hero from "../components/Hero";
 import LargeCard from "../cards/LargeCard";
 import MediumCard from "../cards/MediumCard";
@@ -8,6 +10,21 @@ import FadeInSection from "../components/FadeInSection";
 
 function Home() {
   const navigate = useNavigate();
+
+  const { data: regularData, isLoading: regularIsLoading } = useQuery({
+    queryKey: ["projects", "regular"],
+    queryFn: getProjects,
+  });
+
+  const { data: featuredData, isLoading: featuredIsLoading } = useQuery({
+    queryKey: ["projects", "featured"],
+    queryFn: getProjects,
+  });
+
+  const { data: junkData, isLoading: junkIsLoading } = useQuery({
+    queryKey: ["projects", "junk"],
+    queryFn: getProjects,
+  });
 
   return (
     <>
@@ -43,15 +60,25 @@ function Home() {
             Some of my favorites
           </p>
           <div className="card-holder">
-            <FadeInSection>
-              <LargeCard />
-            </FadeInSection>
-            <FadeInSection>
-              <LargeCard />
-            </FadeInSection>
-            <FadeInSection>
-              <LargeCard />
-            </FadeInSection>
+            {featuredIsLoading ? (
+              <p style={{ textAlign: "center" }}>
+                Loading featured projects...
+              </p>
+            ) : (
+              <div className="card-holder">
+                {featuredData?.map((proj) => (
+                  <FadeInSection key={proj.id}>
+                    <LargeCard
+                      id={proj.id}
+                      title={proj.title}
+                      description={proj.description}
+                      imgURL={proj.imageurl}
+                      imgDescription={proj.imagedescription}
+                    />
+                  </FadeInSection>
+                ))}
+              </div>
+            )}
           </div>
           <FadeInSection>
             <h1
@@ -67,8 +94,23 @@ function Home() {
               Some more great ones
             </p>
             <div className="card-holder">
-              <MediumCard />
-              <MediumCard />
+              {regularIsLoading ? (
+                <p style={{ textAlign: "center" }}>Loading projects...</p>
+              ) : (
+                <div className="card-holder">
+                  {regularData?.map((proj) => (
+                    <FadeInSection key={proj.id}>
+                      <MediumCard
+                        id={proj.id}
+                        title={proj.title}
+                        description={proj.description}
+                        imgURL={proj.imageurl}
+                        imgDescription={proj.imagedescription}
+                      />
+                    </FadeInSection>
+                  ))}
+                </div>
+              )}
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>
@@ -98,8 +140,26 @@ function Home() {
               style={{ marginBottom: "var(--space-md)" }}
               className="card-holder"
             >
-              <SmallCard />
-              <SmallCard />
+              {junkIsLoading ? (
+                <p style={{ textAlign: "center" }}>Loading trinkets...</p>
+              ) : (
+                <div
+                  style={{ marginBottom: "var(--space-md)" }}
+                  className="card-holder"
+                >
+                  {junkData?.map((proj) => (
+                    <FadeInSection key={proj.id}>
+                      <SmallCard
+                        id={proj.id}
+                        title={proj.title}
+                        description={proj.description}
+                        imgURL={proj.imageurl}
+                        imgDescription={proj.imagedescription}
+                      />
+                    </FadeInSection>
+                  ))}
+                </div>
+              )}
             </div>
             <FadeInSection>
               <div style={{ display: "flex", justifyContent: "center" }}>

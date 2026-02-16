@@ -20,6 +20,10 @@
     transform 1s ease;
 }
 
+.large-card {
+  height: 500px;
+}
+
 .large-card:hover {
   transform: scale(1.03);
   box-shadow: 7px 7px #ffcb00;

@@ -16,6 +16,12 @@ function LargeCard({
 
   const url = isInternal ? `/projects/live/${id}` : `/projects/id/${id}`;
 
+  // Truncate description if over a certain amount of characters
+  const displayDescription =
+    description.length > 200
+      ? description.substring(0, 200) + "..."
+      : description;
+
   return (
     <a className="card-a-tag" href={url} rel="noopener noreferrer">
       <article className="large-card card">
@@ -27,7 +33,7 @@ function LargeCard({
         />
         <div>
           <h2>{title}</h2>
-          <p>{description}</p>
+          <p>{displayDescription}</p>
           <p>Click to see more</p>
         </div>
       </article>
