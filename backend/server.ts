@@ -41,7 +41,7 @@ function setAuthCookie(res: any, token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     // If it's prod make sure the cookie is the backend URL, else make it lax
-    sameSite: isProd ? undefined : "lax",
+    sameSite: "lax",
     // miliseconds * second * minutes * hours
     maxAge: 1000 * 60 * 60 * 24,
   });
@@ -118,7 +118,7 @@ if (isProd) {
 
   app.use(express.static(clientDistPath));
 
-  app.get("*", (_, res) => {
+  app.get("/*", (_, res) => {
     res.sendFile(path.join(clientDistPath, "index.html"));
   });
 }
