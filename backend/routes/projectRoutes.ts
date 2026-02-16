@@ -29,11 +29,15 @@ function parseLimit(limit?: string): number {
 // Handeles the logic fo how many projects are pulled and what type are to be pulled
 const getProjectsHandler = async (req: Request, res: Response) => {
   try {
-    const type = parseType(req.params.type);
-    let limit = null;
+    const typeParam = req.params.type as string;
+    const limitParam = req.params.limit as string | undefined;
 
-    if (req.params.limit) {
-      limit = parseLimit(req.params.limit);
+    const type = parseType(req.params.type);
+    // Default limit
+    let limit: number = 5;
+
+    if (limitParam) {
+      limit = parseLimit(limitParam);
     }
 
     const conditions = ["projects.hidden = FALSE"];
