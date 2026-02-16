@@ -6,11 +6,7 @@ import { getProjects } from "../api/projects";
 import ErrorPopup from "../components/ErrorPopup";
 import type { ProjectsProps } from "../types/projectTypes";
 
-function Projects({
-  title,
-  projectType = "regular",
-  subheading,
-}: ProjectsProps) {
+function Projects({ title, projectType = "all", subheading }: ProjectsProps) {
   const navigate = useNavigate();
 
   // Get the data form the query and using map populate the page

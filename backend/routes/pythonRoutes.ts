@@ -32,7 +32,6 @@ router.post("/pim", requireAuth, async (req: Request, res: Response) => {
   try {
     // Getting the code in the body
     const { data } = req.body;
-    console.log("HALLO", data);
 
     if (!data) {
       return res.status(400).json({ error: "No data provided" });

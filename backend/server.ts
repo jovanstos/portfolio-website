@@ -21,25 +21,26 @@ const server = createServer(app);
 const PORT = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === "production";
 
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || undefined;
-
-// Handle the cors option if the app is in production or not...
-// ... this is used so dev tools can be used with vite and nodemon
-const corsOptions = isProd
-  ? { origin: false }
-  : {
-      origin: CLIENT_ORIGIN,
-      credentials: true,
-    };
+// In Prod, the origin is the same, so we disable CORS (origin: false).
+// In Dev, we need to allow the Vite/React localhost port.
+const corsOptions = {
+  origin: isProd ? false : process.env.CLIENT_ORIGIN || "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST"],
+};
 
 const io = new Server(server, {
   cors: corsOptions,
+  pingTimeout: 60000,
 });
 
 function setAuthCookie(res: any, token: string) {
+  // Raw HTTP (no SSL), 'secure: true' will block cookies, so this accounts for that
+  const isSecure = isProd && process.env.USE_HTTPS === "true";
+
   res.cookie("auth_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     // If it's prod make sure the cookie is the backend URL, else make it lax
     sameSite: "lax",
     // miliseconds * second * minutes * hours
@@ -47,6 +48,9 @@ function setAuthCookie(res: any, token: string) {
   });
 }
 
+if (isProd) {
+  app.set("trust proxy", 1);
+}
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());

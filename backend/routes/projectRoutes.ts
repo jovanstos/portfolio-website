@@ -5,7 +5,7 @@ import { pool } from "../database/connection.js";
 const router: Router = Router();
 
 // Projects in the database are stored as different types so they be displayed on the right pages
-const ALLOWED_TYPES = ["regular", "junk", "featured"] as const;
+const ALLOWED_TYPES = ["all", "regular", "junk", "featured"] as const;
 type ProjectType = (typeof ALLOWED_TYPES)[number];
 
 // This is to parse the string to check if it's an allowed type, if not throw an error
@@ -17,38 +17,21 @@ function parseType(type: string): ProjectType {
   return type as ProjectType;
 }
 
-// Put a limiter on how many projects can be pulled to stop API abuse
-function parseLimit(limit?: string): number {
-  const n = Number(limit);
-
-  if (!Number.isInteger(n) || n < 1) return 5;
-
-  return Math.min(n, 20);
-}
-
 // Handeles the logic fo how many projects are pulled and what type are to be pulled
 const getProjectsHandler = async (req: Request, res: Response) => {
   try {
     const typeParam = req.params.type as string;
-    const limitParam = req.params.limit as string | undefined;
 
     const type = parseType(typeParam);
-    // Default limit
-    let limit: number = 5;
-
-    if (limitParam) {
-      limit = parseLimit(limitParam);
-    }
 
     const conditions = ["projects.hidden = FALSE"];
 
     // Handles changing the where clause conditions
     if (type === "junk") conditions.push("projects.junk = TRUE");
     else if (type === "featured") conditions.push("projects.featured = TRUE");
+    else if (type === "all") conditions.push("projects.junk = FALSE");
     else {
-      if (limit) {
-        conditions.push("projects.featured = FALSE");
-      }
+      conditions.push("projects.featured = FALSE");
       conditions.push("projects.junk = FALSE");
     }
 
@@ -62,11 +45,12 @@ const getProjectsHandler = async (req: Request, res: Response) => {
         images.url AS imageUrl
         FROM projects
         JOIN images ON projects.image_id = images.id
-        WHERE ${conditions.join(" AND ")}
-        LIMIT $1;
+        WHERE ${conditions.join(" AND ")};
         `;
 
-    const { rows } = await pool.query(query, [limit]);
+    const { rows } = await pool.query(query);
+    console.log(query);
+
     res.json(rows);
   } catch {
     res.status(400).json({ message: "Invalid request" });
@@ -74,7 +58,6 @@ const getProjectsHandler = async (req: Request, res: Response) => {
 };
 
 router.get("/all/:type", requireAuth, getProjectsHandler);
-router.get("/all/:type/:limit", requireAuth, getProjectsHandler);
 
 // Gets on project by ID
 router.get("/id/:id", requireAuth, async (req: Request, res: Response) => {

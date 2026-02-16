@@ -69,8 +69,6 @@ export const compileUserCode = async (sourceCode: string): Promise<Buffer> => {
  * @param data - Array of numbers to classify (e.g. [0.5, 0.1, 100, 0.2, 15, 2])
  */
 export const runPIMClassifier = async (data: number[]): Promise<any> => {
-  console.log("WE GOT IT", data);
-
   const pythonScriptPath = path.join(process.cwd(), "python/PIM.py");
   const pythonCommand = "python3";
 

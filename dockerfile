@@ -24,13 +24,13 @@ COPY package*.json ./
 RUN npm install
 
 # Development version setup
-# FROM base AS development
-# # Copy the source code
-# COPY . .
-# # Expose Vite and backend Express server
-# EXPOSE 5174 3000
-# # Run the dev command in package.json
-# CMD ["npm", "run", "dev"]
+FROM base AS development
+# Copy the source code
+COPY . .
+# Expose Vite and backend Express server
+EXPOSE 5174 3000
+# Run the dev command in package.json
+CMD ["npm", "run", "dev"]
 
 # Production build setup
 FROM base AS build-stage
