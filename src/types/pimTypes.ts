@@ -33,7 +33,7 @@ export type StockChartProps = {
 export type PlayerProps = {
   playerName: string;
   playerIMG: string;
-  stock: PlayerPortfolio;
+  portfolio: PlayerPortfolio;
   color: string;
   width: number;
   height: number;

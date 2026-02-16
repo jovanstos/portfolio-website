@@ -14,7 +14,11 @@ import StockChart from "./utils/StockChart";
 // import { Parser } from '@json2csv/plainjs';
 // import { getTrainingData } from './PIMDataUtils';
 
+// Create the player and AI
 const player = new PlayerPortfolio("Player 1");
+const preston = new PlayerPortfolio("Preston");
+const randy = new PlayerPortfolio("Randy");
+const granny = new PlayerPortfolio("Granny");
 
 // High-growth tech: High price, moderate earnings = High P/E
 const stock1 = new Stock("NovaTech Robotics", 210.5, 450000000, 85, 75, 92);
@@ -30,6 +34,9 @@ const stock4 = new Stock("TerraMart Global", 155.1, 1200000000, 45, 10, 12);
 
 // Penny Tech Startup: Low price and very low earnings, high buzz
 const stock5 = new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
+
+// Granny will buy and hold one stock the whole game, she's a base line
+granny.addAsset(stock4, 644);
 
 // P.I.M. stands for predictive investment model
 function PIM() {
@@ -89,16 +96,51 @@ function PIM() {
     }
   }
 
+  function handlePlayerAI(stockChanges: number[]): void {
+    player.updateData(week);
+    granny.updateData(week);
+
+    // Randy random like his name selects a random stock each week to go all in on
+    const randysPick = Math.floor(Math.random() * stockChanges.length);
+    // Apply the change directly to cash to save on resources
+    randy.cash += randy.cash * stockChanges[randysPick];
+    randy.updateData(week);
+
+    // Preston makes the best trade 90% of the time else it's random
+    let prestonsPickIndex: number;
+    const isSmartMove = Math.random() < 0.9;
+
+    if (isSmartMove) {
+      // Find the index of the highest positive change
+      prestonsPickIndex = stockChanges.indexOf(Math.max(...stockChanges));
+    } else {
+      // Pick a random index (the 10% "oops" factor)
+      prestonsPickIndex = Math.floor(Math.random() * stockChanges.length);
+    }
+
+    // Apply the change directly to cash to save on resources
+    preston.cash += preston.cash * stockChanges[prestonsPickIndex];
+    preston.updateData(week);
+  }
+
   function runSim() {
-    simulateNextWeek(week, stock1, globalNews);
-    simulateNextWeek(week, stock2, globalNews);
-    simulateNextWeek(week, stock3, globalNews);
-    simulateNextWeek(week, stock4, globalNews);
-    simulateNextWeek(week, stock5, globalNews);
+    const stock1Change = simulateNextWeek(week, stock1, globalNews);
+    const stock2Change = simulateNextWeek(week, stock2, globalNews);
+    const stock3Change = simulateNextWeek(week, stock3, globalNews);
+    const stock4Change = simulateNextWeek(week, stock4, globalNews);
+    const stock5Change = simulateNextWeek(week, stock5, globalNews);
 
     setWeek((prev) => prev + 1);
 
     handleNewsCycle();
+
+    handlePlayerAI([
+      stock1Change,
+      stock2Change,
+      stock3Change,
+      stock4Change,
+      stock5Change,
+    ]);
   }
 
   const renderContent = () => {
@@ -244,7 +286,7 @@ function PIM() {
           <PlayerCard
             playerName="Player 1"
             playerIMG="player-profile.webp"
-            stock={player}
+            portfolio={player}
             color="white"
             width={200}
             height={100}
@@ -252,7 +294,7 @@ function PIM() {
           <PlayerCard
             playerName="Preston Blackwell"
             playerIMG="preston-profile.webp"
-            stock={player}
+            portfolio={preston}
             color="white"
             width={200}
             height={100}
@@ -260,7 +302,7 @@ function PIM() {
           <PlayerCard
             playerName="Randy Random"
             playerIMG="randy-profile.webp"
-            stock={player}
+            portfolio={randy}
             color="white"
             width={200}
             height={100}
@@ -268,7 +310,7 @@ function PIM() {
           <PlayerCard
             playerName="Granny"
             playerIMG="grandma-profile.webp"
-            stock={player}
+            portfolio={granny}
             color="white"
             width={200}
             height={100}

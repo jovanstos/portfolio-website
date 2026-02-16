@@ -1,8 +1,6 @@
 import type { PlayerStock, PlayerStake } from "../../types/pimTypes";
 import type { Stock } from "./Stock";
 
-const START_DATE = new Date("2025-01-01").getTime();
-
 export class PlayerPortfolio {
   name: string;
   // Used to give IDs
@@ -32,29 +30,18 @@ export class PlayerPortfolio {
     this.cash = 100000;
     this.assets = this.cash;
 
-    this.data = [[START_DATE, this.assets]];
+    this.data = [[0, this.assets]];
 
     this.stocks = {};
     this.stakes = {};
   }
 
-  addData() {
-    // Safe access to the last element's date
-    const lastEntry = this.data[this.data.length - 1][0];
-
-    // Added this so typescript stops yelling at me
-    if (!lastEntry) return 0;
-
-    const nextDate = new Date(lastEntry);
-
-    // Add 1 day to the last known date
-    nextDate.setDate(nextDate.getDate() + 1);
-
+  updateData(week: number) {
     // Calculate stake to see if you hit or not first since that's cash
     this.calculateStakes();
     this.calculateAssets();
 
-    this.data.push([nextDate.getTime(), this.assets]);
+    this.data.push([week, this.assets]);
   }
 
   addAsset(stock: Stock, shares: number) {
