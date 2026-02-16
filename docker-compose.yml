@@ -32,5 +32,5 @@ services:
     ports:
       - "80:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV:-production}
     restart: always
