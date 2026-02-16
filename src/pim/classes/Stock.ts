@@ -1,6 +1,6 @@
 export class Stock {
   // Name of the company
-  companyName: string;
+  name: string;
   // Price of Stock
   currentPrice: number;
   // Money Made
@@ -32,7 +32,7 @@ export class Stock {
     volatility: number,
     socialBuzz: number,
   ) {
-    this.companyName = companyName;
+    this.name = companyName;
     this.currentPrice = currentPrice;
     this.currentEarnings = currentEarnings;
     this.volume = volume;

@@ -4,6 +4,7 @@ import type { Stock } from "./Stock";
 const START_DATE = new Date("2025-01-01").getTime();
 
 export class PlayerPortfolio {
+  name: string;
   // Used to give IDs
   currentID: number;
   // How much money
@@ -24,7 +25,9 @@ export class PlayerPortfolio {
   // }
   stakes: Record<number, PlayerStake>;
 
-  constructor() {
+  constructor(playerName: string) {
+    this.name = playerName;
+
     this.currentID = 0;
     this.cash = 100000;
     this.assets = this.cash;

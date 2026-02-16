@@ -40,7 +40,7 @@ function StockComponent({
 
   return (
     <section className="stock">
-      <h3>{stock.companyName}</h3>
+      <h3>{stock.name}</h3>
       {stockInfoView ? (
         <table className="stock-table">
           <thead>

@@ -1,4 +1,5 @@
 import type { Stock } from "../pim/classes/Stock";
+import type { PlayerPortfolio } from "../pim/classes/PlayerPortfolio";
 
 export interface StockData {
   priceChange: number;
@@ -22,7 +23,7 @@ export type StockComponentProps = {
 };
 
 export type StockChartProps = {
-  stock: Stock;
+  stock: Stock | PlayerPortfolio;
   color: string;
   width: number;
   height: number;
@@ -32,7 +33,7 @@ export type StockChartProps = {
 export type PlayerProps = {
   playerName: string;
   playerIMG: string;
-  stock: Stock;
+  stock: PlayerPortfolio;
   color: string;
   width: number;
   height: number;

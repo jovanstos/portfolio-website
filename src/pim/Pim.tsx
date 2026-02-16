@@ -9,11 +9,12 @@ import type { NewsObject } from "../types/pimTypes";
 import FadeInSection from "../components/FadeInSection";
 import "../styles/PIM.css";
 import { PlayerPortfolio } from "./classes/PlayerPortfolio";
+import StockChart from "./utils/StockChart";
 // Only used when deving
 // import { Parser } from '@json2csv/plainjs';
 // import { getTrainingData } from './PIMDataUtils';
 
-const player = new PlayerPortfolio();
+const player = new PlayerPortfolio("Player 1");
 
 // High-growth tech: High price, moderate earnings = High P/E
 const stock1 = new Stock("NovaTech Robotics", 210.5, 450000000, 85, 75, 92);
@@ -55,9 +56,9 @@ function PIM() {
       s.companyNews = generateNewsValue();
       if (s.companyNews !== 0) {
         newEntries.push({
-          text: `${s.companyName} announces record profits!`,
+          text: `${s.name} announces record profits!`,
           type: "Company",
-          company: s.companyName,
+          company: s.name,
           severity: s.companyNews > 0 ? "positive" : "negative",
           week: week,
         });
@@ -118,7 +119,18 @@ function PIM() {
           </>
         );
       case "assets":
-        return <h1 style={{ color: "white" }}>Your Assets</h1>;
+        return (
+          <>
+            <h1 style={{ color: "white" }}>Your Assets</h1>
+            <StockChart
+              stock={player}
+              color="#008FFB"
+              width={550}
+              height={150}
+              tooltip={true}
+            />
+          </>
+        );
       case "stock":
       default:
         return (
@@ -232,7 +244,7 @@ function PIM() {
           <PlayerCard
             playerName="Player 1"
             playerIMG="player-profile.webp"
-            stock={stock1}
+            stock={player}
             color="white"
             width={200}
             height={100}
@@ -240,7 +252,7 @@ function PIM() {
           <PlayerCard
             playerName="Preston Blackwell"
             playerIMG="preston-profile.webp"
-            stock={stock1}
+            stock={player}
             color="white"
             width={200}
             height={100}
@@ -248,7 +260,7 @@ function PIM() {
           <PlayerCard
             playerName="Randy Random"
             playerIMG="randy-profile.webp"
-            stock={stock1}
+            stock={player}
             color="white"
             width={200}
             height={100}
@@ -256,7 +268,7 @@ function PIM() {
           <PlayerCard
             playerName="Granny"
             playerIMG="grandma-profile.webp"
-            stock={stock1}
+            stock={player}
             color="white"
             width={200}
             height={100}

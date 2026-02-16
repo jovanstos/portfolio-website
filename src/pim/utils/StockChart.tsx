@@ -7,7 +7,7 @@ function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
   const options: ApexOptions = {
     colors: [color],
     chart: {
-      id: stock.companyName,
+      id: stock.name,
     },
     dataLabels: {
       enabled: false,
@@ -49,7 +49,7 @@ function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
 
   const series = [
     {
-      name: `${stock.companyName} Stock`,
+      name: `${stock.name} Chart`,
       data: stock.data,
     },
   ];
