@@ -49,7 +49,6 @@ const getProjectsHandler = async (req: Request, res: Response) => {
         `;
 
     const { rows } = await pool.query(query);
-    console.log(query);
 
     res.json(rows);
   } catch {
