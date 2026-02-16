@@ -118,7 +118,7 @@ if (isProd) {
 
   app.use(express.static(clientDistPath));
 
-  app.get("/*", (_, res) => {
+  app.get("/:splat*", (_, res) => {
     res.sendFile(path.join(clientDistPath, "index.html"));
   });
 }
