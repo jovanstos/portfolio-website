@@ -14,6 +14,7 @@ export interface StockData {
 }
 
 export type StockComponentProps = {
+  player: PlayerPortfolio;
   stock: Stock;
   color: string;
   globalNews: number;

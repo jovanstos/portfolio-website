@@ -18,6 +18,16 @@
   border-radius: var(--radius-lg);
 }
 
+#next-week-button {
+  width: 100%;
+  display: flex;
+  justify-content: right;
+}
+
+#next-week-button > button {
+  background-color: var(--color-accent);
+}
+
 .pim-button {
   display: block;
   margin: 5px;
@@ -102,6 +112,11 @@
   color: light-dark(black, white);
 }
 
+.stock-actions > button {
+  display: inline;
+  color: light-dark(black, white);
+}
+
 .stock-chart {
   color: black;
 }
@@ -156,4 +171,8 @@
   border-radius: 100%;
   border: 2px solid #00ff88;
   margin-right: 10px;
+}
+
+.popup-inner-content {
+  color: light-dark(black, white);
 }

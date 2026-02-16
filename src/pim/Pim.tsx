@@ -106,9 +106,9 @@ function PIM() {
     randy.cash += randy.cash * stockChanges[randysPick];
     randy.updateData(week);
 
-    // Preston makes the best trade 90% of the time else it's random
+    // Preston makes the best trade 85% of the time else it's random
     let prestonsPickIndex: number;
-    const isSmartMove = Math.random() < 0.9;
+    const isSmartMove = Math.random() < 0.85;
 
     if (isSmartMove) {
       // Find the index of the highest positive change
@@ -178,6 +178,7 @@ function PIM() {
         return (
           <>
             <StockComponent
+              player={player}
               stock={stock1}
               color="#008FFB"
               globalNews={globalNews}
@@ -186,6 +187,7 @@ function PIM() {
               height={150}
             />
             <StockComponent
+              player={player}
               stock={stock2}
               color="#fbc000"
               globalNews={globalNews}
@@ -194,6 +196,7 @@ function PIM() {
               height={150}
             />
             <StockComponent
+              player={player}
               stock={stock3}
               color="#fb004f"
               globalNews={globalNews}
@@ -202,6 +205,7 @@ function PIM() {
               height={150}
             />
             <StockComponent
+              player={player}
               stock={stock4}
               color="#5400fb"
               globalNews={globalNews}
@@ -210,6 +214,7 @@ function PIM() {
               height={150}
             />
             <StockComponent
+              player={player}
               stock={stock5}
               color="#fb6000"
               globalNews={globalNews}
@@ -254,7 +259,10 @@ function PIM() {
         P.I.M (Prediction Investment Model) Game
       </h1>
       <h1 style={{ color: "white" }}>Week: {week}/26</h1>
-      <h2 style={{ color: "white" }}>Assets: $0</h2>
+      <h2 style={{ color: "white" }}>Assets: ${player.assets.toFixed(2)}</h2>
+      <div id="next-week-button">
+        <button onClick={runSim}>Next Week</button>
+      </div>
       <section id="PIM-game">
         <div id="PIM-nav">
           <h2 style={{ color: "white" }}>Menu</h2>
@@ -317,7 +325,6 @@ function PIM() {
           />
         </div>
       </section>
-      <button onClick={runSim}>Run Sim</button>
     </main>
   );
 }

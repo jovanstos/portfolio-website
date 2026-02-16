@@ -104,7 +104,7 @@ export class PlayerPortfolio {
 
   calculateStakes() {
     // Loop through and check if user bet up or down
-    Object.values(this.stakes).forEach((s) => {
+    Object.entries(this.stakes).forEach(([id, s]) => {
       let missed = false;
       // If they bet the wrong way then they missed the bet and lose the amount
       if (s.stakeType == "UP") {
@@ -125,6 +125,9 @@ export class PlayerPortfolio {
         const cashWon = s.stakeAmount + s.stakeAmount * percChange;
         this.cash += cashWon;
       }
+
+      // Delete after stake was checked
+      delete this.stakes[Number(id)];
     });
   }
 }
