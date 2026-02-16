@@ -5,12 +5,15 @@ import { generateNewsValue } from "./newsAlgorithm";
 import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
 import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
-import type { newsObject } from "../types/pimTypes";
+import type { NewsObject } from "../types/pimTypes";
 import FadeInSection from "../components/FadeInSection";
 import "../styles/PIM.css";
+import { PlayerPortfolio } from "./classes/PlayerPortfolio";
 // Only used when deving
 // import { Parser } from '@json2csv/plainjs';
 // import { getTrainingData } from './PIMDataUtils';
+
+const player = new PlayerPortfolio();
 
 // High-growth tech: High price, moderate earnings = High P/E
 const stock1 = new Stock("NovaTech Robotics", 210.5, 450000000, 85, 75, 92);
@@ -32,7 +35,7 @@ function PIM() {
   const [activeView, setActiveView] = useState<"stock" | "news" | "assets">(
     "stock",
   );
-  const [newsFeed, setNewsFeed] = useState<newsObject[]>([
+  const [newsFeed, setNewsFeed] = useState<NewsObject[]>([
     {
       text: "This is the news feed, here you will see any news stories!",
       type: "Global",
@@ -46,7 +49,7 @@ function PIM() {
 
   function handleNewsCycle() {
     const stocks = [stock1, stock2, stock3, stock4, stock5];
-    const newEntries: newsObject[] = [];
+    const newEntries: NewsObject[] = [];
 
     stocks.forEach((s) => {
       s.companyNews = generateNewsValue();
