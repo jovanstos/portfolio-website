@@ -33,11 +33,11 @@ let io;
 
 if (isProd) {
   io = new Server(server, {
-    cors: corsOptions,
     pingTimeout: 60000,
   });
 } else {
   io = new Server(server, {
+    cors: corsOptions,
     pingTimeout: 60000,
   });
 }
