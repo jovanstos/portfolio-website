@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Stock } from "./classes/Stock";
 import { simulateNextWeek } from "./stockAlgorithm";
-import { generateNewsValue } from "./newsAlgorithm";
+import { generateNewsValue, getNewsStory } from "./newsAlgorithm";
 import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
 import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
@@ -66,8 +66,9 @@ function PIM() {
     stocks.forEach((s) => {
       s.companyNews = generateNewsValue();
       if (s.companyNews !== 0) {
+        const story = getNewsStory(s.companyNews, "Company");
         newEntries.push({
-          text: `${s.name} announces record profits!`,
+          text: `${s.name}: ${story}`,
           type: "Company",
           company: s.name,
           severity: s.companyNews > 0 ? "positive" : "negative",
@@ -85,8 +86,10 @@ function PIM() {
       setGlobalNews(newVal);
 
       if (newVal !== 0) {
+        const story = getNewsStory(newVal, "Global");
+
         newEntries.push({
-          text: "Global News",
+          text: story,
           type: "Global",
           company: "N/A",
           severity: newVal > 0 ? "positive" : "negative",

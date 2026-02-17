@@ -52,10 +52,19 @@ export type PlayerStake = {
   stakeAmount: number;
 };
 
+export type NewsType = "Global" | "Company";
+
 export type NewsObject = {
   text: string;
-  type: "Global" | "Company";
+  type: NewsType;
   company: string;
   severity: string;
   week: number;
 };
+
+export interface NewsDatabase {
+  [key: number]: {
+    Company: string[];
+    Global: string[];
+  };
+}
