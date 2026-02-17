@@ -24,15 +24,23 @@ const isProd = process.env.NODE_ENV === "production";
 // In Prod, the origin is the same, so we disable CORS (origin: false).
 // In Dev, we need to allow the Vite/React localhost port.
 const corsOptions = {
-  origin: isProd ? false : process.env.CLIENT_ORIGIN || "http://localhost:5173",
+  origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST"],
 };
 
-const io = new Server(server, {
-  cors: corsOptions,
-  pingTimeout: 60000,
-});
+let io;
+
+if (isProd) {
+  io = new Server(server, {
+    cors: corsOptions,
+    pingTimeout: 60000,
+  });
+} else {
+  io = new Server(server, {
+    pingTimeout: 60000,
+  });
+}
 
 function setAuthCookie(res: any, token: string) {
   // Raw HTTP (no SSL), 'secure: true' will block cookies, so this accounts for that
