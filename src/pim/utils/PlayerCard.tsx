@@ -25,7 +25,7 @@ function PlayerCard({
       <div className="player-profile">
         <img
           className="player-img"
-          src={playerIMG}
+          src={`/${playerIMG}`}
           alt="player profile image"
         />
         <h3>{playerName}</h3>

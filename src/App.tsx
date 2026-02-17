@@ -57,8 +57,11 @@ function App() {
           path="/projects/live/9"
           element={<Project id={9} mainContent={<SpellCaster />} />}
         />
+        <Route
+          path="/projects/live/10"
+          element={<Project id={10} mainContent={<PIM />} />}
+        />
         {/* These are shortcut links to apps that are used frequently*/}
-        <Route path="/pim" element={<PIM />} />
         <Route path="/zipline" element={<Zipline />} />
         <Route path="/converter" element={<Converter />} />
         <Route
