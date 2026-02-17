@@ -55,7 +55,7 @@ function StockComponent({
     mutationFn: postDataToPIM,
     onSuccess: async (data: any) => {
       // Update local state to show in popup
-      const PIMText = handlePIMPrediction(data);
+      const PIMText = handlePIMPrediction(data[0]);
 
       setPimPrediction(PIMText);
     },
@@ -293,12 +293,12 @@ function StockComponent({
                   style={{ marginBottom: "1rem", color: "#4CAF50" }}
                 />
                 <p style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                  {pimPrediction || "No prediction available."}
+                  {`For:${stock.name} ${pimPrediction}` ||
+                    "No prediction available."}
                 </p>
               </>
             )}
           </div>
-
           {!PIMMutation.isPending && (
             <button className="pim-button" onClick={closePopup}>
               Close
@@ -329,7 +329,6 @@ function StockComponent({
               }
             />
           </div>
-
           <div
             className="stake-direction-selector"
             style={{ display: "flex", gap: "10px", margin: "20px 0" }}

@@ -183,9 +183,28 @@ export function getTrainingData() {
   return data;
 }
 
-export function handlePIMPrediction(prediction: number[]): string {
-  console.log(prediction);
-  return "yo";
+export function handlePIMPrediction(prediction: number): string {
+  const formatedPrediction = prediction.toFixed(2);
+  // Up
+  if (prediction >= 0.6)
+    return `Strong Bullish Signal: High upward momentum expected. ${formatedPrediction}`;
+  if (prediction > 0.55)
+    return `Bullish Outlook: Favorable conditions. ${formatedPrediction}`;
+  if (prediction > 0.52)
+    return `Mildly Bullish: Slight upward bias detected. ${formatedPrediction}`;
+
+  // Neutral
+  if (prediction >= 0.48 && prediction <= 0.52) {
+    return `Neutral: Market consolidation; no clear directional trend. ${formatedPrediction}`;
+  }
+
+  // Down
+  if (prediction >= 0.45)
+    return `Mildly Bearish: Slight downward bias detected. ${formatedPrediction}`;
+  if (prediction >= 0.4)
+    return `Bearish Outlook: Negative pressure likely. ${formatedPrediction}`;
+
+  return `Strong Bearish Signal: High probability of drop. ${formatedPrediction}`;
 }
 
 export function formatNumber(num: number): string {
