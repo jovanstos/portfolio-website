@@ -183,4 +183,22 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  min-width: 700px;
+}
+
+@media screen and (max-width: 950px) {
+  #PIM-game {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pim-content-holder {
+    min-width: 0px;
+    width: 320px;
+    height: 500px;
+  }
+
+  .start-end {
+    min-width: 350px;
+  }
 }

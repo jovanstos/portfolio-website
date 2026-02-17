@@ -65,6 +65,7 @@ function PIM() {
   function handleNewsCycle() {
     const stocks = [stock1, stock2, stock3, stock4, stock5];
     const newEntries: NewsObject[] = [];
+    const nextWeek = week + 1;
 
     stocks.forEach((s) => {
       s.companyNews = generateNewsValue();
@@ -75,7 +76,7 @@ function PIM() {
           type: "Company",
           company: s.name,
           severity: s.companyNews > 0 ? "positive" : "negative",
-          week: week,
+          week: nextWeek,
         });
       }
     });
@@ -96,7 +97,7 @@ function PIM() {
           type: "Global",
           company: "N/A",
           severity: newVal > 0 ? "positive" : "negative",
-          week: week,
+          week: nextWeek,
         });
       }
     }
