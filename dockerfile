@@ -60,6 +60,7 @@ RUN pip install llvmlite tensorflow
 COPY --from=build-stage /app/dist ./dist
 COPY --from=build-stage /app/backend_dist ./backend_dist
 COPY --from=build-stage /app/package*.json ./
+COPY --from=build-stage /app/python ./python
 RUN npm install --omit=dev
 
 EXPOSE 3000

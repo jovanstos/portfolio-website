@@ -3,6 +3,10 @@ import fs from "fs/promises";
 import path from "path";
 import { nanoid } from "nanoid";
 import os from "os";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Compiles source code string to WASM binary buffer.
@@ -16,7 +20,7 @@ export const compileUserCode = async (sourceCode: string): Promise<Buffer> => {
   const tempDir = os.tmpdir();
   const inputFilePath = path.join(tempDir, `${runId}.van`);
   const outputWasmPath = path.join(tempDir, `${runId}.wasm`);
-  const pythonScriptPath = path.join(process.cwd(), "python/compiler.py");
+  const pythonScriptPath = path.join(__dirname, "../../python/compiler.py");
 
   try {
     // Write the user's string to a temp file
@@ -69,7 +73,7 @@ export const compileUserCode = async (sourceCode: string): Promise<Buffer> => {
  * @param data - Array of numbers to classify (e.g. [0.5, 0.1, 100, 0.2, 15, 2])
  */
 export const runPIMClassifier = async (data: number[]): Promise<any> => {
-  const pythonScriptPath = path.join(process.cwd(), "python/PIM.py");
+  const pythonScriptPath = path.join(__dirname, "../../python/PIM.py");
   const pythonCommand = "python3";
 
   return new Promise((resolve, reject) => {
