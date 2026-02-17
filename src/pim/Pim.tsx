@@ -54,6 +54,10 @@ function PIM() {
   ]);
   const [globalNews, setGlobalNews] = useState<number>(0);
   const [week, setWeek] = useState<number>(0);
+  // Used to create DOM updates
+  const [transactionCount, setTransactionCount] = useState(0);
+
+  console.log(transactionCount);
 
   function handleNewsCycle() {
     const stocks = [stock1, stock2, stock3, stock4, stock5];
@@ -143,6 +147,8 @@ function PIM() {
     ]);
   }
 
+  const triggerUpdate = () => setTransactionCount((prev) => prev + 1);
+
   const renderContent = () => {
     switch (activeView) {
       case "news":
@@ -166,11 +172,99 @@ function PIM() {
             <h1 style={{ color: "white" }}>Your Assets</h1>
             <StockChart
               stock={player}
-              color="#008FFB"
+              color="white"
               width={550}
-              height={150}
+              height={250}
               tooltip={true}
             />
+            <h2>Cash:</h2>
+            <p>${player.cash.toFixed(2)}</p>
+            <h2>Stocks:</h2>
+            {Object.values(player.stocks).map((pstoc, key) => (
+              <div key={key}>
+                <table className="stock-table" style={{ width: "100%" }}>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Shares</th>
+                      <th>Buy Price</th>
+                      <th>Current Val</th>
+                      <th>Change</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{pstoc.stockObject.name}</td>
+                      <td>{pstoc.shares}</td>
+                      <td>${pstoc.buyPrice.toFixed(2)}</td>
+                      <td>
+                        $
+                        {(
+                          pstoc.shares * pstoc.stockObject.currentPrice
+                        ).toFixed(2)}
+                      </td>
+                      <td>
+                        {(
+                          ((pstoc.stockObject.currentPrice - pstoc.buyPrice) /
+                            pstoc.buyPrice) *
+                          100
+                        ).toFixed(2)}
+                        %
+                      </td>
+                      <td>
+                        <button
+                          className="pim-button pim-sell-button"
+                          style={{ fontSize: "0.8rem", padding: "5px" }}
+                          onClick={() => {
+                            player.sellAsset(key);
+                            triggerUpdate();
+                          }}
+                        >
+                          Sell
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            ))}
+            <h2>Stakes:</h2>
+            {Object.values(player.stakes).map((pstake, key) => (
+              <div key={key}>
+                <table className="stock-table" style={{ width: "100%" }}>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Amount</th>
+                      <th>Type</th>
+                      <th>Stock Price</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{pstake.stockObject.name}</td>
+                      <td>${pstake.stakeAmount.toFixed(2)}</td>
+                      <td>{pstake.stakeType}</td>
+                      <td>${pstake.stakePrice.toFixed(2)}</td>
+                      <td>
+                        <button
+                          className="pim-button pim-sell-button"
+                          style={{ fontSize: "0.8rem", padding: "5px" }}
+                          onClick={() => {
+                            player.sellStake(key);
+                            triggerUpdate();
+                          }}
+                        >
+                          Sell
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </>
         );
       case "stock":
