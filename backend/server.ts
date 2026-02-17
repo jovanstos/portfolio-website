@@ -82,7 +82,7 @@ app.use((req, res, next) => {
 
     // Logic to check if only only a number of seconds are left so the token can be refreshed for real users
     const now = Math.floor(Date.now() / 1000);
-    if (payload.exp - now < 10) {
+    if (payload.exp - now < 15) {
       const newToken = signToken({ clientID: payload.clientID });
       setAuthCookie(res, newToken);
     }
