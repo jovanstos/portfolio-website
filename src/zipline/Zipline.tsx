@@ -272,36 +272,58 @@ function Zipline() {
     if (!sessionKeyRef.current) return;
 
     const currentRoomID = roomID.current;
-
     const chunkSize = 64 * 1024;
+
     socket.emit("file:init", {
       roomID: currentRoomID,
       meta: { name: file.name, size: file.size, type: file.type },
     });
 
-    for (let offset = 0; offset < file.size; offset += chunkSize) {
-      const chunk = new Uint8Array(
-        await file.slice(offset, offset + chunkSize).arrayBuffer(),
-      );
-      const encrypted = await aesEncrypt(chunk, sessionKeyRef.current);
-      socket.emit("file:chunk", { roomID: currentRoomID, payload: encrypted });
+    try {
+      for (let offset = 0; offset < file.size; offset += chunkSize) {
+        const chunk = new Uint8Array(
+          await file.slice(offset, offset + chunkSize).arrayBuffer(),
+        );
+        const encrypted = await aesEncrypt(chunk, sessionKeyRef.current);
+
+        // Wrap emit in a Promise to wait for ACK
+        await new Promise<void>((resolve, reject) => {
+          socket.emit(
+            "file:chunk",
+            { roomID: currentRoomID, payload: encrypted },
+            (response: any) => {
+              // 'response' comes from the server callback(response)
+              if (response && response.success) {
+                resolve();
+              } else {
+                reject(new Error(response?.error || "Unknown upload error"));
+              }
+            },
+          );
+        });
+      }
+
+      socket.emit("file:complete", { roomID: currentRoomID });
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          from: "self",
+          type: "file",
+          name: file.name,
+          blob: file,
+        },
+      ]);
+
+      setError("");
+      setIsError(false);
+    } catch (err: any) {
+      console.error("Upload failed:", err);
+      // Display the error popup if the transfer fails mid-way
+      setError(err.message || "File upload failed");
+      setIsError(true);
     }
-
-    socket.emit("file:complete", { roomID: currentRoomID });
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: uid(),
-        from: "self",
-        type: "file",
-        name: file.name,
-        blob: file,
-      },
-    ]);
-
-    setError("");
-    setIsError(false);
   }
 
   function copyToClipboard(text: string) {

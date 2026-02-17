@@ -144,43 +144,58 @@ export function initSockets(io: Server) {
       socket.to(roomID).emit("file:init", { meta });
     });
 
-    socket.on("file:chunk", ({ roomID, payload }) => {
+    socket.on("file:chunk", ({ roomID, payload }, callback) => {
       const room = rooms.get(roomID);
-
       if (!room) {
-        emitErrorMessage(socket, "ID entered was not found");
+        if (callback)
+          callback({ success: false, error: "ID entered was not found" });
         return;
       }
 
       const transfer = room.transfers?.get(socket.id);
 
+      // 2. Transfer Validation
       if (!transfer || !transfer.active) {
-        emitErrorMessage(
-          socket,
-          "No active file transfer or file exceeds 5MB limit",
-        );
+        if (callback)
+          callback({
+            success: false,
+            error: "No active file transfer or file exceeds 5MB limit",
+          });
         return;
       }
 
-      const payloadJson = JSON.stringify(payload);
-
-      const chunkSize = payload
-        ? payload.length
-        : Buffer.byteLength(payloadJson, "utf8");
+      let chunkSize = 0;
+      if (Buffer.isBuffer(payload)) {
+        chunkSize = payload.length;
+      } else if (typeof payload === "string") {
+        chunkSize = Buffer.byteLength(payload, "utf8");
+      } else {
+        // Fallback if client sends an object/array, this can cause glitches because it makes the payload larger
+        chunkSize = Buffer.byteLength(JSON.stringify(payload));
+      }
 
       transfer.bytesReceived += chunkSize;
 
+      // Size Limit Check
       if (transfer.bytesReceived > MAX_FILE_SIZE) {
         transfer.active = false;
         room.transfers!.delete(socket.id);
 
         emitErrorMessage(socket, "File upload exceeded 5MB limit");
-
         socket.to(roomID).emit("file:abort");
+
+        if (callback) callback({ success: false, error: "Limit exceeded" });
         return;
       }
 
+      // Relay to Receiver
       socket.to(roomID).emit("file:chunk", { payload });
+
+      // Send ACK
+      // This tells the client "I processed this chunk, send the next one."
+      if (callback) {
+        callback({ success: true });
+      }
     });
 
     socket.on("file:complete", ({ roomID }) => {
