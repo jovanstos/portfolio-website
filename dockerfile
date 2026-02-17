@@ -49,6 +49,9 @@ ENV PIP_BREAK_SYSTEM_PACKAGES=1
 RUN apt-get update && apt-get install -y \
     clang \
     lld \
+    llvm \
+    llvm-dev \
+    build-essential \
     python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
