@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import fs from "fs/promises";
 import path from "path";
 import { nanoid } from "nanoid";
-import { log } from "console";
+import os from "os";
 
 /**
  * Compiles source code string to WASM binary buffer.
@@ -13,7 +13,7 @@ export const compileUserCode = async (sourceCode: string): Promise<Buffer> => {
   // 1. Generate Unique IDs for this request (Prevents collisions between users)
   const runId = nanoid();
 
-  const tempDir = "./temp";
+  const tempDir = os.tmpdir();
   const inputFilePath = path.join(tempDir, `${runId}.van`);
   const outputWasmPath = path.join(tempDir, `${runId}.wasm`);
   const pythonScriptPath = path.join(process.cwd(), "python/compiler.py");
