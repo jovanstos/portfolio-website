@@ -40,6 +40,9 @@ granny.addAsset(stock4, 644);
 
 // P.I.M. stands for predictive investment model
 function PIM() {
+  const [gameState, setGameState] = useState<"start" | "playing" | "end">(
+    "start",
+  );
   const [activeView, setActiveView] = useState<"stock" | "news" | "assets">(
     "stock",
   );
@@ -131,6 +134,11 @@ function PIM() {
   }
 
   function runSim() {
+    if (week >= 26) {
+      setGameState("end");
+      return;
+    }
+
     const stock1Change = simulateNextWeek(week, stock1, globalNews);
     const stock2Change = simulateNextWeek(week, stock2, globalNews);
     const stock3Change = simulateNextWeek(week, stock3, globalNews);
@@ -151,6 +159,112 @@ function PIM() {
   }
 
   const triggerUpdate = () => setTransactionCount((prev) => prev + 1);
+
+  // START SCREEN LOGIC
+  if (gameState === "start") {
+    return (
+      <main id="PIM" className="start-end">
+        <h1 style={{ color: "white", fontSize: "3rem", marginBottom: "20px" }}>
+          P.I.M.
+        </h1>
+        <h2 style={{ color: "#aaa", marginBottom: "40px" }}>
+          Predictive Investment Model Simulation
+        </h2>
+        <div
+          style={{
+            color: "white",
+            maxWidth: "600px",
+            lineHeight: "1.6",
+            marginBottom: "40px",
+          }}
+        >
+          <p>
+            Welcome to the simulation. You play as "Player 1" and are a stock
+            investor over a 26-week period. You have a secret tool to assist you
+            in this period called P.I.M. an AI/ML. P.I.M is able to predict if a
+            stock will go up and down, helping you make better trades.
+          </p>
+          <hr />
+          <p>
+            You will compete against 3 differnt AI in the market, after 26 weeks
+            whoever has the highest assets wins! Analyze the market, read the
+            news, manage your assets correctly, and use P.I.M. to outperform the
+            competition! 😎
+          </p>
+        </div>
+        <button
+          className="pim-button"
+          style={{ fontSize: "1.5rem", padding: "15px 40px" }}
+          onClick={() => {
+            setGameState("playing");
+            runSim(); // Run the 0 week immediately upon start
+          }}
+        >
+          Start Game
+        </button>
+      </main>
+    );
+  }
+
+  // END GAME SCREEN LOGIC
+  if (gameState === "end") {
+    // Sort players by total assets for the leaderboard
+    const allPlayers = [player, preston, randy, granny].sort(
+      (a, b) => b.assets - a.assets,
+    );
+
+    return (
+      <main id="PIM" className="start-end">
+        <h1 style={{ color: "white", fontSize: "3rem" }}>Game Over</h1>
+        <h2 style={{ color: "white" }}>Week 27 Reached</h2>
+
+        <div
+          style={{
+            marginTop: "30px",
+            marginBottom: "30px",
+            width: "100%",
+            maxWidth: "600px",
+          }}
+        >
+          <h3
+            style={{
+              color: "white",
+              borderBottom: "1px solid #555",
+              paddingBottom: "10px",
+            }}
+          >
+            Final Standings
+          </h3>
+          {allPlayers.map((p, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: p.name === player.name ? "#008FFB" : "white",
+                padding: "15px",
+                background: "rgba(255,255,255,0.05)",
+                marginBottom: "10px",
+                borderRadius: "8px",
+                border: p.name === player.name ? "1px solid #008FFB" : "none",
+              }}
+            >
+              <span style={{ fontSize: "1.2rem" }}>
+                #{index + 1} {p.name}
+              </span>
+              <span style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
+                ${p.assets.toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <h2 style={{ color: "#4caf50", marginTop: "20px" }}>
+          Thanks for playing!
+        </h2>
+      </main>
+    );
+  }
 
   const renderContent = () => {
     switch (activeView) {
@@ -353,7 +467,7 @@ function PIM() {
   return (
     <main id="PIM">
       <h1 style={{ color: "white" }}>
-        P.I.M (Prediction Investment Model) Game
+        P.I.M. (Prediction Investment Model) Simulation
       </h1>
       <h1 style={{ color: "white" }}>Week: {week}/26</h1>
       <h2 style={{ color: "white" }}>Assets: ${player.assets.toFixed(2)}</h2>

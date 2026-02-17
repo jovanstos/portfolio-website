@@ -176,3 +176,11 @@
 .popup-inner-content {
   color: light-dark(black, white);
 }
+
+.start-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
