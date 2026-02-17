@@ -22,7 +22,3 @@ export type ContactPayload = {
   userAgent?: string;
   page?: string;
 };
-
-export type ApiErrorResponse = {
-  message?: string;
-};

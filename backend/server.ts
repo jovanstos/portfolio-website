@@ -9,6 +9,7 @@ import projectRoutes from "./routes/projectRoutes.js";
 import projectContentRoutes from "./routes/projectContentRoutes.js";
 import converterRoutes from "./routes/converterRoutes.js";
 import pythonRoutes from "./routes/pythonRoutes.js";
+import emailRoutes from "./routes/emailRoute.js";
 import { initSockets } from "./sockets/socket.js";
 import { signToken, verifyToken } from "./jwt/jwt.js";
 import { decode } from "jsonwebtoken";
@@ -121,6 +122,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/project-content", projectContentRoutes);
 app.use("/api/convert", converterRoutes);
 app.use("/api/python", pythonRoutes);
+app.use("/api/email", emailRoutes);
 
 // How to run the site if it's production
 if (isProd) {
