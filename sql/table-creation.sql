@@ -35,3 +35,8 @@ CREATE TABLE project_content (
         REFERENCES images(id)
         ON DELETE SET NULL
 );
+
+CREATE TABLE whitelist (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ip TEXT
+);
