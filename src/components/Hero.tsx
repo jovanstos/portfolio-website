@@ -199,8 +199,13 @@ function Hero() {
           </h1>
           <hr />
           <h2 style={{ fontStyle: "initial" }}>Software Engineer</h2>
-          <h3 style={{ fontSize: "var(--medium)", color: "#FFCB00" }}>
-            Location: Chicagoland Area
+          <h3
+            style={{
+              fontSize: "var(--medium)",
+              color: "var(--color-highlight)",
+            }}
+          >
+            Location: Greater Chicago Area
           </h3>
           <p>
             I turned my obsession into the ability to create solutions to real

@@ -37,6 +37,11 @@
   max-width: 1000px;
 }
 
+#home-info-text > b {
+  font-size: var(--xlarge);
+  color: light-dark(var(--color-accent), var(--color-highlight));
+}
+
 .card-holder {
   display: flex;
   justify-content: center;

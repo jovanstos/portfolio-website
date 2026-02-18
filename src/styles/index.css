@@ -29,6 +29,7 @@
   --color-bg-accent: light-dark(#d9dced, #0b0c12);
   --color-bg-daccent: light-dark(#c3c6d5, #06060a);
   --color-accent: #3b82f6;
+  --color-highlight: #ffcb00;
 
   /* Spacing scale */
   --space-xs: 0.25rem;

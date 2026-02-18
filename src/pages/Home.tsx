@@ -32,14 +32,7 @@ function Home() {
       <FadeInSection>
         <div id="home-info">
           <p id="home-info-text">
-            <b
-              style={{
-                fontSize: "var(--xlarge)",
-                color: "#FFCB00",
-              }}
-            >
-              Real quick,{" "}
-            </b>
+            <b>Real quick, </b>
             just a rundown of the site. The rocket ship in the top left is a
             spinable wheel with the navigation links. The sun/moon in the top
             right is to switch between light/dark mode. Also, this is a MEGA

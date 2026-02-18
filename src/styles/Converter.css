@@ -23,7 +23,7 @@
 }
 
 .file-dropzone.dragging {
-  border-color: #ffcb00;
+  border-color: var(--color-highlight);
 }
 
 #converter-options {
