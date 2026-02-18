@@ -2,7 +2,15 @@ import { Router, Request, Response } from "express";
 import multer from "multer";
 import sharp from "sharp";
 import { requireAuth } from "./auth.js";
-import { getUploader } from "./whitelist.js";
+
+const MAX_SIZE_STANDARD = 5 * 1024 * 1024; // 5 MB
+
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: MAX_SIZE_STANDARD },
+});
 
 const router: Router = Router();
 
@@ -14,13 +22,11 @@ type OutputFormat = (typeof ALLOWED_FORMATS)[number];
 router.post(
   "/",
   (req, res, next) => {
-    const upload = getUploader(req);
-
     upload.single("image")(req, res, (err: any) => {
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE") {
           return res.status(413).json({
-            error: "Image too large.",
+            error: "Image too large, must be under 5MB.",
           });
         }
         return res.status(400).json({ error: err.message });

@@ -1,13 +1,10 @@
 import { Server, Socket } from "socket.io";
 import { RoomState } from "../types/socketTypes.js";
 import crypto from "crypto";
-import {
-  isIpWhitelisted,
-  MAX_SIZE_STANDARD,
-  MAX_SIZE_VIP,
-} from "../routes/whitelist.js";
 
 const rooms = new Map<string, RoomState>();
+
+const MAX_SIZE_STANDARD = 5 * 1024 * 1024; // 5 MB
 
 function emitErrorMessage(socket: Socket, message: string) {
   socket.emit("room:error-message", { message });
@@ -143,11 +140,7 @@ export function initSockets(io: Server) {
         return;
       }
 
-      const clientIp = getSocketIp(socket);
-      const limit = isIpWhitelisted(clientIp)
-        ? MAX_SIZE_VIP
-        : MAX_SIZE_STANDARD;
-      if (meta?.size > limit) {
+      if (meta?.size > MAX_SIZE_STANDARD) {
         emitErrorMessage(socket, "File exceeds 5MB limit");
         return;
       }
@@ -193,15 +186,11 @@ export function initSockets(io: Server) {
       transfer.bytesReceived += chunkSize;
 
       // Size Limit Check
-      const clientIp = getSocketIp(socket);
-      const limit = isIpWhitelisted(clientIp)
-        ? MAX_SIZE_VIP
-        : MAX_SIZE_STANDARD;
-      if (transfer.bytesReceived > limit) {
+      if (transfer.bytesReceived > MAX_SIZE_STANDARD) {
         transfer.active = false;
         room.transfers!.delete(socket.id);
 
-        emitErrorMessage(socket, "File upload exceeded limit");
+        emitErrorMessage(socket, "File upload exceeded 5MB limit");
         socket.to(roomID).emit("file:abort");
 
         if (callback) callback({ success: false, error: "Limit exceeded" });
