@@ -5,8 +5,9 @@ import type {
   TouchedState,
   ErrorState,
   ContactPayload,
-  ApiErrorResponse,
 } from "../types/contactTypes";
+import { sendEmail } from "../api/email";
+import { useMutation } from "@tanstack/react-query";
 import "../styles/Contact.css";
 
 const INITIAL: ContactFormState = {
@@ -26,6 +27,22 @@ function Contact() {
   const [touched, setTouched] = useState<TouchedState>({});
   const [status, setStatus] = useState<ContactStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const EmailMutation = useMutation({
+    mutationFn: sendEmail,
+    onSuccess: async () => {
+      setForm(INITIAL);
+      setTouched({});
+      setStatus("success");
+    },
+    onError: (error: any) => {
+      const msg =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      console.error(msg);
+      setStatus("error");
+      setErrorMsg(msg);
+    },
+  });
 
   const errors: ErrorState = useMemo(() => {
     const e: ErrorState = {};
@@ -104,36 +121,7 @@ function Contact() {
       page: window.location.href,
     };
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      let data: ApiErrorResponse = {};
-      try {
-        data = (await res.json()) as ApiErrorResponse;
-      } catch {
-        // Ignore if server returns no JSON
-      }
-
-      if (!res.ok) {
-        throw new Error(
-          data?.message || "Something went wrong. Please try again.",
-        );
-      }
-      setStatus("success");
-      setForm(INITIAL);
-      setTouched({});
-    } catch (err: unknown) {
-      setStatus("error");
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Failed to send. Please try again.";
-      setErrorMsg(message);
-    }
+    EmailMutation.mutate(payload);
   }
 
   return (

@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev";
 // Simple but important logic in handling the JWT logic creating and verificaiton
 export function signToken(
   payload: JwtPayload,
-  options: SignOptions = { expiresIn: "15m" },
+  options: SignOptions = { expiresIn: "5m" },
 ): string {
   return jwt.sign(payload, JWT_SECRET, options);
 }

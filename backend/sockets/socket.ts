@@ -1,14 +1,26 @@
 import { Server, Socket } from "socket.io";
 import { RoomState } from "../types/socketTypes.js";
 import crypto from "crypto";
+import {
+  isIpWhitelisted,
+  MAX_SIZE_STANDARD,
+  MAX_SIZE_VIP,
+} from "../routes/whitelist.js";
 
 const rooms = new Map<string, RoomState>();
 
-// 5 MB
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
 function emitErrorMessage(socket: Socket, message: string) {
   socket.emit("room:error-message", { message });
+}
+
+// Extract IP from Socket
+function getSocketIp(socket: Socket): string {
+  // Check headers first (in case of Nginx/Proxy)
+  const forwarded = socket.handshake.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0].trim();
+  }
+  return socket.handshake.address;
 }
 
 /* 
@@ -131,7 +143,11 @@ export function initSockets(io: Server) {
         return;
       }
 
-      if (meta?.size > MAX_FILE_SIZE) {
+      const clientIp = getSocketIp(socket);
+      const limit = isIpWhitelisted(clientIp)
+        ? MAX_SIZE_VIP
+        : MAX_SIZE_STANDARD;
+      if (meta?.size > limit) {
         emitErrorMessage(socket, "File exceeds 5MB limit");
         return;
       }
@@ -177,11 +193,15 @@ export function initSockets(io: Server) {
       transfer.bytesReceived += chunkSize;
 
       // Size Limit Check
-      if (transfer.bytesReceived > MAX_FILE_SIZE) {
+      const clientIp = getSocketIp(socket);
+      const limit = isIpWhitelisted(clientIp)
+        ? MAX_SIZE_VIP
+        : MAX_SIZE_STANDARD;
+      if (transfer.bytesReceived > limit) {
         transfer.active = false;
         room.transfers!.delete(socket.id);
 
-        emitErrorMessage(socket, "File upload exceeded 5MB limit");
+        emitErrorMessage(socket, "File upload exceeded limit");
         socket.to(roomID).emit("file:abort");
 
         if (callback) callback({ success: false, error: "Limit exceeded" });
