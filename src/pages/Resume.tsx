@@ -49,11 +49,11 @@ function Resume() {
             </a>{" "}
             •{" "}
             <a
-              href="http://www.jovanstosic.dev"
+              href="https://jovanstosic.dev/"
               rel="noopener noreferrer"
               target="_blank"
             >
-              www.jovanstosic.dev
+              jovanstosic.dev
             </a>
           </header>
         </FadeInSection>
@@ -93,7 +93,7 @@ function Resume() {
             <hr />
             <div className="resumeDetail">
               <h4>RIM Logistics</h4>
-              <p>August 2023 - February 2023</p>
+              <p>August 2023 - February 2026</p>
             </div>
             <div className="resumeDetail">
               <p>Software Engineer</p>
@@ -237,11 +237,31 @@ function Resume() {
             </div>
             <div className="resumeDetail">
               <h4>Fundamentals of Cybersecurity Skill Path</h4>
+              <p>July 2024</p>
+            </div>
+            <div className="resumeDetail">
               <p>Codecademy</p>
+              <a
+                href="https://www.codecademy.com/profiles/jovanstos/certificates/06984a073b064e61879cca3e82a9b3d2"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Codecademy
+              </a>
             </div>
             <div className="resumeDetail">
               <h4>Computer Science Career Path</h4>
+              <p>June 2024</p>
+            </div>
+            <div className="resumeDetail">
               <p>Codecademy</p>
+              <a
+                href="https://www.codecademy.com/profiles/jovanstos/certificates/05009c20e9174378acd37e6c2d0fbfc4"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Codecademy
+              </a>
             </div>
           </section>
         </FadeInSection>
