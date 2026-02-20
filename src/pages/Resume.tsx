@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import Dropdown from "../components/DropDown";
 
 function Resume() {
+  const pdfUrl =
+    "https://portfolio-website-image-bucket.nyc3.digitaloceanspaces.com/Jovan_Stosic_Resume_WEB.pdf";
+
   const navigate = useNavigate();
 
   return (
@@ -130,10 +133,10 @@ function Resume() {
                   high-performance similarity searches.
                 </li>
                 <li>
-                  Developed and deployed "EasyPeasySQL" a Python Tinker SQL IDE,
-                  used for staff and temporary employees to securely access the
-                  database. This IDE allowed the team to monitor and track usage
-                  of the database in our own secure environment.
+                  Developed and deployed "EasyPeasySQL" a Python Tkinter SQL
+                  IDE, used for staff and temporary employees to securely access
+                  the database. This IDE allowed the team to monitor and track
+                  usage of the database in our own secure environment.
                 </li>
                 <li>
                   Developed "Altova Interchange," a robust Python middleware
@@ -203,10 +206,6 @@ function Resume() {
                 </li>
               </ul>
             </Dropdown>
-            <p>
-              For more expernice dating back all the way to 2017 please reach
-              out, and I will send you the full resume!
-            </p>
           </section>
         </FadeInSection>
         <FadeInSection>
@@ -284,15 +283,30 @@ function Resume() {
             <hr />
             <p>
               <h4 style={{ display: "inline" }}>Programming Languages:</h4>{" "}
-              Python, JavaScript/TypeScript, C++, Java, SQL, CSS, HTML
+              Python, JavaScript/TypeScript, C++, Java, SQL, HTML, CSS
             </p>
             <p>
-              <h4 style={{ display: "inline" }}>Software / Frameworks:</h4> Git,
-              GitHub/GitLab/Bitbucket, Docker, React, Vue, Spring Boot,
-              Electron.js, VS Code, JetBrains Suite, AI/LLM Agents
+              <h4 style={{ display: "inline" }}>Frameworks & Libraries:</h4>{" "}
+              React, Vue, Spring Boot, Electron.js, Pandas, TensorFlow
+            </p>
+            <p>
+              <h4 style={{ display: "inline" }}>Tools & Infrastructure:</h4>{" "}
+              Git, GitHub/GitLab/Bitbucket, Docker, Pinecone, PostgreSQL, MySQL
+            </p>
+            <p>
+              <h4 style={{ display: "inline" }}>Concepts:</h4> REST APIs, CI/CD,
+              DevOps, Machine Learning, LLM Agents / RAG, System Architecture
             </p>
           </section>
         </FadeInSection>
+        <a
+          href={pdfUrl}
+          download="Jovan_Stosic_Resume_WEB.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button>Download PDF</button>
+        </a>
       </article>
     </main>
   );
