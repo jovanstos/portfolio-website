@@ -65,28 +65,26 @@ function Resume() {
             <h3>Education</h3>
             <hr />
             <div className="resumeDetail">
-              <h4>Western Governors University</h4>
-              <p>Online</p>
+              <p>
+                <h4 style={{ display: "inline" }}>
+                  Western Governors University
+                </h4>{" "}
+                | Bachelor Of Science Computer Science | August 2024 - December
+                2025
+              </p>
             </div>
             <div className="resumeDetail">
-              <p>Computer Science</p>
-              <p>August 2024 - December 2025</p>
+              <p>
+                <h4 style={{ display: "inline" }}>Fullstack Academy</h4> |
+                Software Engineering Boot Camp | February 2023 - July 2023
+              </p>
             </div>
             <div className="resumeDetail">
-              <h4>Fullstack Academy</h4>
-              <p>Online</p>
-            </div>
-            <div className="resumeDetail">
-              <p>Software Engineering Boot Camp</p>
-              <p>February 2023 - July 2023</p>
-            </div>
-            <div className="resumeDetail">
-              <h4>College Dupage</h4>
-              <p>Glen Ellyn, IL</p>
-            </div>
-            <div className="resumeDetail">
-              <p>Associates In Science & Engineering</p>
-              <p>August 2020 - December 2022</p>
+              <p>
+                <h4 style={{ display: "inline" }}>College Of Dupage</h4> |
+                Associate in Science & Engineering | August 2020 - December 2022
+                Professional Experience
+              </p>
             </div>
           </section>
         </FadeInSection>
@@ -145,8 +143,9 @@ function Resume() {
                   legacy system with a high-availability solution featuring
                   real-time document tracking.
                 </li>
-                <li>Introduced and set up the companies Git and Github.</li>
-                <li>Introduced and set up the companies DevOps.</li>
+                <li>
+                  Introduced and set up the company's Git, Github, and DevOps.
+                </li>
               </ul>
             </Dropdown>
             <div className="resumeDetail">
@@ -157,55 +156,6 @@ function Resume() {
               <p>Intern</p>
               <p>Bartlett, IL</p>
             </div>
-            <Dropdown title="Details">
-              <ul>
-                <li>
-                  Gained knowledge of office operations and logistics
-                  terminology at RIM.
-                </li>
-                <li>
-                  Communicated effectively with stakeholders for real-time
-                  shipment updates.
-                </li>
-                <li>Monitored and addressed shipment progress issues.</li>
-                <li>Organized documents and maintained systematic records.</li>
-                <li>
-                  Collaborated in a team environment to meet deadlines
-                  efficiently.
-                </li>
-              </ul>
-            </Dropdown>
-            <div className="resumeDetail">
-              <h4>Z37E Clothing</h4>
-              <p>February 2021 - December 2022</p>
-            </div>
-            <div className="resumeDetail">
-              <p>Self-employed</p>
-              <p>Online</p>
-            </div>
-            <Dropdown title="Details">
-              <ul>
-                <li>
-                  Founded and scaled Z37E Clothing, generating $1,500 in sales
-                  within a year.
-                </li>
-                <li>
-                  Managed a team of 4, delegating roles to boost productivity.
-                </li>
-                <li>Built and launched an engaging e-commerce website.</li>
-                <li>
-                  Developed marketing strategies to enhance brand visibility.
-                </li>
-                <li>
-                  Oversaw material sourcing, manufacturing, and delivery
-                  processes.
-                </li>
-                <li>
-                  Demonstrated leadership and entrepreneurial skills to drive
-                  business success.
-                </li>
-              </ul>
-            </Dropdown>
           </section>
         </FadeInSection>
         <FadeInSection>
@@ -292,10 +242,6 @@ function Resume() {
             <p>
               <h4 style={{ display: "inline" }}>Tools & Infrastructure:</h4>{" "}
               Git, GitHub/GitLab/Bitbucket, Docker, Pinecone, PostgreSQL, MySQL
-            </p>
-            <p>
-              <h4 style={{ display: "inline" }}>Concepts:</h4> REST APIs, CI/CD,
-              DevOps, Machine Learning, LLM Agents / RAG, System Architecture
             </p>
           </section>
         </FadeInSection>
