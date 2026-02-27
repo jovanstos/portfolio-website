@@ -38,7 +38,7 @@ function Home() {
             right is to switch between light/dark mode. Also, this is a MEGA
             monolith app; it has multiple services and live projects. You can
             learn more about the app by going to the detailed explanation here:{" "}
-            <a href="/" rel="noopener noreferrer">
+            <a href="/projects/id/17" rel="noopener noreferrer">
               Project page.
             </a>
           </p>
