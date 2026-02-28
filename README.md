@@ -16,12 +16,26 @@ All code and design assets within this repository are the property of Jovan Stos
 
 I kindly ask that you respect the integrity of this work. If you find the code helpful for learning, I encourage you to use it as inspiration to build something unique of your own rather than copying this implementation. Thank you!
 
-ReadMe under construction
+## Start Of Read Me
+
+### Description
+
+This app is not like a regular portfolio website; it is a single, monolithic app. It has multiple services and live projects embedded within the website, and I had to ensure they all had a seamless connection. It uses many programming languages, which I had to get working via an API in my Express.js backend. It has its own MySQL database as well and is set up with advanced security features.
+
+### Tech Stack
+
+- Languages: Python, TypeScript, JavaScript, PostgresSQL
+
+- Front-End: React.js, TypeScript, JavaScript, HTML, CSS, Vite
+
+- Back-End: Express.js, Socket.io, JWT, Docker
+
+ReadMe is still under construction. For now just checkout the package.json scripts to see how to run it.
+
+commands I shouldn't forget:
 
 docker compose up
 
 .env production and remove VITE_SOCKET_URL CLIENT_ORIGIN
-
-uncommet dev to dev
 
 export NODE_ENV=production && docker compose build
