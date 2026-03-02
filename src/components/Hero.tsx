@@ -178,7 +178,7 @@ function Hero() {
             <CircleBadge
               topText="Jovan Stosic"
               bottomText="Software Engineer"
-              imageUrl="./temp.jpg"
+              imageUrl="./jovan-pfp.webp"
             />
           </div>
         )}
