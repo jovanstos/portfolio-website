@@ -21,6 +21,7 @@ type OutputFormat = (typeof ALLOWED_FORMATS)[number];
 // Handles the post request of taking the image and converting it to the requested format
 router.post(
   "/",
+  requireAuth,
   (req, res, next) => {
     upload.single("image")(req, res, (err: any) => {
       if (err instanceof multer.MulterError) {
@@ -34,7 +35,6 @@ router.post(
       next(err);
     });
   },
-  requireAuth,
   async (req: Request, res: Response) => {
     try {
       const file = req.file;

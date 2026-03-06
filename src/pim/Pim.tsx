@@ -298,8 +298,8 @@ function PIM() {
             <h2>Cash:</h2>
             <p>${player.cash.toFixed(2)}</p>
             <h2>Stocks:</h2>
-            {Object.values(player.stocks).map((pstoc, key) => (
-              <div key={key}>
+            {Object.entries(player.stocks).map(([stockKey, pstoc]) => (
+              <div key={stockKey}>
                 <table className="stock-table" style={{ width: "100%" }}>
                   <thead>
                     <tr>
@@ -335,7 +335,7 @@ function PIM() {
                           className="pim-button pim-sell-button"
                           style={{ fontSize: "0.8rem", padding: "5px" }}
                           onClick={() => {
-                            player.sellAsset(key);
+                            player.sellAsset(Number(stockKey));
                             triggerUpdate();
                           }}
                         >
@@ -348,8 +348,8 @@ function PIM() {
               </div>
             ))}
             <h2>Stakes:</h2>
-            {Object.values(player.stakes).map((pstake, key) => (
-              <div key={key}>
+            {Object.entries(player.stakes).map(([stakeKey, pstake]) => (
+              <div key={stakeKey}>
                 <table className="stock-table" style={{ width: "100%" }}>
                   <thead>
                     <tr>
@@ -371,7 +371,7 @@ function PIM() {
                           className="pim-button pim-sell-button"
                           style={{ fontSize: "0.8rem", padding: "5px" }}
                           onClick={() => {
-                            player.sellStake(key);
+                            player.sellStake(Number(stakeKey));
                             triggerUpdate();
                           }}
                         >
