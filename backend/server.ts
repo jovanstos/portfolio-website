@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
+import compression from "compression";
 import projectRoutes from "./routes/projectRoutes.js";
 import projectContentRoutes from "./routes/projectContentRoutes.js";
 import converterRoutes from "./routes/converterRoutes.js";
@@ -63,6 +64,7 @@ if (isProd) {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+app.use(compression());
 
 // Handle the JWT short term token logic to have it so the client must be a verifed bowser to avoid API abuse
 app.use((req, res, next) => {
