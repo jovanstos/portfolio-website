@@ -62,6 +62,42 @@ function Resume() {
         </FadeInSection>
         <FadeInSection>
           <section className="resumeSection">
+            <h3>Executive Summary</h3>
+            <hr />
+            <p>
+              High-energy and deeply passionate Software Engineer driven by a
+              love for continuous learning and technical problem-solving.
+              Proficient across a diverse stack of languages including Python,
+              TypeScript, and Java , and highly adept at leveraging modern
+              agentic AI development tools to accelerate coding and build
+              robust, full-stack architectures. Dedicated to delivering
+              measurable business impact, demonstrated by engineering automated
+              enterprise pipelines that reduced operational overhead by 99%.
+            </p>
+          </section>
+        </FadeInSection>
+        <FadeInSection>
+          <section className="resumeSection">
+            <h3>Technical Skills</h3>
+            <hr />
+            <p>
+              <h4 style={{ display: "inline" }}>Programming Languages:</h4>{" "}
+              Python, JavaScript/TypeScript, Java, SQL, HTML, CSS, C++
+            </p>
+            <p>
+              <h4 style={{ display: "inline" }}>Frameworks & Libraries:</h4>{" "}
+              React, Vue, Spring Boot, Electron.js, Pandas, TensorFlow, Hugging
+              Face, and Scikit-Learn
+            </p>
+            <p>
+              <h4 style={{ display: "inline" }}>Tools & Infrastructure:</h4>{" "}
+              Agentic AI Development, Claude Code, Git, GitHub/GitLab, Docker,
+              PostgreSQL, MySQL, MongoDB
+            </p>
+          </section>
+        </FadeInSection>
+        <FadeInSection>
+          <section className="resumeSection">
             <h3>Education</h3>
             <hr />
             <div className="resumeDetail">
@@ -83,7 +119,6 @@ function Resume() {
               <p>
                 <h4 style={{ display: "inline" }}>College Of Dupage</h4> |
                 Associate in Science & Engineering | August 2020 - December 2022
-                Professional Experience
               </p>
             </div>
           </section>
@@ -224,25 +259,6 @@ function Resume() {
               <a href="./projects" rel="noopener noreferrer">
                 Projects
               </a>
-            </p>
-          </section>
-        </FadeInSection>
-        <FadeInSection>
-          <section className="resumeSection">
-            <h3>Technical Skills</h3>
-            <hr />
-            <p>
-              <h4 style={{ display: "inline" }}>Programming Languages:</h4>{" "}
-              Python, JavaScript/TypeScript, Java, SQL, HTML, CSS, C++
-            </p>
-            <p>
-              <h4 style={{ display: "inline" }}>Frameworks & Libraries:</h4>{" "}
-              React, Vue, Spring Boot, Electron.js, Pandas, TensorFlow
-            </p>
-            <p>
-              <h4 style={{ display: "inline" }}>Tools & Infrastructure:</h4>{" "}
-              Agentic AI Development, Claude Code, Git, GitHub/GitLab, Docker,
-              PostgreSQL, MySQL, MongoDB
             </p>
           </section>
         </FadeInSection>
