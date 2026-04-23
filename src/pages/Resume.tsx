@@ -229,11 +229,11 @@ function Resume() {
         </FadeInSection>
         <FadeInSection>
           <section className="resumeSection">
-            <h3>Skills</h3>
+            <h3>Technical Skills</h3>
             <hr />
             <p>
               <h4 style={{ display: "inline" }}>Programming Languages:</h4>{" "}
-              Python, JavaScript/TypeScript, C++, Java, SQL, HTML, CSS
+              Python, JavaScript/TypeScript, Java, SQL, HTML, CSS, C++
             </p>
             <p>
               <h4 style={{ display: "inline" }}>Frameworks & Libraries:</h4>{" "}
@@ -241,7 +241,8 @@ function Resume() {
             </p>
             <p>
               <h4 style={{ display: "inline" }}>Tools & Infrastructure:</h4>{" "}
-              Git, GitHub/GitLab/Bitbucket, Docker, Pinecone, PostgreSQL, MySQL
+              Agentic AI Development, Claude Code, Git, GitHub/GitLab, Docker,
+              PostgreSQL, MySQL, MongoDB
             </p>
           </section>
         </FadeInSection>
