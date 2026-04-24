@@ -183,6 +183,10 @@ export function getTrainingData() {
   return data;
 }
 
+export function formatStockSequence(stock: Stock, lookback: number): number[][] {
+  return stock.featureHistory.slice(-lookback);
+}
+
 export function handlePIMPrediction(prediction: number): string {
   const formatedPrediction = prediction.toFixed(2);
   // Up

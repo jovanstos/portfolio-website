@@ -12,7 +12,7 @@ export const postCodeToCompiler = async (
   return res.data;
 };
 
-export const postDataToPIM = async (stockData: number[]): Promise<number[]> => {
+export const postDataToPIM = async (stockData: number[][]): Promise<number[]> => {
   const res = await api.post("/python/pim", { data: stockData });
 
   return res.data;

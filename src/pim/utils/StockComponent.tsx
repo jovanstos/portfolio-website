@@ -5,7 +5,7 @@ import { postDataToPIM } from "../../api/python";
 import StockChart from "./StockChart";
 import Popup from "../../components/Popup";
 import {
-  formatStockData,
+  formatStockSequence,
   handlePIMPrediction,
   formatNumber,
 } from "../PIMDataUtils";
@@ -69,8 +69,8 @@ function StockComponent({
 
   const askPIM = () => {
     setActivePopup("PIM");
-    setPimPrediction(null); // Reset previous prediction
-    PIMMutation.mutate(formatStockData(stock, globalNews, week));
+    setPimPrediction(null);
+    PIMMutation.mutate(formatStockSequence(stock, 10));
   };
 
   const handleInfoButton = () => {

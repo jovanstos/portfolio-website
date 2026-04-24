@@ -10,9 +10,10 @@ import FadeInSection from "../components/FadeInSection";
 import "../styles/PIM.css";
 import { PlayerPortfolio } from "./classes/PlayerPortfolio";
 import StockChart from "./utils/StockChart";
+import { formatStockData } from "./PIMDataUtils";
 // Only used when deving
-// import { Parser } from '@json2csv/plainjs';
-// import { getTrainingData } from './PIMDataUtils';
+import { Parser } from "@json2csv/plainjs";
+import { getTrainingData } from "./PIMDataUtils";
 
 // Create the player and AI
 const player = new PlayerPortfolio("Player 1");
@@ -51,7 +52,7 @@ function PIM() {
       text: "This is the news feed, here you will see any news stories!",
       type: "Global",
       company: "N/A",
-      severity: "netural",
+      severity: "neutral",
       week: 0,
     },
   ]);
@@ -145,6 +146,11 @@ function PIM() {
     const stock3Change = simulateNextWeek(week, stock3, globalNews);
     const stock4Change = simulateNextWeek(week, stock4, globalNews);
     const stock5Change = simulateNextWeek(week, stock5, globalNews);
+
+    // Capture feature snapshot after simulation so PIM can use temporal sequences
+    [stock1, stock2, stock3, stock4, stock5].forEach((s) => {
+      s.featureHistory.push(formatStockData(s, globalNews, week));
+    });
 
     setWeek((prev) => prev + 1);
 
@@ -440,36 +446,37 @@ function PIM() {
   };
 
   // Only used when deving
-  // function downloadCSV() {
-  //     const data = getTrainingData()
+  function downloadCSV() {
+    const data = getTrainingData();
 
-  //     try {
-  //         const parser = new Parser();
-  //         const csv = parser.parse(data);
+    try {
+      const parser = new Parser();
+      const csv = parser.parse(data);
 
-  //         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  //         const url = URL.createObjectURL(blob);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
 
-  //         // Create a temporary link element to trigger download
-  //         const link = document.createElement('a');
-  //         link.href = url;
-  //         link.setAttribute('download', 'PIM_training_data.csv');
-  //         document.body.appendChild(link);
-  //         link.click();
+      // Create a temporary link element to trigger download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "PIM_training_data.csv");
+      document.body.appendChild(link);
+      link.click();
 
-  //         // Cleanup
-  //         document.body.removeChild(link);
-  //         URL.revokeObjectURL(url);
-  //     } catch (err) {
-  //         console.error("CSV Export Error:", err);
-  //     }
-  // };
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("CSV Export Error:", err);
+    }
+  }
 
   return (
     <main id="PIM">
       <h1 style={{ color: "white" }}>
         P.I.M. (Prediction Investment Model) Simulation
       </h1>
+      <button onClick={downloadCSV}>dddd</button>
       <h1 style={{ color: "white" }}>Week: {week}/26</h1>
       <h2 style={{ color: "white" }}>Assets: ${player.assets.toFixed(2)}</h2>
       <div id="next-week-button">

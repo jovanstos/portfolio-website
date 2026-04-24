@@ -3,32 +3,32 @@ import json
 import os
 
 # Suppress TF logs so they don't mess up stdout JSON
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+# Update this value after retraining — PIMTrainer.py prints the optimal threshold
+PREDICTION_THRESHOLD = 0.5
 
 try:
     import tensorflow as tf
     import numpy as np
 
     def run_prediction():
-        # Get input from command line arguments
         if len(sys.argv) < 2:
             print(json.dumps({"error": "No input data provided"}))
             return
 
-        # List of numbers
+        # List of lists: [[week1_features...], [week2_features...], ...]
         input_data = json.loads(sys.argv[1])
-        
-        # Load Model
-        model_path = os.path.join(os.getcwd(), 'python/pim_classifier.keras')
+
+        # Use __file__ so path works regardless of where Node server is launched from
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(script_dir, 'pim_classifier.keras')
         model = tf.keras.models.load_model(model_path)
 
-        # Process Input
-        input_tensor = np.array([[input_data]], dtype=np.float32)
+        # Reshape to [1, N, 8] — batch=1, N=weeks of history, 8 features
+        input_tensor = np.array([input_data], dtype=np.float32)
 
-        # Predict
         prediction = model.predict(input_tensor, verbose=0)
-
-        # Output result as JSON to stdout
         print(json.dumps({"prediction": prediction.tolist()}))
 
     if __name__ == "__main__":

@@ -23,6 +23,8 @@ export class Stock {
   companyNews: number;
   // Stock data
   data: [number | undefined, number][];
+  // Normalized feature snapshots per week, used for PIM sequence input
+  featureHistory: number[][];
 
   constructor(
     companyName: string,
@@ -51,6 +53,7 @@ export class Stock {
     this.companyNews = 0;
     this.projectedEarnings = 0;
     this.data = [];
+    this.featureHistory = [];
   }
 
   updatePE() {

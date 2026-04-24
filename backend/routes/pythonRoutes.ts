@@ -30,17 +30,17 @@ router.post("/compile", requireAuth, async (req: Request, res: Response) => {
 
 router.post("/pim", requireAuth, async (req: Request, res: Response) => {
   try {
-    // Getting the code in the body
     const { data } = req.body;
 
-    if (!data) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
       return res.status(400).json({ error: "No data provided" });
     }
 
-    // Runing the model
-    const prediction = await runPIMClassifier(data);
+    if (!Array.isArray(data[0]) || data[0].length !== 8) {
+      return res.status(400).json({ error: "Invalid data format: expected array of 8-feature vectors" });
+    }
 
-    // Send the prediction back
+    const prediction = await runPIMClassifier(data);
     res.send(prediction[0]);
   } catch (error: any) {
     res.status(500).json({

@@ -70,17 +70,23 @@ export const compileUserCode = async (sourceCode: string): Promise<Buffer> => {
 
 /**
  * Runs the PIM classifier model via a spawned Python process.
- * @param data - Array of numbers to classify (e.g. [0.5, 0.1, 100, 0.2, 15, 2])
+ * @param data - Sequence of weekly feature vectors [[week1_features], [week2_features], ...]
  */
-export const runPIMClassifier = async (data: number[]): Promise<any> => {
+export const runPIMClassifier = async (data: number[][]): Promise<any> => {
   const pythonScriptPath = path.join(__dirname, "../../python/PIM.py");
   const pythonCommand = "python3";
+  const TIMEOUT_MS = 30000;
 
   return new Promise((resolve, reject) => {
     const pyProcess = spawn(pythonCommand, [
       pythonScriptPath,
       JSON.stringify(data),
     ]);
+
+    const timeout = setTimeout(() => {
+      pyProcess.kill();
+      reject(new Error("PIM prediction timed out after 30 seconds"));
+    }, TIMEOUT_MS);
 
     let stdoutData = "";
     let stderrData = "";
@@ -94,6 +100,7 @@ export const runPIMClassifier = async (data: number[]): Promise<any> => {
     });
 
     pyProcess.on("close", (code) => {
+      clearTimeout(timeout);
       if (code !== 0) {
         return reject(new Error(`Python Error: ${stderrData}`));
       }
