@@ -45,6 +45,8 @@ function StockComponent({
   const [_, setTick] = useState(0);
   const forceUpdate = () => setTick((t) => t + 1);
 
+  console.log(globalNews, week);
+
   const ownedHoldings = useMemo(() => {
     return Object.entries(player.stocks).filter(
       ([_, s]) => s.stockObject.name === stock.name,
