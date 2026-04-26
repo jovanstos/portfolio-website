@@ -1,36 +1,12 @@
-# docker-compose.prod.yml (development)
-# services:
-#   app:
-#     build:
-#       context: .
-#       target: ${NODE_ENV:-development} # Switches based on the environment variable
-#     env_file:
-#       - .env # Grabs everything .env file
-#     volumes:
-#       - .:/app
-#       - /app/node_modules # Prevents host modules from overwriting container modules
-#     ports:
-#       - "5174:5174" # Vite Frontend
-#       - "3000:3000" # Express Backend
-#     environment:
-#       - NODE_ENV=${NODE_ENV:-development}
-#     # For development server and frontend will run concurrently
-#     command: >
-#       sh -c "npm run dev & npm run dev-server"
-
-# docker-compose.prod.yml (production)
 services:
   app:
     build:
       context: .
-      target: ${NODE_ENV:-production}
+      target: production
     env_file:
       - .env
-    volumes:
-      - .:/app
-      - /app/node_modules # Prevents host modules from overwriting container modules
     ports:
       - "80:3000"
     environment:
-      - NODE_ENV=${NODE_ENV:-production}
+      - NODE_ENV=production
     restart: always

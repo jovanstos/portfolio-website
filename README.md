@@ -34,8 +34,10 @@ ReadMe is still under construction. For now just checkout the package.json scrip
 
 commands I shouldn't forget:
 
+Local dev:
+
+docker compose -f docker-compose.dev.yml up
+
+Local prod test:
+
 docker compose up
-
-.env production and remove VITE_SOCKET_URL CLIENT_ORIGIN
-
-export NODE_ENV=production && docker compose build

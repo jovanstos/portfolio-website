@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "5174:5174"
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development

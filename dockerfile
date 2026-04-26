@@ -1,11 +1,8 @@
-# Base setup creation
+# ── Stage 1: heavy system deps (Python, LLVM) ──────────────────────────────
+# This layer is cached. It only reruns when the apt/pip installs change.
 FROM node:22-bookworm AS base
 WORKDIR /app
-
-# Allow pip to install globally in Debian Bookworm (Node 22)
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
-
-# Install LLVM, Python, and build tools
 RUN apt-get update && apt-get install -y \
     clang \
     lld \
@@ -15,56 +12,32 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
-
-# Install python libraries
 RUN pip install llvmlite tensorflow
 
-# Copy package files first to leverage Docker cache
+# ── Stage 2: npm install (all deps, for dev + build) ───────────────────────
+FROM base AS deps
 COPY package*.json ./
 RUN npm install
 
-# Development version setup
-FROM base AS development
-# Copy the source code
+# ── Stage 3: development ────────────────────────────────────────────────────
+FROM deps AS development
 COPY . .
-# Expose Vite and backend Express server
 EXPOSE 5174 3000
-# Run the dev command in package.json
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npm run dev & npm run dev-server"]
 
-# Production build setup
-FROM base AS build-stage
+# ── Stage 4: build the frontend + backend ──────────────────────────────────
+FROM deps AS builder
 COPY . .
 RUN npm run build && npm run build-server
 
-# Production version setup
-FROM node:22-bookworm-slim AS production
-WORKDIR /app
-
-# Re-declare the pip env var for production stage
-ENV PIP_BREAK_SYSTEM_PACKAGES=1
-
-# Production needs Python and LLVM runtime libraries
-# Python/Pip must be reinstalled here because this stage starts fresh from 'slim'
-RUN apt-get update && apt-get install -y \
-    clang \
-    lld \
-    llvm \
-    llvm-dev \
-    build-essential \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install llvmlite for production runtime
-RUN pip install llvmlite tensorflow
-
-# Copy only the compiled code and production dependencies
-COPY --from=build-stage /app/dist ./dist
-COPY --from=build-stage /app/backend_dist ./backend_dist
-COPY --from=build-stage /app/package*.json ./
-COPY --from=build-stage /app/python ./python
-RUN npm install --omit=dev
-
+# ── Stage 5: production runtime ────────────────────────────────────────────
+# Inherits system deps from base (Python/LLVM needed at runtime).
+# Installs only production npm deps — no dev bloat.
+FROM base AS production
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/backend_dist ./backend_dist
+COPY --from=builder /app/python ./python
 EXPOSE 3000
 CMD ["npm", "run", "start"]
