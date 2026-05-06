@@ -425,7 +425,7 @@ function Zipline() {
           <div id="join-room">
             <h2>Pair Device</h2>
             <button
-              className="secondary-button"
+              className="primary-button"
               onClick={() => setIsScannerOpen(true)}
             >
               Scan QR Code
