@@ -7,3 +7,8 @@ export type ChatMessage =
       name: string;
       blob: Blob;
     };
+
+export interface QRCodeData {
+  roomID: string;
+  pairingCode: string;
+}

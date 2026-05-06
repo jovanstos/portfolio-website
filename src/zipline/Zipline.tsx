@@ -1,8 +1,10 @@
 import { useRef, useState, useEffect } from "react";
 import { ImFolderUpload } from "react-icons/im";
 import { FaCopy, FaDownload } from "react-icons/fa";
+import { QRCodeSVG } from "qrcode.react";
 import Popup from "../components/Popup";
-import type { ChatMessage } from "../types/ziplineTypes";
+import QRScanner from "./QRScanner";
+import type { ChatMessage, QRCodeData } from "../types/ziplineTypes";
 import ErrorPopup from "../components/ErrorPopup";
 import { socket } from "./socket";
 import {
@@ -42,6 +44,7 @@ function Zipline() {
   const [messageInput, setMessageInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const [isScannerOpen, setIsScannerOpen] = useState<boolean>(false);
 
   useEffect(() => {
     // All of the socket listners listening for key events
@@ -148,6 +151,17 @@ function Zipline() {
     setIsPopupOpen(!isPopupOpen);
   }
 
+  function closeScannerPopup() {
+    setIsScannerOpen(false);
+  }
+
+  function handleQRScan(data: QRCodeData) {
+    setRoomSateId(data.roomID);
+    setPairingCode(data.pairingCode);
+    roomID.current = data.roomID;
+    setIsScannerOpen(false);
+  }
+
   const handleFileClick = () => {
     fileInputRef.current?.click();
   };
@@ -166,9 +180,9 @@ function Zipline() {
   }
 
   const handleRoomIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRoomSateId(event.target.value);
-
-    roomID.current = roomSateID;
+    const value = event.target.value;
+    setRoomSateId(value);
+    roomID.current = value;
   };
 
   const handlePairKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -370,6 +384,14 @@ function Zipline() {
         <h2>Pairing Information</h2>
         <br />
         <div id="pairing-info-container">
+          <div id="qr-code-display">
+            <QRCodeSVG
+              value={JSON.stringify({ roomID: roomSateID, pairingCode })}
+              size={200}
+              level="H"
+              includeMargin
+            />
+          </div>
           <div>
             <h3 className="pairing-info">ID: {roomSateID}</h3>
             <h3 className="pairing-info">Code: {pairingCode}</h3>
@@ -382,6 +404,9 @@ function Zipline() {
         </p>
       </Popup>
       <ErrorPopup isError={isError} message={error} />
+      {isScannerOpen && (
+        <QRScanner onScan={handleQRScan} onClose={closeScannerPopup} />
+      )}
       {!approved ? (
         <section id="room-options">
           <div id="create-room">
@@ -399,6 +424,13 @@ function Zipline() {
           <h2>Or</h2>
           <div id="join-room">
             <h2>Pair Device</h2>
+            <button
+              className="secondary-button"
+              onClick={() => setIsScannerOpen(true)}
+            >
+              Scan QR Code
+            </button>
+            <p>Or enter manually:</p>
             <input
               type="text"
               value={roomSateID}
