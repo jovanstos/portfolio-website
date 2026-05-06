@@ -28,13 +28,18 @@ function QRScanner({ onScan, onClose }: QRScannerProps) {
     scanner.render(
       (result) => {
         try {
-          const data = JSON.parse(result) as QRCodeData;
-          if (data.roomID && data.pairingCode) {
+          const url = new URL(result);
+          const roomID = url.searchParams.get("roomID");
+          const pairingCode = url.searchParams.get("pairingCode");
+
+          if (roomID && pairingCode) {
             scanner.clear();
-            onScan(data);
+            onScan({ roomID, pairingCode });
+          } else {
+            setError("QR code missing pairing info");
           }
         } catch {
-          setError("Invalid QR code format");
+          setError("Invalid QR code — must be a Zipline pairing link");
         }
       },
       (error) => {

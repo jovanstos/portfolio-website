@@ -47,6 +47,38 @@ function Zipline() {
   const [isScannerOpen, setIsScannerOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paramRoomID = params.get("roomID");
+    const paramPairingCode = params.get("pairingCode");
+
+    if (paramRoomID && paramPairingCode) {
+      setRoomSateId(paramRoomID);
+      setPairingCode(paramPairingCode);
+      roomID.current = paramRoomID;
+
+      // Clean the params from the URL bar without triggering a reload
+      window.history.replaceState({}, "", window.location.pathname);
+
+      const autoJoin = async () => {
+        await createKeys();
+        const exportedPublicKey = await exportPublicKey(publicKeyRef.current!);
+        socket.emit("room:join", {
+          roomID: paramRoomID,
+          publicKey: exportedPublicKey,
+          pairingCode: paramPairingCode,
+        });
+        socket.on("room:approved", () => {
+          setApproved(true);
+          setError("");
+          setIsError(false);
+        });
+      };
+
+      autoJoin();
+    }
+  }, []);
+
+  useEffect(() => {
     // All of the socket listners listening for key events
 
     // Get RSA-OAEP key to use to send the session key
@@ -386,7 +418,7 @@ function Zipline() {
         <div id="pairing-info-container">
           <div id="qr-code-display">
             <QRCodeSVG
-              value={JSON.stringify({ roomID: roomSateID, pairingCode })}
+              value={`https://jovanstosic.dev/zipline?roomID=${encodeURIComponent(roomSateID)}&pairingCode=${encodeURIComponent(pairingCode)}`}
               size={200}
               level="H"
               includeMargin
