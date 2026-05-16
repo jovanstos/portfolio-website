@@ -1,4 +1,5 @@
 import "../styles/Card.css";
+import { Link } from "react-router-dom";
 import type { CardProps } from "../types/cardTypes";
 
 // Export out internal project ids so it is DRY and can be used else where
@@ -23,7 +24,7 @@ function LargeCard({
       : description;
 
   return (
-    <a className="card-a-tag" href={url} rel="noopener noreferrer">
+    <Link className="card-a-tag" to={url}>
       <article className="large-card card">
         <img
           src={imgURL}
@@ -37,7 +38,7 @@ function LargeCard({
           <p>Click to see more</p>
         </div>
       </article>
-    </a>
+    </Link>
   );
 }
 

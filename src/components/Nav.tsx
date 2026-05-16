@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { IoRocketSharp } from "react-icons/io5";
 import "../styles/Nav.css";
 
@@ -122,11 +123,10 @@ export default function Nav() {
         onPointerCancel={onPointerUp}
       >
         {items.map((item) => (
-          <a
+          <Link
             key={item.href}
             className="wheelItem"
-            href={item.href}
-            rel="noopener noreferrer"
+            to={item.href}
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => {
               if (!canHover) setOpen(false);
@@ -136,7 +136,7 @@ export default function Nav() {
             }}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </div>
     </nav>

@@ -67,7 +67,7 @@ function Zipline() {
           publicKey: exportedPublicKey,
           pairingCode: paramPairingCode,
         });
-        socket.on("room:approved", () => {
+        socket.once("room:approved", () => {
           setApproved(true);
           setError("");
           setIsError(false);
@@ -172,7 +172,9 @@ function Zipline() {
       socket.off("msg:encrypted");
       socket.off("file:init");
       socket.off("file:chunk");
+      socket.off("file:abort");
       socket.off("file:complete");
+      socket.off("room:error-message");
     };
   }, []);
 
@@ -242,7 +244,7 @@ function Zipline() {
       publicKey: exportedPublicKey,
     });
 
-    socket.on("room:pairing-code", ({ pairingCode, approved }) => {
+    socket.once("room:pairing-code", ({ pairingCode, approved }) => {
       setPairingCode(pairingCode);
       setApproved(approved);
       setIsPopupOpen(true);
@@ -264,7 +266,7 @@ function Zipline() {
       pairingCode,
     });
 
-    socket.on("room:approved", () => {
+    socket.once("room:approved", () => {
       setApproved(true);
       setError("");
       setIsError(false);
@@ -421,7 +423,7 @@ function Zipline() {
               value={`https://jovanstosic.dev/zipline?roomID=${encodeURIComponent(roomSateID)}&pairingCode=${encodeURIComponent(pairingCode)}`}
               size={200}
               level="H"
-              includeMargin
+              marginSize={4}
             />
           </div>
           <div>

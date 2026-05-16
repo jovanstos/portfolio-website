@@ -1,4 +1,5 @@
 import "../styles/Card.css";
+import { Link } from "react-router-dom";
 import type { CardProps } from "../types/cardTypes";
 import { internalProjectIDs } from "./LargeCard";
 
@@ -16,7 +17,7 @@ function SmallCard({
   const url = isInternal ? `/projects/live/${id}` : `/projects/id/${id}`;
 
   return (
-    <a className="card-a-tag" href={url} rel="noopener noreferrer">
+    <Link className="card-a-tag" to={url}>
       <article className="small-card card">
         <img
           src={imgURL}
@@ -25,7 +26,7 @@ function SmallCard({
           height={"150px"}
         />
       </article>
-    </a>
+    </Link>
   );
 }
 

@@ -58,19 +58,17 @@ function Home() {
                 Loading featured projects...
               </p>
             ) : (
-              <div className="card-holder">
-                {featuredData?.map((proj) => (
-                  <FadeInSection key={proj.id}>
-                    <LargeCard
-                      id={proj.id}
-                      title={proj.title}
-                      description={proj.description}
-                      imgURL={proj.imageurl}
-                      imgDescription={proj.imagedescription}
-                    />
-                  </FadeInSection>
-                ))}
-              </div>
+              featuredData?.map((proj) => (
+                <FadeInSection key={proj.id}>
+                  <LargeCard
+                    id={proj.id}
+                    title={proj.title}
+                    description={proj.description}
+                    imgURL={proj.imageurl}
+                    imgDescription={proj.imagedescription}
+                  />
+                </FadeInSection>
+              ))
             )}
           </div>
           <FadeInSection>
@@ -90,19 +88,17 @@ function Home() {
               {regularIsLoading ? (
                 <p style={{ textAlign: "center" }}>Loading projects...</p>
               ) : (
-                <div className="card-holder">
-                  {regularData?.map((proj) => (
-                    <FadeInSection key={proj.id}>
-                      <MediumCard
-                        id={proj.id}
-                        title={proj.title}
-                        description={proj.description}
-                        imgURL={proj.imageurl}
-                        imgDescription={proj.imagedescription}
-                      />
-                    </FadeInSection>
-                  ))}
-                </div>
+                regularData?.map((proj) => (
+                  <FadeInSection key={proj.id}>
+                    <MediumCard
+                      id={proj.id}
+                      title={proj.title}
+                      description={proj.description}
+                      imgURL={proj.imageurl}
+                      imgDescription={proj.imagedescription}
+                    />
+                  </FadeInSection>
+                ))
               )}
             </div>
             <FadeInSection>
@@ -136,22 +132,17 @@ function Home() {
               {junkIsLoading ? (
                 <p style={{ textAlign: "center" }}>Loading trinkets...</p>
               ) : (
-                <div
-                  style={{ marginBottom: "var(--space-md)" }}
-                  className="card-holder"
-                >
-                  {junkData?.map((proj) => (
-                    <FadeInSection key={proj.id}>
-                      <SmallCard
-                        id={proj.id}
-                        title={proj.title}
-                        description={proj.description}
-                        imgURL={proj.imageurl}
-                        imgDescription={proj.imagedescription}
-                      />
-                    </FadeInSection>
-                  ))}
-                </div>
+                junkData?.map((proj) => (
+                  <FadeInSection key={proj.id}>
+                    <SmallCard
+                      id={proj.id}
+                      title={proj.title}
+                      description={proj.description}
+                      imgURL={proj.imageurl}
+                      imgDescription={proj.imagedescription}
+                    />
+                  </FadeInSection>
+                ))
               )}
             </div>
             <FadeInSection>

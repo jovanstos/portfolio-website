@@ -210,7 +210,7 @@ function Hero() {
           <p>
             I turned my obsession into the ability to create solutions to real
             problems. A few years ago, I sold my car to be able to fund my
-            education to become a software engineer. I had to used all the money
+            education to become a software engineer. I had to use all the money
             I had. It was a risk I took to pursue my dreams. I know you've heard
             the same story a million times: "I love programming!" but it is a
             different for me. It's all I've ever wanted and have obsessed over.

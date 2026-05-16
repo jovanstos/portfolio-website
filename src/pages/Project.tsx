@@ -106,8 +106,8 @@ function Project({
           const hasImage = Boolean(articleData.imageurl);
 
           return (
-            <FadeInSection>
-              <article className="project-article" key={articleData.id}>
+            <FadeInSection key={articleData.id}>
+              <article className="project-article">
                 <h2 className="project-h2">{articleData.title}</h2>
                 {hasImage && (
                   <>

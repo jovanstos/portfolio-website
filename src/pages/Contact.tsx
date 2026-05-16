@@ -58,7 +58,7 @@ function Contact() {
     return e;
   }, [form]);
 
-  const canSubmit = Object.keys(errors).length === 0 && status !== "sending";
+  const canSubmit = Object.keys(errors).length === 0 && !EmailMutation.isPending;
 
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

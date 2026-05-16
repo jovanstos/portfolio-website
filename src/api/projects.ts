@@ -1,12 +1,11 @@
 import { api } from "./client";
+import type { QueryFunctionContext } from "@tanstack/react-query";
 import type { ProjectData } from "../types/projectTypes";
 
 export const getProjects = async ({
   queryKey,
-}: {
-  queryKey: [string, string];
-}): Promise<ProjectData[]> => {
-  const [, type] = queryKey;
+}: QueryFunctionContext): Promise<ProjectData[]> => {
+  const type = queryKey[1] as string;
 
   const res = await api.get(`/projects/all/${type}`);
 
@@ -15,8 +14,8 @@ export const getProjects = async ({
 
 export const getProjectByID = async ({
   queryKey,
-}: any): Promise<ProjectData> => {
-  const [, id] = queryKey;
+}: QueryFunctionContext): Promise<ProjectData> => {
+  const id = queryKey[1];
 
   const res = await api.get(`/projects/id/${id}`);
 

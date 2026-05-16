@@ -15,6 +15,22 @@ const isValidEmail = (email: string): boolean => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
 router.post("/", async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, subject, message } = req.body as ContactPayload;
@@ -35,16 +51,6 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Configure Nodemailer with Gmail
-    // Note: "App Password" for Gmail, not login password. That would be bad.
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
-
     // Construct the email
     const mailOptions = {
       from: `"Portfolio Contact" <${process.env.GMAIL_USER}>`, // Sender address is mine
@@ -53,25 +59,25 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
       subject: `[Contact Form] ${subject}`,
       text: `
         You have a new message from your portfolio-website:
-        
+
         Name: ${name}
         Email: ${email}
         Subject: ${subject}
-        
+
         Message:
         ${message}
-        
+
         -------------------------
       `,
       html: `
         <h3>New Contact Form Submission</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
         <br/>
         <p><strong>Message:</strong></p>
         <blockquote style="background: #f9f9f9; padding: 10px; border-left: 5px solid #ccc;">
-          ${message.replace(/\n/g, "<br>")}
+          ${escapeHtml(message).replace(/\n/g, "<br>")}
         </blockquote>
       `,
     };

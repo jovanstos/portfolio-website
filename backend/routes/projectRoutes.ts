@@ -60,13 +60,14 @@ router.get("/all/:type", requireAuth, getProjectsHandler);
 
 // Gets on project by ID
 router.get("/id/:id", requireAuth, async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ message: "Invalid ID" });
-  }
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
-  const query = `
+    const query = `
     SELECT
     projects.id,
     projects.title,
@@ -80,9 +81,16 @@ router.get("/id/:id", requireAuth, async (req: Request, res: Response) => {
     AND projects.id = $1;
     `;
 
-  const { rows } = await pool.query(query, [id]);
+    const { rows } = await pool.query(query, [id]);
 
-  res.json(rows[0]);
+    if (!rows[0]) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json(rows[0]);
+  } catch {
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 export default router;
