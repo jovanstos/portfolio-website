@@ -1,58 +1,70 @@
 #home {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 50px;
-}
-
-.fade-in-section {
-  opacity: 0;
-  transform: translateY(100px);
-  transition:
-    opacity 1s ease-out,
-    transform 0.5s ease-out;
-  will-change: opacity, transform;
-}
-
-.fade-in-section.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.home-projects {
   width: 100%;
-  max-width: 1800px;
 }
-
-#home-info {
+.home-sections,
+.home-tools,
+.home-tip {
+  width: min(1200px, calc(100% - 32px));
+  margin: 24px auto;
+}
+.home-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.home-tools a {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   padding: 20px;
-  border-radius: 0px 0px 50px 50px;
-  margin-bottom: 20px;
-  background-color: var(--color-bg-accent);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-accent);
 }
-
-#home-info-text {
-  margin: 10px 0px;
-  max-width: 1000px;
+.home-tools strong {
+  font-size: 1.25rem;
 }
-
-#home-info-text > b {
-  font-size: var(--xlarge);
-  color: light-dark(var(--color-accent), var(--color-highlight));
+.home-tools span {
+  color: var(--color-text-secondary);
+  margin-top: 8px;
 }
-
+.home-tip {
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 0;
+}
+.home-tip summary {
+  cursor: pointer;
+}
+.home-tip p {
+  margin-top: 12px;
+}
+.home-projects {
+  margin: 48px 0;
+}
+.section-heading {
+  margin-bottom: 24px;
+}
+.section-heading h2 {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  margin-bottom: 8px;
+}
 .card-holder {
-  display: flex;
-  justify-content: center;
-  gap: 10px 20px;
-  margin: 15px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 24px 0;
 }
-
-@media screen and (max-width: 750px) {
-  .card-holder {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px 20px;
+.card-holder.small-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 900px) {
+  .card-holder,
+  .card-holder.small-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 550px) {
+  .home-tools,
+  .card-holder,
+  .card-holder.small-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

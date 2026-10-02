@@ -1,204 +1,168 @@
 #PIM {
-  background-color: #0b0e11;
-  color: light-dark(black, white);
+  background: #0b0e11;
+  color: #f3f4f6;
   border-radius: var(--radius-lg);
-  padding: 15px;
-  max-width: 1200px;
-  border: 5px solid black;
-}
-
-#PIM-game {
-  display: flex;
-  margin: 20px 0px;
-}
-
-#PIM-nav {
-  background-color: #06060a;
-  padding: 25px;
-  border-radius: var(--radius-lg);
-}
-
-#next-week-button {
+  padding: clamp(12px, 3vw, 24px);
   width: 100%;
+  max-width: 1200px;
+}
+#PIM p,
+#PIM h1,
+#PIM h2,
+#PIM h3 {
+  color: #f3f4f6;
+}
+.pim-header {
   display: flex;
-  justify-content: right;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
-
-#next-week-button > button {
-  background-color: var(--color-accent);
+.pim-header > div {
+  flex: 1;
+  min-width: 180px;
 }
-
-.pim-button {
-  display: block;
-  margin: 5px;
+.pim-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
 }
-
-.pim-button > * {
-  display: inline;
-  margin-left: 5px;
+.pim-tabs button[aria-pressed="true"] {
+  outline: 2px solid var(--color-accent);
 }
-
-.pim-buy-button {
-  background-color: #00c569;
+#PIM-game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 16px;
 }
-
-.pim-buy-button:hover {
-  background-color: #00ff88;
-}
-
-.pim-sell-button {
-  background-color: #d53051;
-}
-
-.pim-sell-button:hover {
-  background-color: #ff3b61;
-}
-
 .pim-content-holder {
-  background-color: #030303;
-  border-radius: var(--radius-lg);
-  padding: 10px;
-  min-width: 600px;
-  height: 500px;
-  overflow: scroll;
-  overflow-y: auto;
-  margin: 0px 15px;
-  animation: fadeInSlide 0.4s ease-out forwards;
+  min-width: 0;
+  background: #030303;
+  border-radius: 12px;
+  padding: 12px;
 }
-
-@keyframes fadeInSlide {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+#players {
+  min-width: 0;
 }
-
-.news-item {
-  border: 2px solid white;
-  border-bottom: none;
-  padding: 5px;
+.pim-button {
+  padding: 8px 12px;
+  margin: 4px;
+  color: #111;
+  background: #cbd5e1;
 }
-
-.news-text {
-  font-size: var(--large);
-}
-
-.severity-positive {
-  background-color: #00c569;
-}
-
-.severity-negative {
-  background-color: #d53051;
-}
-
-.severity-netural {
-  border-bottom: 2px solid white;
-}
-
-.stock {
-  background-color: #030303;
-  padding: 10px;
-}
-
-.stock > * {
-  color: white;
-}
-
-.stock > button {
-  color: light-dark(black, white);
-}
-
-.stock-actions > button {
+.pim-button svg {
   display: inline;
-  color: light-dark(black, white);
+  vertical-align: middle;
+  margin-left: 6px;
 }
-
-.stock-chart {
-  color: black;
+.pim-buy-button {
+  background: #00c569;
 }
-
+.pim-sell-button {
+  background: #ef607b;
+}
+.stock {
+  padding: 16px 0;
+  border-bottom: 1px solid #ffffff25;
+  overflow-x: auto;
+}
+.stock h3 {
+  margin-bottom: 12px;
+}
+.stock-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 .stock-table {
   border-collapse: collapse;
+  font-size: 0.85rem;
 }
-
-.stock-td,
-.stock-th {
-  border: 1px solid white;
-  padding: 5px;
+.stock-table th,
+.stock-table td {
+  border: 1px solid #8886;
+  padding: 8px;
 }
-
-.stock-th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #1d1d1d;
-  color: white;
+.stock-chart {
+  min-width: 0;
+  color: #111;
 }
-
-#players {
-  color: white;
-  overflow: scroll;
-  max-height: 500px;
-}
-
 .player-card {
-  background-color: #06060a;
-  padding: 10px;
-  border-radius: var(--radius-lg);
-  margin-top: 5px;
-  margin-right: 20px;
+  background: #141922;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
 }
-
-.player-card > * {
-  color: white;
-}
-
-.player-profile > * {
-  display: inline;
-}
-
 .player-profile {
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-
 .player-img {
-  height: 45px;
-  width: 45px;
-  border-radius: 100%;
-  border: 2px solid #00ff88;
-  margin-right: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
 }
-
-.popup-inner-content {
-  color: light-dark(black, white);
+.news-item {
+  padding: 12px;
+  border-left: 3px solid #999;
+  margin: 12px 0;
+  background: #141922;
 }
-
+.severity-positive {
+  border-color: #00c569;
+}
+.severity-negative {
+  border-color: #ef607b;
+}
+.pim-holding {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #ffffff25;
+}
 .start-end {
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-width: 700px;
+  gap: 24px;
 }
-
-@media screen and (max-width: 950px) {
+.start-end p {
+  max-width: 650px;
+}
+.pim-standings {
+  width: min(100%, 600px);
+  text-align: left;
+}
+.pim-standings li {
+  padding: 12px;
+}
+.pim-standings strong {
+  float: right;
+}
+.popup-input-group {
+  margin: 16px 0;
+}
+.popup-input-group label {
+  display: block;
+  margin-bottom: 8px;
+}
+.popup-inner-content {
+  color: var(--color-text);
+}
+@media (max-width: 800px) {
   #PIM-game {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: minmax(0, 1fr);
   }
-
-  .pim-content-holder {
-    min-width: 0px;
-    width: 320px;
-    height: 500px;
-  }
-
-  .start-end {
-    min-width: 350px;
+  #players {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
   }
 }

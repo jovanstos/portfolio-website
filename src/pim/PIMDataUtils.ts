@@ -183,11 +183,16 @@ export function getTrainingData() {
   return data;
 }
 
-export function formatStockSequence(stock: Stock, lookback: number): number[][] {
+export function formatStockSequence(
+  stock: Stock,
+  lookback: number,
+): number[][] {
   return stock.featureHistory.slice(-lookback);
 }
 
 export function handlePIMPrediction(prediction: number): string {
+  if (!Number.isFinite(prediction) || prediction < 0 || prediction > 1)
+    throw new Error("Invalid prediction response.");
   const formatedPrediction = prediction.toFixed(2);
   // Up
   if (prediction >= 0.6)

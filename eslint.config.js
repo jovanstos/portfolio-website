@@ -1,31 +1,52 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import reactX from "eslint-plugin-react-x";
+import reactDom from "eslint-plugin-react-dom";
 
-export default defineConfig([
-  globalIgnores(['dist']),
+export default tseslint.config(
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommendedTypeChecked,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-      reactX.configs['recommended-typescript'],
-      reactDom.configs.recommended,
+    ignores: [
+      "dist/**",
+      "backend_dist/**",
+      "node_modules/**",
+      "backend/utils/pythonRunner.ts",
+      "backend/routes/pythonRoutes.ts",
     ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      ecmaVersion: 2020,
-      globals: globals.browser,
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+      ],
     },
   },
-])
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    languageOptions: { globals: globals.browser },
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+      "react-x": reactX,
+      "react-dom": reactDom,
+    },
+    rules: {
+      ...reactHooks.configs.flat.recommended.rules,
+      ...reactX.configs.recommended.rules,
+      ...reactDom.configs.recommended.rules,
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+    },
+  },
+  {
+    files: ["backend/**/*.ts", "*config.ts"],
+    languageOptions: { globals: globals.node },
+  },
+);

@@ -1,54 +1,43 @@
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
-import "../styles/index.css";
-
-const LINKS = [
-  { label: "Home", href: "/" },
-  { label: "About Me", href: "/about" },
-  { label: "Contact Me", href: "/contact" },
-  { label: "Résumé", href: "/resume" },
-  { label: "Projects", href: "/projects" },
-  { label: "Junk Yard", href: "/junk" },
-];
-
-const SOCIALS = [
-  { label: <FaGithub size={40} />, href: "https://github.com/jovanstos" },
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import { SITE_LINKS } from "./siteLinks";
+const socials = [
+  { label: "GitHub", href: "https://github.com/jovanstos", icon: FaGithub },
   {
-    label: <FaLinkedin size={40} />,
+    label: "LinkedIn",
     href: "https://www.linkedin.com/in/jovanstosic12/",
+    icon: FaLinkedin,
   },
-  { label: <FaTwitter size={40} />, href: "https://x.com/jovanstos" },
+  { label: "X / Twitter", href: "https://x.com/jovanstos", icon: FaTwitter },
 ];
-
-function Footer() {
-  const year = new Date().getFullYear();
-
+export default function Footer() {
+  const [year] = useState(() => new Date().getFullYear());
   return (
     <footer>
       <section>
         <div>
           <h1>Socials</h1>
-          <div style={{ display: "flex" }}>
-            {SOCIALS.map((media) => (
+          <div className="footer-socials">
+            {socials.map(({ label, href, icon: Icon }) => (
               <a
-                key={media.href}
-                href={media.href}
-                rel="noopener noreferrer"
+                key={href}
+                href={href}
                 target="_blank"
-                style={{ color: "white", marginRight: "5px" }}
+                rel="noopener noreferrer"
+                aria-label={label}
               >
-                {media.label}
+                <Icon size={45} />
               </a>
             ))}
           </div>
         </div>
         <div>
           <h1>Links</h1>
-          <ul style={{ listStyleType: "none", margin: "0", padding: "0" }}>
-            {LINKS.map((link) => (
+          <ul>
+            {SITE_LINKS.map((link) => (
               <li key={link.href}>
-                <a href={link.href} style={{ color: "white" }}>
-                  {link.label}
-                </a>
+                <Link to={link.href}>{link.label}</Link>
               </li>
             ))}
           </ul>
@@ -58,5 +47,3 @@ function Footer() {
     </footer>
   );
 }
-
-export default Footer;

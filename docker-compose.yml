@@ -2,11 +2,15 @@ services:
   app:
     build:
       context: .
+      dockerfile: dockerfile
       target: production
     env_file:
-      - .env
-    ports:
-      - "80:3000"
+      - .env.production
     environment:
-      - NODE_ENV=production
-    restart: always
+      NODE_ENV: production
+      PORT: "3000"
+    # The host's HTTPS reverse proxy is the only public entry point.
+    ports:
+      - "127.0.0.1:3000:3000"
+    init: true
+    restart: unless-stopped

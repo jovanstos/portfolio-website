@@ -2,6 +2,7 @@ services:
   app:
     build:
       context: .
+      dockerfile: dockerfile
       target: development
     env_file:
       - .env
@@ -12,4 +13,8 @@ services:
       - "5174:5174"
       - "3000:3000"
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
+      PORT: "3000"
+      CLIENT_ORIGIN: http://localhost:5174
+      TRUST_PROXY_HOPS: "0"
+    init: true

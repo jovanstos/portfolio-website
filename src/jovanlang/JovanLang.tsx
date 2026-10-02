@@ -1,156 +1,144 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { useMutation } from "@tanstack/react-query";
+import "./monaco";
 import { postCodeToCompiler } from "../api/python";
 import "../styles/JovanLang.css";
-
-interface LogEntry {
-  id: number;
-  message: string;
-  type: "info" | "error" | "system";
-}
-
-function JovanLang() {
-  const [code, setCode] = useState<string>(
-    `x = 10\nprint(x)\n\nfuncvan add(a):\n    return a + 5\n\nifvan(x < 15):\n    print("Less than 15!")\n\nprint(add(x))`,
+const sample =
+  'x = 10\nprint(x)\n\nfuncvan add(a):\n    return a + 5\n\nifvan(x < 15):\n    print("Less than 15!")\n\nprint(add(x))';
+export default function JovanLang() {
+  const [code, setCode] = useState(sample);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [status, setStatus] = useState("Ready");
+  const worker = useRef<Worker | null>(null);
+  const timer = useRef<number | undefined>(undefined);
+  const generation = useRef(0);
+  const request = useRef<AbortController | undefined>(undefined);
+  function release() {
+    worker.current?.terminate();
+    worker.current = null;
+    clearTimeout(timer.current);
+    request.current?.abort();
+    request.current = undefined;
+  }
+  useEffect(
+    () => () => {
+      generation.current++;
+      worker.current?.terminate();
+      clearTimeout(timer.current);
+      request.current?.abort();
+    },
+    [],
   );
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [isRunning, setIsRunning] = useState(false);
-
-  // For adding logs to the terminal window
-  const addLog = (
-    message: string,
-    type: "info" | "error" | "system" = "info",
-  ) => {
-    setLogs((prev) => [
-      ...prev,
-      { id: Date.now() + Math.random(), message, type },
-    ]);
-  };
-
-  const compilerMutation = useMutation({
-    mutationFn: postCodeToCompiler,
-    onSuccess: async (blob) => {
-      addLog("Compilation successful. Executing WASM...", "system");
-      await runWasm(blob);
-    },
-    onError: (error: any) => {
-      const msg =
-        error instanceof Error ? error.message : "Unknown error occurred";
-      addLog(`Compilation Failed: ${msg}`, "error");
-      setIsRunning(false);
-    },
-  });
-
-  // The WASM Execution Engine
-  const runWasm = async (blob: Blob) => {
-    try {
-      // Convert Blob to ArrayBuffer
-      const buffer = await blob.arrayBuffer();
-
-      // Need a reference to the memory to read strings later
-      let wasmMemory: WebAssembly.Memory | null = null;
-
-      // Define the imports to create he bridge between Python-WASM and JS
-      const importObject = {
-        env: {
-          // Handle print_num(double)
-          print_num: (arg: number) => {
-            addLog(arg.toString());
-          },
-          // Handle print_str(ptr)
-          print_str: (ptr: number) => {
-            if (!wasmMemory) return;
-
-            // Read the bytes from WASM memory until we hit 0 which is a null terminator
-            const memoryArray = new Uint8Array(wasmMemory.buffer);
-            let str = "";
-            let i = ptr;
-            while (memoryArray[i] !== 0) {
-              str += String.fromCharCode(memoryArray[i]);
-              i++;
-            }
-            addLog(str);
-          },
-        },
-      };
-
-      // Instantiate
-      const { instance } = await WebAssembly.instantiate(buffer, importObject);
-
-      // Assign memory reference so print_str can use it
-      wasmMemory = instance.exports.memory as WebAssembly.Memory;
-
-      // Run the main function
-      const main = instance.exports.main as CallableFunction;
-
-      if (main) {
-        main();
-        addLog("Program finished.", "system");
-      } else {
-        addLog("Error: No main function found in WASM module.", "error");
-      }
-    } catch (e: any) {
-      addLog(`Runtime Error: ${e.message}`, "error");
-    } finally {
-      setIsRunning(false);
-    }
-  };
-
-  const handleRun = () => {
+  async function run() {
+    release();
+    const current = ++generation.current;
+    const controller = new AbortController();
+    request.current = controller;
     setLogs([]);
-    setIsRunning(true);
-    addLog("Compiling...", "system");
-    compilerMutation.mutate(code);
-  };
-
+    setStatus("Compiling");
+    try {
+      const blob = await postCodeToCompiler(code, controller.signal);
+      const buffer = await blob.arrayBuffer();
+      if (current !== generation.current) return;
+      setStatus("Running");
+      const runtime = new Worker(new URL("./wasm.worker.ts", import.meta.url), {
+        type: "module",
+      });
+      worker.current = runtime;
+      runtime.onmessage = (
+        event: MessageEvent<{
+          type: string;
+          lines?: string[];
+          message?: string;
+        }>,
+      ) => {
+        if (current !== generation.current) return;
+        if (event.data.type === "output")
+          setLogs((lines) =>
+            [...lines, ...(event.data.lines ?? [])].slice(-1000),
+          );
+        else {
+          setStatus(
+            event.data.type === "done"
+              ? "Finished"
+              : `Runtime error: ${event.data.message}`,
+          );
+          release();
+        }
+      };
+      runtime.onerror = () => {
+        if (current === generation.current) {
+          setStatus("Worker failed. Try again.");
+          release();
+        }
+      };
+      timer.current = window.setTimeout(() => {
+        generation.current++;
+        release();
+        setStatus("Stopped: five-second execution limit reached.");
+      }, 5000);
+      runtime.postMessage(buffer, [buffer]);
+    } catch (error) {
+      if (current === generation.current) {
+        setStatus(
+          `Compilation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        release();
+      }
+    }
+  }
+  const running = status === "Running" || status === "Compiling";
   return (
-    <main id="jovanlang-ide">
+    <section id="jovanlang-ide">
       <header className="ide-header">
         <h1>JovanLang IDE</h1>
-        <button
-          className="run-button"
-          onClick={handleRun}
-          disabled={isRunning || compilerMutation.isPending}
-        >
-          {isRunning ? "Running..." : "Run Code ▶"}
-        </button>
+        <div>
+          <button
+            className="run-button"
+            onClick={() => void run()}
+            disabled={running || !code.trim()}
+          >
+            Run code ▶
+          </button>
+          {running && (
+            <button
+              onClick={() => {
+                generation.current++;
+                release();
+                setStatus("Stopped");
+              }}
+            >
+              Stop
+            </button>
+          )}
+        </div>
       </header>
+      <p className="ide-status" role="status">
+        {status} · Browser execution limited to five seconds.
+      </p>
       <div className="ide-workspace">
         <div className="editor-pane">
           <Editor
             height="100%"
-            // Using python highlighting since it's closest to my language
             defaultLanguage="python"
             theme="vs-dark"
             value={code}
-            onChange={(value) => setCode(value || "")}
+            onChange={(value) => setCode(value ?? "")}
             options={{
               minimap: { enabled: false },
               fontSize: 14,
               scrollBeyondLastLine: false,
+              ariaLabel: "JovanLang source code",
             }}
           />
         </div>
         <div className="terminal-pane">
-          <div className="terminal-header">Terminal Output</div>
-          <div className="terminal-content">
-            {logs.length === 0 && (
-              <span className="terminal-placeholder">Ready to run...</span>
-            )}
-            {logs.map((log) => (
-              <div key={log.id} className={`log-line log-${log.type}`}>
-                <span className="log-prefix">
-                  {log.type === "system" ? ">" : "$"}
-                </span>{" "}
-                {log.message}
-              </div>
-            ))}
-          </div>
+          <div className="terminal-header">Terminal output</div>
+          <pre className="terminal-content" aria-label="Program output">
+            {logs.length ? logs.join("\n") : "Ready to run…"}
+          </pre>
         </div>
       </div>
-    </main>
+    </section>
   );
 }
-
-export default JovanLang;

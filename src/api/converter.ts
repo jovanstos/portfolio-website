@@ -16,9 +16,6 @@ export const convertImage = async (
 
   const res = await api.post("/convert", formData, {
     responseType: "blob",
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   });
 
   return res.data;

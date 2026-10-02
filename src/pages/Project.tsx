@@ -1,140 +1,144 @@
 import "../styles/Project.css";
-import FadeInSection from "../components/FadeInSection";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectByID } from "../api/projects";
 import { getProjectContentByID } from "../api/projectContent";
-import type {
-  ProjectContent,
-  ProjectData,
-  ProjectProps,
-} from "../types/projectTypes";
-import ErrorPopup from "../components/ErrorPopup";
+import { ApiError } from "../api/client";
+import type { ProjectProps } from "../types/projectTypes";
+import QueryFeedback from "../components/QueryFeedback";
 import Markdown from "react-markdown";
-
-function Project({
+const liveNames: Record<number, string> = {
+  6: "Zipline",
+  7: "Chimp Converter",
+  8: "JovanLang",
+  9: "SpellCaster",
+  10: "P.I.M.",
+};
+export default function Project({
   id: propId,
-  subHeading = "To have the best experience desktop is recommended.",
+  subHeading,
   mainContent = null,
 }: ProjectProps) {
   const { id: paramId } = useParams();
-  // If it's a live project tis part is important to get the correct ID
-  const id = propId || paramId;
-
-  const navigate = useNavigate();
-
-  // Queries to GET all the correct data
-  const projectQuery = useQuery<ProjectData>({
-    queryKey: ["project", id!],
+  const id = propId ?? Number(paramId);
+  const valid = Number.isSafeInteger(id) && id > 0;
+  const project = useQuery({
+    queryKey: ["project", id],
     queryFn: getProjectByID,
-    enabled: !!id,
+    enabled: valid,
   });
-
-  const contentQuery = useQuery<ProjectContent[]>({
-    queryKey: ["projectContent", id!],
+  const articles = useQuery({
+    queryKey: ["projectContent", id],
     queryFn: getProjectContentByID,
-    enabled: !!id,
+    enabled: valid,
   });
-
-  // Handle if the data is still loading
-  if (projectQuery.isLoading || contentQuery.isLoading) {
+  const title = project.data?.title ?? liveNames[id] ?? "Project";
+  useEffect(() => {
+    document.title = `${title} · Jovan Stosic`;
+  }, [title]);
+  if (!valid)
     return (
       <main id="project">
-        <p>Loading...</p>
+        <h1>Invalid project address</h1>
+        <Link to="/projects">Back to projects</Link>
       </main>
     );
-  }
-
-  // Handle if there is a error and display the correct message with the error popup
-  if (projectQuery.error || contentQuery.error) {
-    if (contentQuery.error) {
-      return (
-        <main id="project">
-          <ErrorPopup
-            isError={contentQuery.isError}
-            message={contentQuery.error}
-          />
-          <p>Error loading project</p>
-        </main>
-      );
-    }
+  if (
+    !mainContent &&
+    project.error instanceof ApiError &&
+    project.error.status === 404
+  )
     return (
       <main id="project">
-        <ErrorPopup
-          isError={projectQuery.isError}
-          message={projectQuery.error}
-        />
-        <p>Error loading project</p>
+        <h1>Project not found</h1>
+        <p>It may have moved or is no longer public.</p>
+        <Link to="/projects">See other projects</Link>
       </main>
     );
-  }
-  const projectData: any = projectQuery.data;
-  const contentData: any = contentQuery.data;
-
   return (
     <main id="project">
-      <h1>{projectData.title}</h1>
-      <p style={{ marginBottom: "15px" }}>{subHeading}</p>
-      {/* If it's a live project then the main content which is a react component should show, if now show the main photo*/}
-      <section id="main-project-hero">
-        {mainContent ? (
-          mainContent
-        ) : (
-          <img
-            id="main-project-img"
-            src={projectData.imageurl}
-            alt={projectData.imagedescription}
-            width="1000"
-          />
+      <header className="project-header">
+        <Link to="/projects">← All projects</Link>
+        <h1>{title}</h1>
+        {subHeading && <p>{subHeading}</p>}
+      </header>
+      <section id="main-project-hero" aria-label="Project preview">
+        {mainContent ?? (
+          <>
+            <QueryFeedback
+              loading={project.isPending}
+              error={project.error}
+              onRetry={() => void project.refetch()}
+            />
+            {project.data && (
+              <img
+                id="main-project-img"
+                src={project.data.imageurl}
+                alt={project.data.imagedescription || `${title} preview`}
+                width={1000}
+                onError={(event) => {
+                  event.currentTarget.src = "/placeholder.webp";
+                }}
+              />
+            )}
+          </>
         )}
-        <a href={projectData.url} rel="noopener noreferrer" target="_blank">
-          Project URL/Github
-        </a>
+        {project.data?.url && /^https?:\/\//.test(project.data.url) && (
+          <a
+            className="button-link secondary-button"
+            href={project.data.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Project URL / GitHub ↗
+          </a>
+        )}
       </section>
+      {mainContent && (
+        <QueryFeedback
+          loading={project.isPending}
+          error={project.error}
+          onRetry={() => void project.refetch()}
+        />
+      )}
       <section className="project-content">
-        {projectData.description ? (
+        {project.data?.description && (
           <div className="project-description">
-            <h1>Project Description:</h1>
-            <p>{projectData.description}</p>
+            <h2>Behind the project</h2>
+            <p>{project.data.description}</p>
           </div>
-        ) : (
-          <></>
         )}
-        <h1 style={{ marginBottom: "20px" }}>Indepth Project Articles:</h1>
-        {contentData?.map((articleData: any) => {
-          const hasText = Boolean(articleData.text);
-          const hasImage = Boolean(articleData.imageurl);
-
-          return (
-            <FadeInSection key={articleData.id}>
-              <article className="project-article">
-                <h2 className="project-h2">{articleData.title}</h2>
-                {hasImage && (
-                  <>
-                    <img
-                      src={articleData.imageurl}
-                      alt={articleData.imagedescription || ""}
-                      width={750}
-                    />
-                    <p style={{ textAlign: "center" }}>
-                      {!hasText ? articleData.imagedescription : ""}
-                    </p>
-                  </>
+        <h2>Notes from the build</h2>
+        <QueryFeedback
+          loading={articles.isPending}
+          error={articles.error}
+          empty={articles.data?.length === 0}
+          onRetry={() => void articles.refetch()}
+        />
+        {articles.data?.map((article) => (
+          <article key={article.id} className="project-article">
+            <h3>{article.title}</h3>
+            {article.imageurl && (
+              <figure>
+                <img
+                  src={article.imageurl}
+                  alt={article.imagedescription || ""}
+                  width={750}
+                  loading="lazy"
+                />
+                {!article.text && article.imagedescription && (
+                  <figcaption>{article.imagedescription}</figcaption>
                 )}
-                {hasText && <Markdown>{articleData.text}</Markdown>}
-              </article>
-            </FadeInSection>
-          );
-        })}
+              </figure>
+            )}
+            {article.text && <Markdown>{article.text}</Markdown>}
+          </article>
+        ))}
       </section>
-      <button
-        className="primary-button contact-button"
-        onClick={() => navigate("/contact")}
-      >
-        Contact Me
-      </button>
+      <Link className="primary-button button-link contact-button" to="/contact">
+        Contact me
+      </Link>
     </main>
   );
 }
-
-export default Project;

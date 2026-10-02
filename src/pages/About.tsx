@@ -52,7 +52,7 @@ function About() {
 
   return (
     <div id="about-background">
-      <Stars speed={5} />
+      <Stars speed={200} />
       <main id="about">
         <h1 style={{ color: "white", textAlign: "center", paddingTop: "50px" }}>
           About Me

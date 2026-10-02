@@ -17,7 +17,7 @@ RUN pip install llvmlite tensorflow
 # ── Stage 2: npm install (all deps, for dev + build) ───────────────────────
 FROM base AS deps
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # ── Stage 3: development ────────────────────────────────────────────────────
 FROM deps AS development
@@ -34,10 +34,12 @@ RUN npm run build && npm run build-server
 # Inherits system deps from base (Python/LLVM needed at runtime).
 # Installs only production npm deps — no dev bloat.
 FROM base AS production
+ENV NODE_ENV=production PORT=3000
 COPY package*.json ./
 RUN npm ci --omit=dev
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/backend_dist ./backend_dist
-COPY --from=builder /app/python ./python
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/backend_dist ./backend_dist
+COPY --from=builder --chown=node:node /app/python ./python
+USER node
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "backend_dist/server.js"]

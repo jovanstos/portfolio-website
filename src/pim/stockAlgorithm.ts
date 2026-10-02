@@ -161,7 +161,7 @@ function getTrend(
   // When there is an earnings the average doesn't matter
   if (!earningsWeek) {
     // MEAN REVERSION Lik an Elastic Band to relax volatility, 3 weeks * 5 days
-    const movingAverage = getMovingAverage(currentStock, -(3 * DAYS_IN_WEEK));
+    const movingAverage = getMovingAverage(currentStock, 3 * DAYS_IN_WEEK);
 
     // Calculate how far we are from the average
     const deviation = currentStock.currentPrice / movingAverage;
@@ -187,7 +187,7 @@ function getTrend(
     return "DOWN";
   }
 
-  let freshTrendScore = randomNumberMax;
+  const freshTrendScore = randomNumberMax;
 
   // Mix with previous momentum to create smooth trends
   const effectiveScore = freshTrendScore * 0.7 + currentStock.momentum * 0.3;
@@ -217,7 +217,7 @@ function getChange(
 ): number {
   // BASE MOVEMENT: Determined by Volatility
   // A stable stock (vol: 10) moves ~0.5% a day. A risky stock (vol: 90) moves ~4.5% a day.
-  let volatilityPercent = (currentStock.volatility / 100) * 0.05;
+  const volatilityPercent = (currentStock.volatility / 100) * 0.05;
   const volumeModifier = currentStock.volume / 100;
 
   let percentChange = 0;
@@ -377,7 +377,11 @@ export function simulateNextWeek(
 
     let todaySurprise: number | null = null;
 
-    if (week % EARNINGS_WEEK == 0 && week > 0 && !weeklyEarningsSurprise) {
+    if (
+      week % EARNINGS_WEEK == 0 &&
+      week > 0 &&
+      weeklyEarningsSurprise === null
+    ) {
       weeklyEarningsSurprise = handleEarnings(currentStock);
 
       todaySurprise = weeklyEarningsSurprise;
@@ -407,6 +411,11 @@ export function simulateNextWeek(
     }
 
     currentStock.updateProjectedEarnings(globalNews);
+    if (
+      !Number.isFinite(currentStock.currentPrice) ||
+      currentStock.currentPrice <= 0
+    )
+      currentStock.currentPrice = Math.max(0.01, oldPrice);
     currentStock.addData([nextDateCount, currentStock.currentPrice]);
 
     const dateObj = new Date(nextDateCount);
@@ -415,7 +424,11 @@ export function simulateNextWeek(
 
     // If there's an earnings the changes are radical so market must adjust
     if (isEarningsDay)
-      updateMarketPsychology(currentStock, percentChange, isEarningsDay);
+      updateMarketPsychology(
+        currentStock,
+        trend === "DOWN" ? -percentChange : percentChange,
+        isEarningsDay,
+      );
 
     // console.log(`--------------------------------`);
     // console.log(`DATE: ${new Date(nextDateCount).toISOString().split('T')[0]}`);

@@ -1,28 +1,65 @@
-import { MdCancel } from "react-icons/md";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import "../styles/Popup.css";
-// This is a simple reusable popup component
-
-interface PopupProps {
+export default function Popup({
+  isOpen,
+  onClose,
+  children,
+  title = "Details",
+}: {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
-}
-
-const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
+  children: ReactNode;
+  title?: string;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const id = useId();
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!isOpen || !dialog) return;
+    const previous = document.activeElement as HTMLElement | null;
+    dialog.showModal();
+    return () => {
+      dialog.close();
+      previous?.focus();
+    };
+  }, [isOpen]);
   if (!isOpen) return null;
-
   return createPortal(
-    <div className="popup-overlay" onClick={onClose}>
-      <div className="popup-container" onClick={(e) => e.stopPropagation()}>
-        <button className="popup-close" onClick={onClose}>
-          <MdCancel />
+    <dialog
+      ref={ref}
+      className="popup-container"
+      aria-labelledby={id}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          const rect = event.currentTarget.getBoundingClientRect();
+          if (
+            event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom
+          )
+            onClose();
+        }
+      }}
+    >
+      <header className="popup-header">
+        <h2 id={id}>{title}</h2>
+        <button
+          type="button"
+          aria-label="Close dialog"
+          className="popup-close"
+          onClick={onClose}
+        >
+          ×
         </button>
-        <div className="popup-content">{children}</div>
-      </div>
-    </div>,
+      </header>
+      <div className="popup-content">{children}</div>
+    </dialog>,
     document.body,
   );
-};
-
-export default Popup;
+}

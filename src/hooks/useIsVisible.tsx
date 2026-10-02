@@ -1,35 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-
-// Custom hook that is used for the  FadeInSection component
-// This checks if the content is visible on the users screen or not so that it can be faded in
-const useIsVisible = (options: object) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
+import { useMediaQuery } from "./useMediaQuery";
+export default function useIsVisible({
+  threshold = 0.1,
+  rootMargin = "0px",
+}: IntersectionObserverInit = {}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const fallback = typeof IntersectionObserver === "undefined";
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
     const element = ref.current;
-
-    if (!element) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-        observer.unobserve(entry.target);
-      }
-    }, options);
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
-    };
-  }, [options]);
-
-  return { ref, isVisible };
-};
-
-export default useIsVisible;
+    if (!element || reduced || fallback || visible) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold, rootMargin },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [threshold, rootMargin, reduced, fallback, visible]);
+  return { ref, isVisible: visible || reduced || fallback };
+}

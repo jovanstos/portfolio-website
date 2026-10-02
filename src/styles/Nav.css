@@ -1,80 +1,101 @@
-nav {
-  cursor: pointer;
+nav[aria-label="Main navigation"] {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 10;
+  top: 16px;
+  left: 16px;
+  z-index: 50;
 }
-
+nav.nav-open {
+  width: min(360px, calc(100vw - 32px));
+  height: min(424px, calc(100dvh - 32px));
+}
 .rocketButton {
-  all: unset;
-  display: inline-flex;
-  cursor: pointer;
-  z-index: 999;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  color: var(--color-accent);
 }
-
+.rocketButton span {
+  font-size: 0.8rem;
+}
 #rocket {
-  transition:
-    transform 180ms ease,
-    filter 180ms ease;
+  transition: transform 180ms ease;
 }
-
-nav:hover #rocket {
-  transform: rotate(-90deg) scale(0.98);
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+.rocketButton[aria-expanded="true"] #rocket {
+  transform: rotate(-90deg);
 }
-
-nav:hover ~ * {
-  filter: blur(3px);
-}
-
-.wheel {
+.nav-backdrop {
   position: fixed;
-  z-index: 5;
-  top: 40px;
-  left: 42px;
-  width: 360px;
-  height: 360px;
-  border-radius: 999px;
-  background: #3b83f669;
-  border: 2px dotted #3b82f6;
-  transform: translate(-50%, -50%);
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
-  transform-origin: center;
+  inset: 0;
+  border-radius: 0;
+  background: #0005;
+  backdrop-filter: blur(2px);
+  z-index: 40;
+}
+.wheel {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  width: min(360px, calc(100vw - 32px), calc(100dvh - 112px));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-bg-accent);
+  border: 2px dotted var(--color-accent);
+  box-shadow: 0 16px 48px #0005;
   touch-action: none;
 }
-
-.wheelInvisible {
-  opacity: 0;
+.wheel[hidden] {
+  display: none;
+}
+.wheel-ring {
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed var(--color-accent);
+  border-radius: 50%;
+  transform: rotate(var(--rotation));
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.92);
 }
-
-.wheelVisible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 .wheelItem {
   position: absolute;
-  top: 45%;
-  left: 35%;
-  transform-origin: center;
-  text-decoration: none;
-  color: white;
-  padding: 7px 12px;
-  font-size: var(--medium);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.484);
-  transition:
-    transform 120ms ease,
-    background 120ms ease;
+  top: 50%;
+  left: 50%;
+  width: 88px;
+  padding: 10px 4px;
+  text-align: center;
+  font-size: 0.85rem;
+  border-radius: 12px;
+  background: var(--color-bg);
+  color: var(--color-text);
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) + var(--rotation)))
+    translateX(
+      calc(min(180px, (100vw - 32px) / 2, (100dvh - 112px) / 2) - 58px)
+    )
+    rotate(calc(-1 * (var(--angle) + var(--rotation))));
 }
-
-.wheelItem:hover {
-  background: rgba(140, 140, 140, 0.484);
+.wheelItem:hover,
+.wheelItem[aria-current="page"] {
+  background: var(--btn-primary);
+  color: white;
+  text-decoration: none;
+}
+.wheel-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+@media (max-height: 420px) {
+  .wheel-hint {
+    display: none;
+  }
+  .wheelItem {
+    font-size: 0.65rem;
+    width: 64px;
+    padding: 5px;
+  }
 }

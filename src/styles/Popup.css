@@ -1,81 +1,37 @@
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 15vh;
-  z-index: 1000;
-}
-
-.error-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 3vh;
-  z-index: 1000;
-}
-
 .popup-container {
-  position: relative;
+  color: var(--color-text);
   background: var(--color-bg-accent);
-  border-radius: 12px;
+  border: 1px solid var(--color-border, #8885);
+  border-radius: var(--radius-lg);
   padding: 24px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  animation: popupFadeIn 0.2s ease-out;
+  width: min(500px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  box-shadow: 0 20px 60px #0006;
 }
-
-.error-popup {
-  color: white;
-  background: rgb(231, 0, 0);
-  padding: 10px;
+.popup-container::backdrop {
+  background: #0009;
+  backdrop-filter: blur(5px);
 }
-
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
 .popup-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: var(--xlarge);
-  cursor: pointer;
+  background: transparent;
+  font-size: 1.8rem;
+  min-width: 44px;
+  min-height: 44px;
 }
-
-.popup-close-error {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: var(--xlarge);
-  cursor: pointer;
-}
-
-.popup-close:hover {
-  color: var(--color-accent);
-}
-
-.popup-close-error:hover {
-  color: rgb(180, 180, 180);
-}
-
 .popup-content {
-  margin-top: 12px;
+  margin-top: 16px;
 }
-
-@keyframes popupFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.inline-error {
+  padding: 12px 16px;
+  border: 1px solid var(--btn-danger);
+  border-radius: var(--radius-md);
+  background: light-dark(#fff1f1, #351c24);
+  color: var(--color-text);
 }

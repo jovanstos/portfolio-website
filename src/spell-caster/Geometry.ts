@@ -19,8 +19,20 @@ export const Geometry = {
     return { x: x / points.length, y: y / points.length };
   },
   resample: (points: Vector2[], n: number) => {
-    if (points.length === 0) return [];
-    const workingPoints = points.map((p) => ({ ...p }));
+    if (
+      points.length === 0 ||
+      n < 2 ||
+      points.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))
+    )
+      return [];
+    const workingPoints = points
+      .filter(
+        (point, index) =>
+          index === 0 || Geometry.distance(point, points[index - 1]) > 1e-9,
+      )
+      .map((p) => ({ ...p }));
+    if (workingPoints.length < 2 || Geometry.pathLength(workingPoints) < 1e-9)
+      return [];
     const interval = Geometry.pathLength(workingPoints) / (n - 1);
     let D = 0;
     const newPoints: Vector2[] = [workingPoints[0]];
@@ -41,9 +53,9 @@ export const Geometry = {
         D += d;
       }
     }
-    if (newPoints.length === n - 1)
-      newPoints.push(workingPoints[workingPoints.length - 1]);
-    return newPoints;
+    while (newPoints.length < n)
+      newPoints.push({ ...workingPoints[workingPoints.length - 1] });
+    return newPoints.slice(0, n);
   },
   rotateToZero: (points: Vector2[]) => {
     const c = Geometry.centroid(points);

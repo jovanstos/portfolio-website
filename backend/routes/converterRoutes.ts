@@ -1,68 +1,85 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import multer from "multer";
 import sharp from "sharp";
+import rateLimit from "express-rate-limit";
 import { requireAuth } from "./auth.js";
-
-const MAX_SIZE_STANDARD = 5 * 1024 * 1024; // 5 MB
-
-const storage = multer.memoryStorage();
-
+const router = Router();
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: MAX_SIZE_STANDARD },
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 1, fieldSize: 32 },
 });
-
-const router: Router = Router();
-
-// Allowed formats for converting the image type
-const ALLOWED_FORMATS = ["png", "jpg", "jpeg", "webp", "gif"] as const;
-type OutputFormat = (typeof ALLOWED_FORMATS)[number];
-
-// Handles the post request of taking the image and converting it to the requested format
+let active = 0;
 router.post(
   "/",
   requireAuth,
+  rateLimit({
+    windowMs: 60_000,
+    limit: 10,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: { message: "Too many conversions. Try again shortly." },
+  }),
   (req, res, next) => {
-    upload.single("image")(req, res, (err: any) => {
-      if (err instanceof multer.MulterError) {
-        if (err.code === "LIMIT_FILE_SIZE") {
-          return res.status(413).json({
-            error: "Image too large, must be under 5MB.",
+    upload.single("image")(req, res, (error: unknown) => {
+      if (error instanceof multer.MulterError)
+        return res
+          .status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400)
+          .json({
+            message:
+              error.code === "LIMIT_FILE_SIZE"
+                ? "Image must be at most 5 MiB."
+                : "Invalid image upload.",
           });
-        }
-        return res.status(400).json({ error: err.message });
-      }
-      next(err);
+      if (error) return next(error);
+      next();
     });
   },
-  async (req: Request, res: Response) => {
+  async (req, res) => {
+    if (!req.file) return res.status(400).json({ message: "Choose an image." });
+    const format: unknown = req.body.outputFormat;
+    if (
+      typeof format !== "string" ||
+      !["png", "jpg", "jpeg", "webp", "gif"].includes(format)
+    )
+      return res.status(400).json({ message: "Unsupported output format." });
+    if (active >= 2)
+      return res
+        .status(503)
+        .json({ message: "Converter is busy. Try again shortly." });
+    active++;
     try {
-      const file = req.file;
-      const { outputFormat } = req.body as { outputFormat?: OutputFormat };
-
-      if (!file) {
-        return res.status(400).json({ error: "No image provided" });
-      }
-
-      if (!outputFormat || !ALLOWED_FORMATS.includes(outputFormat)) {
-        return res.status(400).json({ error: "Invalid output format" });
-      }
-
-      const convertedBuffer = await sharp(file.buffer)
-        .toFormat(outputFormat)
-        .toBuffer();
-
-      res.setHeader("Content-Type", `image/${outputFormat}`);
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=converted.${outputFormat}`,
-      );
-
-      return res.send(convertedBuffer);
-    } catch (error) {
-      return res.status(500).json({ error: "Image conversion failed" });
+      const image = sharp(req.file.buffer, {
+        limitInputPixels: 25_000_000,
+        failOn: "error",
+      });
+      const metadata = await image.metadata();
+      if (
+        !metadata.format ||
+        !["png", "jpeg", "webp", "gif"].includes(metadata.format)
+      )
+        return res
+          .status(400)
+          .json({ message: "Use a PNG, JPEG, WebP, or GIF image." });
+      const output =
+        format === "jpg" ? "jpeg" : (format as "png" | "jpeg" | "webp" | "gif");
+      const converted = await image.toFormat(output).toBuffer();
+      return res
+        .type(`image/${output}`)
+        .set(
+          "Content-Disposition",
+          `attachment; filename="converted.${format}"`,
+        )
+        .send(converted);
+    } catch {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Image could not be decoded. Use a valid image under 5 MiB and 25 megapixels.",
+        });
+    } finally {
+      active--;
     }
   },
 );
-
 export default router;

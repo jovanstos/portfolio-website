@@ -1,6 +1,6 @@
 #contact-page {
   width: min(980px, 92vw);
-  margin: 60px auto;
+  margin: 96px auto 48px;
   height: 100%;
   min-height: 80vh;
 }
@@ -53,8 +53,7 @@
   width: 100%;
   border-radius: 12px;
   padding: 0.85rem 0.9rem;
-  outline: none;
-  border: none;
+  border: 1px solid var(--color-border);
   background-color: var(--color-bg);
   color: inherit;
   transition:
@@ -69,7 +68,7 @@
 }
 
 .error {
-  color: red;
+  color: light-dark(#b91c1c, #ff9b9b);
 }
 
 .meta-row {

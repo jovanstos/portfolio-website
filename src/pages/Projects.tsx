@@ -1,53 +1,45 @@
 import "../styles/Projects.css";
-import MediumCard from "../cards/MediumCard";
-import { useNavigate } from "react-router-dom";
+import ProjectCard from "../cards/ProjectCard";
 import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "../api/projects";
-import ErrorPopup from "../components/ErrorPopup";
+import QueryFeedback from "../components/QueryFeedback";
 import type { ProjectsProps } from "../types/projectTypes";
-
-function Projects({ title, projectType = "all", subheading }: ProjectsProps) {
-  const navigate = useNavigate();
-
-  // Get the data form the query and using map populate the page
-  const { data, isLoading, error, isError } = useQuery({
+export default function Projects({
+  title,
+  projectType = "all",
+  subheading,
+}: ProjectsProps) {
+  const query = useQuery({
     queryKey: ["projects", projectType],
     queryFn: getProjects,
   });
-
   return (
     <main id="projects">
-      <ErrorPopup isError={isError} message={error} />
-      <div style={{ textAlign: "center" }}>
+      <header className="section-heading">
         <h1>{title}</h1>
-        <p>{subheading}</p>
-        <button
-          style={{ marginTop: "10px" }}
-          className="primary-button contact-button"
-          onClick={() => navigate("/contact")}
-        >
-          Contact Me
-        </button>
-      </div>
-      <section id="projects-mapped">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p>Error loading projects</p>
-        ) : (
-          data!.map((project) => (
-            <MediumCard
-              key={project.id}
-              id={project.id}
-              title={project.title}
-              imgURL={project.imageurl}
-              imgDescription={project.imagedescription}
-            />
-          ))
-        )}
+        <p>
+          {subheading ??
+            "A collection of tools, experiments, and things I wanted."}
+        </p>
+      </header>
+      <QueryFeedback
+        loading={query.isPending}
+        error={query.error}
+        empty={query.data?.length === 0}
+        onRetry={() => void query.refetch()}
+      />
+      <section id="projects-mapped" aria-label="Projects">
+        {query.data?.map((project) => (
+          <ProjectCard
+            key={project.id}
+            id={project.id}
+            title={project.title}
+            description={project.description}
+            imgURL={project.imageurl}
+            imgDescription={project.imagedescription}
+          />
+        ))}
       </section>
     </main>
   );
 }
-
-export default Projects;

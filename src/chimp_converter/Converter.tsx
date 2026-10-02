@@ -1,132 +1,183 @@
-import "../styles/Converter.css";
-import { useState, useCallback } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { convertImage } from "../api/converter";
 import type { ImageFormat } from "../types/converterTypes";
-import ErrorPopup from "../components/ErrorPopup";
-
-function Converter() {
-  const [file, setFile] = useState<File | null>(null);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [outputFormat, setOutputFormat] = useState<ImageFormat>("png");
-  const [isDragging, setIsDragging] = useState(false);
-
-  // This the function for sending the image to the backend to be converted...
-  // ... useMutation is being used here because it's designed to handle the post request that this is
-  const convertMutation = useMutation({
+import "../styles/Converter.css";
+export default function Converter({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
+  const Heading = embedded ? "h2" : "h1";
+  const [selection, setSelection] = useState<{
+    file: File;
+    preview: string;
+  } | null>(null);
+  const [format, setFormat] = useState<ImageFormat>("png");
+  const [error, setError] = useState("");
+  const [dragging, setDragging] = useState(false);
+  const [result, setResult] = useState<{ blob: Blob; name: string } | null>(
+    null,
+  );
+  const id = useId();
+  const input = useRef<HTMLInputElement>(null);
+  useEffect(
+    () => () => {
+      if (selection) URL.revokeObjectURL(selection.preview);
+    },
+    [selection],
+  );
+  const mutation = useMutation({
     mutationFn: convertImage,
-    onSuccess: (blob) => {
-      setIsError(false);
-      setErrorMessage("");
-
-      const originalName = file?.name.split(".")[0];
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${originalName}.${outputFormat}`;
-      link.click();
-      URL.revokeObjectURL(url);
+    onSuccess: (blob, variables) => {
+      const stem = variables.file.name.replace(/\.[^.]+$/, "") || "converted";
+      setResult({ blob, name: `${stem}.${variables.outputFormat}` });
     },
-    onError: (error: any) => {
-      setIsError(true);
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage("An unexpected error occurred.");
-      }
-    },
+    onError: (failure: Error) => setError(failure.message),
   });
-
-  // These functions are self documenting
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!file) {
-      setIsError(true);
-      setErrorMessage("Please select a file to convert.");
+  function select(file: File) {
+    setError("");
+    setResult(null);
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Choose an image no larger than 5 MiB.");
       return;
     }
-
-    convertMutation.mutate({
-      file,
-      outputFormat,
-    });
-  };
-
-  const handleFile = (newFile: File) => {
-    setFile(newFile);
-    setIsError(false);
-    setErrorMessage("");
-  };
-
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
+    if (
+      !["image/png", "image/jpeg", "image/webp", "image/gif"].includes(
+        file.type,
+      )
+    ) {
+      setError("Choose a PNG, JPEG, WebP, or GIF image.");
+      return;
     }
-  }, []);
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => setIsDragging(false);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
-    }
-  };
-
+    setSelection({ file, preview: URL.createObjectURL(file) });
+  }
+  function download() {
+    if (!result) return;
+    const url = URL.createObjectURL(result.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = result.name;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   return (
-    <section id="converter">
-      <ErrorPopup isError={isError} message={errorMessage} />
-      <div id="img-holder">
+    <section id="converter" role={embedded ? undefined : "main"}>
+      <header>
         <img
           src="/chimp.gif"
-          width={"100px"}
-          alt="One black and gray chimpanze running"
+          width="140"
+          height="100"
+          alt="Running chimpanzee"
         />
-      </div>
-      <form onSubmit={handleSubmit}>
-        <div
-          className={`file-dropzone ${isDragging ? "dragging" : ""}`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => document.getElementById("fileInput")?.click()}
+        <Heading>Chimp Converter</Heading>
+        <p>One image in. Another format out.</p>
+      </header>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (selection && !mutation.isPending) {
+            setError("");
+            setResult(null);
+            mutation.mutate({ file: selection.file, outputFormat: format });
+          }
+        }}
+      >
+        <label
+          className={`file-dropzone ${dragging ? "dragging" : ""}`}
+          htmlFor={id}
+          onDragOver={(event) => {
+            event.preventDefault();
+            if (!mutation.isPending) setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(event) => {
+            event.preventDefault();
+            setDragging(false);
+            const file = event.dataTransfer.files[0];
+            if (file && !mutation.isPending) select(file);
+          }}
         >
-          {file ? file.name : "Click or drag a file here"}
-        </div>
-        <input
-          type="file"
-          id="fileInput"
-          style={{ display: "none" }}
-          onChange={handleFileSelect}
-        />
+          <input
+            ref={input}
+            id={id}
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            disabled={mutation.isPending}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) select(file);
+            }}
+          />
+          <span>
+            {selection
+              ? "Choose a replacement image"
+              : "Choose an image or drop it here"}
+          </span>
+        </label>
+        {selection && (
+          <div className="converter-preview">
+            <img src={selection.preview} alt="Selected image preview" />
+            <p>
+              {selection.file.name} · {(selection.file.size / 1024).toFixed(1)}{" "}
+              KiB
+            </p>
+            <button
+              className="secondary-button"
+              type="button"
+              disabled={mutation.isPending}
+              onClick={() => {
+                setSelection(null);
+                setResult(null);
+                input.current?.focus();
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
         <div id="converter-options">
+          <label htmlFor={`${id}-format`}>Output format</label>
           <select
-            value={outputFormat}
-            onChange={(e) => setOutputFormat(e.target.value as ImageFormat)}
+            id={`${id}-format`}
+            value={format}
+            disabled={mutation.isPending}
+            onChange={(event) => setFormat(event.target.value as ImageFormat)}
           >
-            <option value="png">PNG</option>
-            <option value="jpg">JPG</option>
-            <option value="jpeg">JPEG</option>
-            <option value="webp">WEBP</option>
-            <option value="gif">GIF</option>
+            {(["png", "jpg", "jpeg", "webp", "gif"] as const).map((option) => (
+              <option key={option} value={option}>
+                {option.toUpperCase()}
+              </option>
+            ))}
           </select>
-          <button type="submit" disabled={convertMutation.isPending}>
-            {convertMutation.isPending ? "Converting..." : "Convert"}
+          <button
+            className="primary-button"
+            disabled={!selection || mutation.isPending}
+          >
+            {mutation.isPending ? "Converting…" : "Convert"}
           </button>
         </div>
       </form>
+      {error && (
+        <p className="inline-error" role="alert">
+          {error}
+        </p>
+      )}
+      {result && (
+        <div role="status">
+          <p>Ready: {result.name}</p>
+          <button className="primary-button" onClick={download}>
+            Download converted image
+          </button>
+        </div>
+      )}
+      <p className="converter-note">
+        Up to 5 MiB and 25 megapixels. Animated GIF inputs convert their first
+        frame only. Images are sent to this server for conversion, not saved as
+        uploads.
+      </p>
     </section>
   );
 }
-
-export default Converter;

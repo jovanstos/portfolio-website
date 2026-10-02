@@ -20,7 +20,7 @@ export const pool = new Pool({
 pool
   .query("SELECT 1")
   .then(() => console.log("Connected to database"))
-  .catch((err: any) => {
+  .catch((err: unknown) => {
     console.error("Database connection error", err);
     process.exit(1);
   });

@@ -1,15 +1,37 @@
 import "../styles/Hero.css";
 import Stars from "./Stars";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 // Handle the phases of the intro animation
 type Phase = "STAR_BURST" | "BADGE" | "FADE_TO_HERO" | "HERO";
+const LETTERS = [..."Jovan Stosic"].map((char, position) => ({
+  char,
+  delay: position * 0.1,
+  id: `name-letter-${position}`,
+}));
 
 function Hero() {
-  const [phase, setPhase] = useState<Phase>("STAR_BURST");
-
-  const navigate = useNavigate();
+  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const [phase, setPhase] = useState<Phase>(() => {
+    try {
+      return reduced || sessionStorage.getItem("intro-seen") === "yes"
+        ? "HERO"
+        : "STAR_BURST";
+    } catch {
+      return reduced ? "HERO" : "STAR_BURST";
+    }
+  });
+  const displayPhase = reduced ? "HERO" : phase;
+  const finish = useCallback(() => {
+    try {
+      sessionStorage.setItem("intro-seen", "yes");
+    } catch {
+      /* Intro can still be skipped without storage. */
+    }
+    setPhase("HERO");
+  }, []);
 
   const burstCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -19,15 +41,19 @@ function Hero() {
   useEffect(() => {
     // This entire section can be summed with it handles the animation logic for the intro
     // It uses math, canves, svgs to create what is seen on screen on the home page
+    if (reduced) return;
     if (phase === "STAR_BURST") {
       const canvas = burstCanvasRef.current;
       if (!canvas) return;
 
       const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) {
+        const timeout = window.setTimeout(finish, 0);
+        return () => window.clearTimeout(timeout);
+      }
 
       let raf = 0;
-      let start = performance.now();
+      const start = performance.now();
 
       // DPR: device pixel ratio
       const DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -150,22 +176,42 @@ function Hero() {
     }
 
     if (phase === "FADE_TO_HERO") {
-      const t = window.setTimeout(() => setPhase("HERO"), FADE_DURATION_MS);
+      const t = window.setTimeout(finish, FADE_DURATION_MS);
       return () => window.clearTimeout(t);
     }
-  }, [phase]);
+  }, [phase, reduced, finish]);
 
   return (
     <section className="hero">
-      <Stars />
+      <Stars speed={1500} />
+      <div className="intro-controls">
+        {displayPhase !== "HERO" ? (
+          <button className="secondary-button" onClick={finish}>
+            Skip intro
+          </button>
+        ) : (
+          <button
+            className="intro-replay"
+            disabled={reduced}
+            onClick={() => setPhase("STAR_BURST")}
+            title={
+              reduced
+                ? "Animations disabled by your motion preference"
+                : "Replay the starburst"
+            }
+          >
+            ↻ Replay intro
+          </button>
+        )}
+      </div>
       <div
         className={[
           "introLayer",
-          phase === "FADE_TO_HERO" ? "introFadeOut" : "",
-          phase === "HERO" ? "introHidden" : "",
+          displayPhase === "FADE_TO_HERO" ? "introFadeOut" : "",
+          displayPhase === "HERO" ? "introHidden" : "",
         ].join(" ")}
       >
-        {phase === "STAR_BURST" && (
+        {displayPhase === "STAR_BURST" && (
           <canvas
             className="burstCanvas"
             ref={burstCanvasRef}
@@ -173,27 +219,36 @@ function Hero() {
           />
         )}
 
-        {phase === "BADGE" && (
+        {displayPhase === "BADGE" && (
           <div className="badgeStage">
             <CircleBadge
               topText="Jovan Stosic"
               bottomText="Software Engineer"
-              imageUrl="./jovan-pfp.webp"
+              imageUrl="/jovan-pfp.webp"
             />
           </div>
         )}
       </div>
       <div
+        inert={displayPhase !== "HERO"}
         className={[
           "realHero",
-          phase === "HERO" ? "heroFadeIn" : "realHeroMuted",
+          displayPhase === "HERO" ? "heroFadeIn" : "realHeroMuted",
         ].join(" ")}
       >
         <div>
-          <h1 className="wave-text" style={{ fontSize: "var(--xxlarge)" }}>
-            {"Jovan Stosic".split("").map((char, index) => (
-              <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                {char === " " ? "\u00A0" : char}
+          <h1
+            className="wave-text"
+            aria-label="Jovan Stosic"
+            style={{ fontSize: "var(--xxlarge)" }}
+          >
+            {LETTERS.map((letter) => (
+              <span
+                key={letter.id}
+                aria-hidden="true"
+                style={{ animationDelay: `${letter.delay}s` }}
+              >
+                {letter.char === " " ? "\u00A0" : letter.char}
               </span>
             ))}
           </h1>
@@ -218,25 +273,18 @@ function Hero() {
             that commitment to every line of code I write. I am a developer who
             views every "wall" as an opportunity to learn and improve, so I can
             build better software. If you would like to read more:
-            <a href="/about" rel="noopener noreferrer">
-              {" "}
-              Click here.
-            </a>
+            <Link to="/about"> Click Here.</Link>
           </p>
           <div style={{ marginTop: "10px" }}>
-            <button
-              style={{ marginRight: "10px" }}
-              className="primary-button contact-button"
-              onClick={() => navigate("/contact")}
+            <Link
+              className="primary-button button-link contact-button"
+              to="/contact"
             >
-              Contact Me
-            </button>
-            <button
-              className="secondary-button"
-              onClick={() => navigate("/resume")}
-            >
+              Contact me
+            </Link>
+            <Link className="secondary-button button-link" to="/resume">
               Résumé
-            </button>
+            </Link>
           </div>
         </div>
       </div>

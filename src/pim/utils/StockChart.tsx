@@ -1,9 +1,10 @@
 import Chart from "react-apexcharts";
 import type { StockChartProps } from "../../types/pimTypes";
 import type { ApexOptions } from "apexcharts";
+import { PlayerPortfolio } from '../classes/PlayerPortfolio';
 import "../../styles/PIM.css";
 
-function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
+function StockChart({ stock, color, height, tooltip }: StockChartProps) {
   const options: ApexOptions = {
     colors: [color],
     chart: {
@@ -24,7 +25,8 @@ function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
       },
     },
     xaxis: {
-      type: "datetime",
+      type: stock instanceof PlayerPortfolio ? 'numeric' : 'datetime',
+      title: { text: stock instanceof PlayerPortfolio ? 'Week' : 'Date' },
     },
     yaxis: {
       labels: {
@@ -60,7 +62,7 @@ function StockChart({ stock, color, width, height, tooltip }: StockChartProps) {
         options={options}
         series={series}
         type="area"
-        width={width}
+        width="100%"
         height={height}
       />
     </div>

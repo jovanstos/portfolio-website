@@ -1,4 +1,4 @@
-import * as express from "express";
+import "express";
 
 // Redclare the express type request to have the clientID for the JWT short term token
 declare global {

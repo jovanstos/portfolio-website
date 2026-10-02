@@ -3,4 +3,16 @@ dist
 backend_dist
 .git
 .env
+.env.*
 *.md
+tests
+test-results
+playwright-report
+coverage
+*.log
+*.tsbuildinfo
+__pycache__
+**/__pycache__
+*.pyc
+audit-*.json
+lint-*.txt

@@ -1,51 +1,24 @@
-import { useState, useEffect } from "react";
-import { MdCancel } from "react-icons/md";
+import { useState } from "react";
 import "../styles/Popup.css";
-
-// A popup that is for errors only that is premade to just take in the error message...
-// ... display the information then close it self with a timeout in use effect
-
-interface ErrorPopupProps {
+export default function ErrorPopup({
+  isError,
+  message,
+}: {
   isError: boolean;
   message: string | Error | null;
-}
-
-const ErrorPopup: React.FC<ErrorPopupProps> = ({ isError, message }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (isError) setIsOpen(true);
-  }, [isError]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const timer = setTimeout(() => {
-      setIsOpen(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [isOpen]);
-
-  const onClose = () => setIsOpen(false);
-
-  if (!isOpen) return null;
-
+}) {
+  const text =
+    message instanceof Error
+      ? message.message
+      : (message ?? "Something went wrong.");
+  const [dismissed, setDismissed] = useState<string | null>(null);
+  if (!isError || dismissed === text) return null;
   return (
-    <div className="error-overlay" onClick={onClose}>
-      <div
-        className="popup-container error-popup"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button className="popup-close-error" onClick={onClose}>
-          <MdCancel />
-        </button>
-        <div className="popup-content">
-          <h2>Error</h2>
-          {message instanceof Error ? message.message : message}
-        </div>
-      </div>
+    <div className="inline-error" role="alert">
+      <p>{text}</p>
+      <button type="button" onClick={() => setDismissed(text)}>
+        Dismiss notice
+      </button>
     </div>
   );
-};
-
-export default ErrorPopup;
+}

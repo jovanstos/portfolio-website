@@ -9,6 +9,7 @@ import type {
 import { sendEmail } from "../api/email";
 import { useMutation } from "@tanstack/react-query";
 import "../styles/Contact.css";
+import { CONTACT_LIMITS, validateContact } from "../../backend/shared/contact";
 
 const INITIAL: ContactFormState = {
   name: "",
@@ -35,10 +36,9 @@ function Contact() {
       setTouched({});
       setStatus("success");
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const msg =
         error instanceof Error ? error.message : "Unknown error occurred";
-      console.error(msg);
       setStatus("error");
       setErrorMsg(msg);
     },
@@ -55,10 +55,16 @@ function Contact() {
     else if (form.message.trim().length < 10)
       e.message = "Message is too short (min 10 chars).";
 
+    for (const [key, max] of Object.entries(CONTACT_LIMITS)) {
+      const field = key as keyof ErrorState;
+      if (form[field].trim().length > max)
+        e[field] = `Maximum ${max} characters.`;
+    }
     return e;
   }, [form]);
 
-  const canSubmit = Object.keys(errors).length === 0 && !EmailMutation.isPending;
+  const canSubmit =
+    Object.keys(errors).length === 0 && !EmailMutation.isPending;
 
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -107,7 +113,16 @@ function Contact() {
       return;
     }
 
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      document.getElementById(Object.keys(errors)[0])?.focus();
+      return;
+    }
+    const validated = validateContact(form);
+    if (!validated.data) {
+      setStatus("error");
+      setErrorMsg(validated.error ?? "Invalid message.");
+      return;
+    }
 
     setStatus("sending");
     setErrorMsg("");
@@ -117,6 +132,7 @@ function Contact() {
       email: form.email.trim(),
       subject: form.subject.trim(),
       message: form.message.trim(),
+      company: form.company,
       userAgent: navigator.userAgent,
       page: window.location.href,
     };
@@ -165,6 +181,8 @@ function Contact() {
                   name="name"
                   type="text"
                   autoComplete="name"
+                  maxLength={CONTACT_LIMITS.name}
+                  readOnly={EmailMutation.isPending}
                   value={form.name}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -187,6 +205,8 @@ function Contact() {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  maxLength={CONTACT_LIMITS.email}
+                  readOnly={EmailMutation.isPending}
                   value={form.email}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -209,6 +229,8 @@ function Contact() {
                 id="subject"
                 name="subject"
                 type="text"
+                maxLength={CONTACT_LIMITS.subject}
+                readOnly={EmailMutation.isPending}
                 value={form.subject}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -232,6 +254,8 @@ function Contact() {
                 id="message"
                 name="message"
                 rows={7}
+                maxLength={CONTACT_LIMITS.message}
+                readOnly={EmailMutation.isPending}
                 value={form.message}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -277,7 +301,7 @@ function Contact() {
             <button
               className="primary-button"
               type="submit"
-              disabled={!canSubmit}
+              disabled={EmailMutation.isPending}
             >
               {status === "sending" ? "Sending..." : "Send message"}
             </button>

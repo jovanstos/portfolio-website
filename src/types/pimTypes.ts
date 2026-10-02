@@ -19,6 +19,7 @@ export type StockComponentProps = {
   color: string;
   globalNews: number;
   week: number;
+  onTrade: (command: 'buy' | 'sell' | 'stake' | 'unstake', stock: Stock, amount: number, direction?: 'UP' | 'DOWN') => void;
   width: number;
   height: number;
 };

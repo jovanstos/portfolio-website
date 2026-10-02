@@ -1,551 +1,195 @@
 import { useState } from "react";
-import { Stock } from "./classes/Stock";
-import { simulateNextWeek } from "./stockAlgorithm";
-import { generateNewsValue, getNewsStory } from "./newsAlgorithm";
 import StockComponent from "./utils/StockComponent";
 import PlayerCard from "./utils/PlayerCard";
-import { FaChartLine, FaNewspaper, FaMoneyBill } from "react-icons/fa";
-import type { NewsObject } from "../types/pimTypes";
-import FadeInSection from "../components/FadeInSection";
-import "../styles/PIM.css";
-import { PlayerPortfolio } from "./classes/PlayerPortfolio";
 import StockChart from "./utils/StockChart";
-import { formatStockData } from "./PIMDataUtils";
-// Only used when deving
-import { Parser } from "@json2csv/plainjs";
-import { getTrainingData } from "./PIMDataUtils";
-
-// Create the player and AI
-const player = new PlayerPortfolio("Player 1");
-const preston = new PlayerPortfolio("Preston");
-const randy = new PlayerPortfolio("Randy");
-const granny = new PlayerPortfolio("Granny");
-
-// High-growth tech: High price, moderate earnings = High P/E
-const stock1 = new Stock("NovaTech Robotics", 210.5, 450000000, 85, 75, 92);
-
-// Stable Utility: Lower price, consistent earnings = Low P/E
-const stock2 = new Stock("GreenGrid Energy", 45.2, 380000000, 30, 15, 20);
-
-// Volatile Biotech: High risk/volatility based on research news
-const stock3 = new Stock("BioPulse Pharma", 88.0, 120000000, 60, 90, 55);
-
-// Blue Chip Retail: Large earnings, very low volatility
-const stock4 = new Stock("TerraMart Global", 155.1, 1200000000, 45, 10, 12);
-
-// Penny Tech Startup: Low price and very low earnings, high buzz
-const stock5 = new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88);
-
-// Granny will buy and hold one stock the whole game, she's a base line
-granny.addAsset(stock4, 644);
-
-// P.I.M. stands for predictive investment model
-function PIM() {
-  const [gameState, setGameState] = useState<"start" | "playing" | "end">(
-    "start",
-  );
-  const [activeView, setActiveView] = useState<"stock" | "news" | "assets">(
-    "stock",
-  );
-  const [newsFeed, setNewsFeed] = useState<NewsObject[]>([
-    {
-      text: "This is the news feed, here you will see any news stories!",
-      type: "Global",
-      company: "N/A",
-      severity: "neutral",
-      week: 0,
-    },
-  ]);
-  const [globalNews, setGlobalNews] = useState<number>(0);
-  const [week, setWeek] = useState<number>(0);
-  // Used to create DOM updates
-  const [transactionCount, setTransactionCount] = useState(0);
-
-  console.log(transactionCount);
-
-  function handleNewsCycle() {
-    const stocks = [stock1, stock2, stock3, stock4, stock5];
-    const newEntries: NewsObject[] = [];
-    const nextWeek = week + 1;
-
-    stocks.forEach((s) => {
-      s.companyNews = generateNewsValue();
-      if (s.companyNews !== 0) {
-        const story = getNewsStory(s.companyNews, "Company");
-        newEntries.push({
-          text: `${s.name}: ${story}`,
-          type: "Company",
-          company: s.name,
-          severity: s.companyNews > 0 ? "positive" : "negative",
-          week: nextWeek,
-        });
-      }
-    });
-
-    const globalNewsChance = Math.random();
-    if (
-      (globalNews !== 0 && globalNewsChance > 0.4) ||
-      globalNewsChance > 0.75
-    ) {
-      const newVal = generateNewsValue();
-      setGlobalNews(newVal);
-
-      if (newVal !== 0) {
-        const story = getNewsStory(newVal, "Global");
-
-        newEntries.push({
-          text: story,
-          type: "Global",
-          company: "N/A",
-          severity: newVal > 0 ? "positive" : "negative",
-          week: nextWeek,
-        });
-      }
-    }
-
-    if (newEntries.length > 0) {
-      setNewsFeed((prev) => [...newEntries, ...prev]);
-    }
-  }
-
-  function handlePlayerAI(stockChanges: number[]): void {
-    player.updateData(week);
-    granny.updateData(week);
-
-    // Randy random like his name selects a random stock each week to go all in on
-    const randysPick = Math.floor(Math.random() * stockChanges.length);
-    // Apply the change directly to cash to save on resources
-    randy.cash += randy.cash * stockChanges[randysPick];
-    randy.updateData(week);
-
-    // Preston makes the best trade 85% of the time else it's random
-    let prestonsPickIndex: number;
-    const isSmartMove = Math.random() < 0.85;
-
-    if (isSmartMove) {
-      // Find the index of the highest positive change
-      prestonsPickIndex = stockChanges.indexOf(Math.max(...stockChanges));
-    } else {
-      // Pick a random index (the 10% "oops" factor)
-      prestonsPickIndex = Math.floor(Math.random() * stockChanges.length);
-    }
-
-    // Apply the change directly to cash to save on resources
-    preston.cash += preston.cash * stockChanges[prestonsPickIndex];
-    preston.updateData(week);
-  }
-
-  function runSim() {
-    if (week >= 26) {
-      setGameState("end");
-      return;
-    }
-
-    const stock1Change = simulateNextWeek(week, stock1, globalNews);
-    const stock2Change = simulateNextWeek(week, stock2, globalNews);
-    const stock3Change = simulateNextWeek(week, stock3, globalNews);
-    const stock4Change = simulateNextWeek(week, stock4, globalNews);
-    const stock5Change = simulateNextWeek(week, stock5, globalNews);
-
-    // Capture feature snapshot after simulation so PIM can use temporal sequences
-    [stock1, stock2, stock3, stock4, stock5].forEach((s) => {
-      s.featureHistory.push(formatStockData(s, globalNews, week));
-    });
-
-    setWeek((prev) => prev + 1);
-
-    handleNewsCycle();
-
-    handlePlayerAI([
-      stock1Change,
-      stock2Change,
-      stock3Change,
-      stock4Change,
-      stock5Change,
-    ]);
-  }
-
-  const triggerUpdate = () => setTransactionCount((prev) => prev + 1);
-
-  // START SCREEN LOGIC
-  if (gameState === "start") {
+import { useGameSession } from "./useGameSession";
+import "../styles/PIM.css";
+// CSV training-data export remains disabled; Python/model development is out of scope.
+const colors = ["#008FFB", "#fbc000", "#fb004f", "#9566ff", "#fb6000"];
+export default function PIM() {
+  const { game, session } = useGameSession();
+  const [view, setView] = useState<"stock" | "news" | "assets">("stock");
+  const profiles = [
+    "player-profile.webp",
+    "preston-profile.webp",
+    "randy-profile.webp",
+    "grandma-profile.webp",
+  ];
+  if (game.phase === "start")
     return (
-      <main id="PIM" className="start-end">
-        <h1 style={{ color: "white", fontSize: "3rem", marginBottom: "20px" }}>
-          P.I.M.
-        </h1>
-        <h2 style={{ color: "#aaa", marginBottom: "40px" }}>
-          Predictive Investment Model Simulation
-        </h2>
-        <div
-          style={{
-            color: "white",
-            maxWidth: "600px",
-            lineHeight: "1.6",
-            marginBottom: "40px",
-          }}
-        >
-          <p>
-            Welcome to the simulation. You play as "Player 1" and are a stock
-            investor over a 26-week period. You have a secret tool to assist you
-            in this period called P.I.M. an AI/ML. P.I.M is able to predict if a
-            stock will go up and down, helping you make better trades.
-          </p>
-          <hr />
-          <p>
-            You will compete against 3 differnt AI in the market, after 26 weeks
-            whoever has the highest assets wins! Analyze the market, read the
-            news, manage your assets correctly, and use P.I.M. to outperform the
-            competition! 😎
-          </p>
-        </div>
-        <button
-          className="pim-button"
-          style={{ fontSize: "1.5rem", padding: "15px 40px" }}
-          onClick={() => {
-            setGameState("playing");
-            runSim(); // Run the 0 week immediately upon start
-          }}
-        >
-          Start Game
+      <section id="PIM" className="start-end">
+        <h1>P.I.M.</h1>
+        <h2>Predictive Investment Model Simulation</h2>
+        <p>
+          Trade across 26 weeks. Read the news, manage your assets, and compete
+          with Preston, Randy, and Granny. Ask PIM for experimental predictions
+          after ten weeks of market history.
+        </p>
+        <p>
+          A game, not financial advice. The opponents keep their original
+          strategies—including Preston's unusually good timing.
+        </p>
+        <button className="primary-button" onClick={session.start}>
+          Start game
         </button>
-      </main>
+      </section>
     );
-  }
-
-  // END GAME SCREEN LOGIC
-  if (gameState === "end") {
-    // Sort players by total assets for the leaderboard
-    const allPlayers = [player, preston, randy, granny].sort(
-      (a, b) => b.assets - a.assets,
-    );
-
+  if (game.phase === "end")
     return (
-      <main id="PIM" className="start-end">
-        <h1 style={{ color: "white", fontSize: "3rem" }}>Game Over</h1>
-        <h2 style={{ color: "white" }}>Week 27 Reached</h2>
-
-        <div
-          style={{
-            marginTop: "30px",
-            marginBottom: "30px",
-            width: "100%",
-            maxWidth: "600px",
+      <section id="PIM" className="start-end">
+        <h1>Game over · 26 weeks complete</h1>
+        <h2>Final standings</h2>
+        <ol className="pim-standings">
+          {[game.player, ...game.opponents]
+            .sort((a, b) => b.assets - a.assets)
+            .map((player) => (
+              <li key={player.name}>
+                {player.name} <strong>${player.assets.toFixed(2)}</strong>
+              </li>
+            ))}
+        </ol>
+        <button
+          className="primary-button"
+          onClick={() => {
+            session.restart();
+            setView("stock");
           }}
         >
-          <h3
-            style={{
-              color: "white",
-              borderBottom: "1px solid #555",
-              paddingBottom: "10px",
-            }}
-          >
-            Final Standings
-          </h3>
-          {allPlayers.map((p, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                color: p.name === player.name ? "#008FFB" : "white",
-                padding: "15px",
-                background: "rgba(255,255,255,0.05)",
-                marginBottom: "10px",
-                borderRadius: "8px",
-                border: p.name === player.name ? "1px solid #008FFB" : "none",
-              }}
-            >
-              <span style={{ fontSize: "1.2rem" }}>
-                #{index + 1} {p.name}
-              </span>
-              <span style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                ${p.assets.toFixed(2)}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <h2 style={{ color: "#4caf50", marginTop: "20px" }}>
-          Thanks for playing!
-        </h2>
-      </main>
-    );
-  }
-
-  const renderContent = () => {
-    switch (activeView) {
-      case "news":
-        return (
-          <>
-            <h1 style={{ color: "white" }}>Market News Feed</h1>
-            {newsFeed.map((news, index) => (
-              <FadeInSection key={index}>
-                <div className={`news-item severity-${news.severity}`}>
-                  <p className="news-text">{news.text}</p>
-                  <span>Week: {news.week} </span>
-                  <span className="news-type">Type: {news.type}</span>
-                </div>
-              </FadeInSection>
-            ))}
-          </>
-        );
-      case "assets":
-        return (
-          <>
-            <h1 style={{ color: "white" }}>Your Assets</h1>
-            <StockChart
-              stock={player}
-              color="white"
-              width={550}
-              height={250}
-              tooltip={true}
-            />
-            <h2>Cash:</h2>
-            <p>${player.cash.toFixed(2)}</p>
-            <h2>Stocks:</h2>
-            {Object.entries(player.stocks).map(([stockKey, pstoc]) => (
-              <div key={stockKey}>
-                <table className="stock-table" style={{ width: "100%" }}>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Shares</th>
-                      <th>Buy Price</th>
-                      <th>Current Val</th>
-                      <th>Change</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{pstoc.stockObject.name}</td>
-                      <td>{pstoc.shares}</td>
-                      <td>${pstoc.buyPrice.toFixed(2)}</td>
-                      <td>
-                        $
-                        {(
-                          pstoc.shares * pstoc.stockObject.currentPrice
-                        ).toFixed(2)}
-                      </td>
-                      <td>
-                        {(
-                          ((pstoc.stockObject.currentPrice - pstoc.buyPrice) /
-                            pstoc.buyPrice) *
-                          100
-                        ).toFixed(2)}
-                        %
-                      </td>
-                      <td>
-                        <button
-                          className="pim-button pim-sell-button"
-                          style={{ fontSize: "0.8rem", padding: "5px" }}
-                          onClick={() => {
-                            player.sellAsset(Number(stockKey));
-                            triggerUpdate();
-                          }}
-                        >
-                          Sell
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            ))}
-            <h2>Stakes:</h2>
-            {Object.entries(player.stakes).map(([stakeKey, pstake]) => (
-              <div key={stakeKey}>
-                <table className="stock-table" style={{ width: "100%" }}>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Amount</th>
-                      <th>Type</th>
-                      <th>Stock Price</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{pstake.stockObject.name}</td>
-                      <td>${pstake.stakeAmount.toFixed(2)}</td>
-                      <td>{pstake.stakeType}</td>
-                      <td>${pstake.stakePrice.toFixed(2)}</td>
-                      <td>
-                        <button
-                          className="pim-button pim-sell-button"
-                          style={{ fontSize: "0.8rem", padding: "5px" }}
-                          onClick={() => {
-                            player.sellStake(Number(stakeKey));
-                            triggerUpdate();
-                          }}
-                        >
-                          Sell
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </>
-        );
-      case "stock":
-      default:
-        return (
-          <>
-            <StockComponent
-              player={player}
-              stock={stock1}
-              color="#008FFB"
-              globalNews={globalNews}
-              week={week}
-              width={550}
-              height={150}
-            />
-            <StockComponent
-              player={player}
-              stock={stock2}
-              color="#fbc000"
-              globalNews={globalNews}
-              week={week}
-              width={550}
-              height={150}
-            />
-            <StockComponent
-              player={player}
-              stock={stock3}
-              color="#fb004f"
-              globalNews={globalNews}
-              week={week}
-              width={550}
-              height={150}
-            />
-            <StockComponent
-              player={player}
-              stock={stock4}
-              color="#5400fb"
-              globalNews={globalNews}
-              week={week}
-              width={550}
-              height={150}
-            />
-            <StockComponent
-              player={player}
-              stock={stock5}
-              color="#fb6000"
-              globalNews={globalNews}
-              week={week}
-              width={550}
-              height={150}
-            />
-          </>
-        );
-    }
-  };
-
-  // Only used when deving
-  function downloadCSV() {
-    const data = getTrainingData();
-
-    try {
-      const parser = new Parser();
-      const csv = parser.parse(data);
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-
-      // Create a temporary link element to trigger download
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "PIM_training_data.csv");
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("CSV Export Error:", err);
-    }
-  }
-
-  return (
-    <main id="PIM">
-      <h1 style={{ color: "white" }}>
-        P.I.M. (Prediction Investment Model) Simulation
-      </h1>
-      <button onClick={downloadCSV}>dddd</button>
-      <h1 style={{ color: "white" }}>Week: {week}/26</h1>
-      <h2 style={{ color: "white" }}>Assets: ${player.assets.toFixed(2)}</h2>
-      <div id="next-week-button">
-        <button onClick={runSim}>Next Week</button>
-      </div>
-      <section id="PIM-game">
-        <div id="PIM-nav">
-          <h2 style={{ color: "white" }}>Menu</h2>
-          <button
-            className={`pim-button ${activeView === "stock" ? "active" : ""}`}
-            onClick={() => setActiveView("stock")}
-          >
-            <FaChartLine />
-            <span>Stock</span>
-          </button>
-          <button
-            className={`pim-button ${activeView === "news" ? "active" : ""}`}
-            onClick={() => setActiveView("news")}
-          >
-            <FaNewspaper /> News
-          </button>
-          <button
-            className={`pim-button ${activeView === "assets" ? "active" : ""}`}
-            onClick={() => setActiveView("assets")}
-          >
-            <FaMoneyBill /> Your Assets
-          </button>
-        </div>
-        <div className="pim-content-holder" key={activeView}>
-          {renderContent()}
-        </div>
-        <div id="players">
-          <h2 style={{ color: "white" }}>Players</h2>
-          <PlayerCard
-            playerName="Player 1"
-            playerIMG="player-profile.webp"
-            portfolio={player}
-            color="white"
-            width={200}
-            height={100}
-          />
-          <PlayerCard
-            playerName="Preston Blackwell"
-            playerIMG="preston-profile.webp"
-            portfolio={preston}
-            color="white"
-            width={200}
-            height={100}
-          />
-          <PlayerCard
-            playerName="Randy Random"
-            playerIMG="randy-profile.webp"
-            portfolio={randy}
-            color="white"
-            width={200}
-            height={100}
-          />
-          <PlayerCard
-            playerName="Granny"
-            playerIMG="grandma-profile.webp"
-            portfolio={granny}
-            color="white"
-            width={200}
-            height={100}
-          />
-        </div>
+          Play again
+        </button>
       </section>
-    </main>
+    );
+  return (
+    <section id="PIM">
+      <header className="pim-header">
+        <div>
+          <h1>P.I.M.</h1>
+          <p>
+            Week {game.week}/26 · Assets ${game.player.assets.toFixed(2)} · Cash
+            ${game.player.cash.toFixed(2)}
+          </p>
+        </div>
+        <button className="primary-button" onClick={session.advance}>
+          Next week
+        </button>
+        <button
+          className="secondary-button"
+          onClick={() => {
+            session.restart();
+            setView("stock");
+          }}
+        >
+          Restart
+        </button>
+      </header>
+      <div className="pim-tabs" aria-label="Game views">
+        {(["stock", "news", "assets"] as const).map((item) => (
+          <button
+            key={item}
+            aria-pressed={view === item}
+            onClick={() => setView(item)}
+          >
+            {item === "stock"
+              ? "Market"
+              : item === "news"
+                ? "News"
+                : "Your assets"}
+          </button>
+        ))}
+      </div>
+      <div id="PIM-game">
+        <div className="pim-content-holder">
+          {view === "stock" &&
+            game.stocks.map((stock, index) => (
+              <StockComponent
+                key={stock.name}
+                player={game.player}
+                stock={stock}
+                color={colors[index]}
+                globalNews={game.globalNews}
+                week={game.week}
+                width={550}
+                height={180}
+                onTrade={session.trade}
+              />
+            ))}
+          {view === "news" && (
+            <>
+              <h2>Market news</h2>
+              {game.news.length === 0 && <p>No market stories yet.</p>}
+              {game.news.map((news) => (
+                <article
+                  key={`${news.week}:${news.text}`}
+                  className={`news-item severity-${news.severity}`}
+                >
+                  <p>{news.text}</p>
+                  <small>Week {news.week}</small>
+                </article>
+              ))}
+            </>
+          )}
+          {view === "assets" && (
+            <>
+              <h2>Your assets</h2>
+              <StockChart
+                stock={game.player}
+                color="#008FFB"
+                width={550}
+                height={230}
+                tooltip
+              />
+              <p>Cash: ${game.player.cash.toFixed(2)}</p>
+              <h3>Holdings</h3>
+              {Object.entries(game.player.stocks).map(([id, holding]) => (
+                <div key={id} className="pim-holding">
+                  <span>
+                    {holding.stockObject.name} · {holding.shares} shares · $
+                    {(
+                      holding.shares * holding.stockObject.currentPrice
+                    ).toFixed(2)}
+                  </span>
+                  <button
+                    onClick={() =>
+                      session.trade("sell", holding.stockObject, Number(id))
+                    }
+                  >
+                    Sell lot
+                  </button>
+                </div>
+              ))}
+              <h3>Stakes</h3>
+              {Object.entries(game.player.stakes).map(([id, stake]) => (
+                <div key={id} className="pim-holding">
+                  <span>
+                    {stake.stockObject.name} · {stake.stakeType} · $
+                    {stake.stakeAmount.toFixed(2)}
+                  </span>
+                  <button
+                    onClick={() =>
+                      session.trade("unstake", stake.stockObject, Number(id))
+                    }
+                  >
+                    Cancel stake
+                  </button>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+        <aside id="players" aria-label="Players">
+          {[game.player, ...game.opponents].map((player, index) => (
+            <PlayerCard
+              key={player.name}
+              playerName={player.name}
+              playerIMG={profiles[index]}
+              portfolio={player}
+              color="#ddd"
+              width={200}
+              height={100}
+            />
+          ))}
+        </aside>
+      </div>
+    </section>
   );
 }
-
-export default PIM;

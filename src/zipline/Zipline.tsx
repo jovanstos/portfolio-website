@@ -1,557 +1,301 @@
-import { useRef, useState, useEffect } from "react";
-import { ImFolderUpload } from "react-icons/im";
-import { FaCopy, FaDownload } from "react-icons/fa";
-import { QRCodeSVG } from "qrcode.react";
-import Popup from "../components/Popup";
-import QRScanner from "./QRScanner";
-import type { ChatMessage, QRCodeData } from "../types/ziplineTypes";
-import ErrorPopup from "../components/ErrorPopup";
-import { socket } from "./socket";
 import {
-  generateKeyPair,
-  exportPublicKey,
-  importPublicKey,
-  encryptText,
-  decryptText,
-  generateAESKey,
-  exportAESKey,
-  importAESKey,
-  aesEncrypt,
-  aesDecrypt,
-} from "./crypto";
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
+import { ZipSession, pairingLink, readInvitation } from "./session";
+import type { JoinInput } from "../../backend/shared/zipline";
 import "../styles/Zipline.css";
-
-function Zipline() {
-  // Declaring all of refs
-  const privateKeyRef = useRef<CryptoKey | null>(null);
-  const publicKeyRef = useRef<CryptoKey | null>(null);
-  const peerPublicKeyRef = useRef<CryptoKey | null>(null);
-  const sessionKeyRef = useRef<CryptoKey | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const incomingFileRef = useRef<{
-    meta: { name: string; type: string };
-    chunks: Uint8Array[];
-  } | null>(null);
-  const roomID = useRef<string>("");
-
-  // Declaing all of the states
-  const [roomSateID, setRoomSateId] = useState<string>("");
-  const [pairingCode, setPairingCode] = useState<string>("");
-  // Error is set up this way so I can work with the error popup component
-  const [isError, setIsError] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [approved, setApproved] = useState<boolean>(false);
-  const [messageInput, setMessageInput] = useState<string>("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [isScannerOpen, setIsScannerOpen] = useState<boolean>(false);
-
+const QRScanner = lazy(() => import("./QRScanner"));
+export default function Zipline({ embedded = false }: { embedded?: boolean }) {
+  const Heading = embedded ? "h2" : "h1";
+  const [session] = useState(() => new ZipSession());
+  const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot);
+  const [initialInvitation] = useState(() => readInvitation(window.location));
+  const [scanner, setScanner] = useState(false);
+  const [manual, setManual] = useState(false);
+  const [code, setCode] = useState("");
+  const [text, setText] = useState("");
+  const [notice, setNotice] = useState("");
+  const input = useRef<HTMLInputElement>(null);
+  const feed = useRef<HTMLUListElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const paramRoomID = params.get("roomID");
-    const paramPairingCode = params.get("pairingCode");
-
-    if (paramRoomID && paramPairingCode) {
-      setRoomSateId(paramRoomID);
-      setPairingCode(paramPairingCode);
-      roomID.current = paramRoomID;
-
-      // Clean the params from the URL bar without triggering a reload
-      window.history.replaceState({}, "", window.location.pathname);
-
-      const autoJoin = async () => {
-        await createKeys();
-        const exportedPublicKey = await exportPublicKey(publicKeyRef.current!);
-        socket.emit("room:join", {
-          roomID: paramRoomID,
-          publicKey: exportedPublicKey,
-          pairingCode: paramPairingCode,
-        });
-        socket.once("room:approved", () => {
-          setApproved(true);
-          setError("");
-          setIsError(false);
-        });
-      };
-
-      autoJoin();
-    }
-  }, []);
-
+    void session.start(initialInvitation);
+    return () => session.dispose();
+  }, [session, initialInvitation]);
   useEffect(() => {
-    // All of the socket listners listening for key events
-
-    // Get RSA-OAEP key to use to send the session key
-    socket.on("peer:public-key", async ({ publicKey }) => {
-      const imported = await importPublicKey(publicKey);
-      peerPublicKeyRef.current = imported;
-
-      if (sessionKeyRef.current) {
-        await sendSessionKey();
-      }
+    if (initialInvitation && (location.search || location.hash))
+      navigate(location.pathname, { replace: true });
+  }, [initialInvitation, navigate, location]);
+  useEffect(() => {
+    feed.current?.scrollTo?.({
+      top: feed.current.scrollHeight,
+      behavior: "auto",
     });
-
-    // Get AES-GCM key to start the encyrpted chat
-    socket.on("session:key", async ({ payload }) => {
-      if (!privateKeyRef.current) return;
-
-      const buffer = Uint8Array.from(atob(payload), (c) => c.charCodeAt(0));
-      const decrypted = await decryptText(buffer.buffer, privateKeyRef.current);
-
-      const aesKey = await importAESKey(decrypted);
-      sessionKeyRef.current = aesKey;
-    });
-
-    // Get encrypted messages to decrypt and add to messages
-    socket.on("msg:encrypted", async ({ payload }) => {
-      if (!sessionKeyRef.current) return;
-
-      const decrypted = await aesDecrypt(payload, sessionKeyRef.current);
-      const text = new TextDecoder().decode(decrypted);
-
-      setMessages((prev) => [
-        ...prev,
-        { id: uid(), from: "other", type: "text", text },
-      ]);
-    });
-
-    // Start the initial state to get a file
-    socket.on("file:init", ({ meta }) => {
-      incomingFileRef.current = {
-        meta,
-        chunks: [],
-      };
-    });
-
-    // Receive chunks fo the file and add them
-    socket.on("file:chunk", async ({ payload }) => {
-      if (!sessionKeyRef.current || !incomingFileRef.current) return;
-
-      const decrypted = await aesDecrypt(payload, sessionKeyRef.current);
-      incomingFileRef.current.chunks.push(new Uint8Array(decrypted));
-    });
-
-    // Abort the file upload and set file ref ot null
-    socket.on("file:abort", async () => {
-      if (!sessionKeyRef.current || !incomingFileRef.current) return;
-
-      incomingFileRef.current = null;
-    });
-
-    // When the file upload is completed do the proper steps to create a new blob and show it
-    socket.on("file:complete", () => {
-      if (!incomingFileRef.current) return;
-
-      const { meta, chunks } = incomingFileRef.current;
-      const blob = new Blob(chunks as BlobPart[], { type: meta.type });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          from: "other",
-          type: "file",
-          name: meta.name,
-          blob,
-        },
-      ]);
-
-      incomingFileRef.current = null;
-    });
-
-    // Handle any error messages
-    socket.on("room:error-message", ({ message }) => {
-      setError(message);
-      setIsError(true);
-    });
-
-    // Clean up
-    return () => {
-      socket.off("peer:public-key");
-      socket.off("session:key");
-      socket.off("msg:encrypted");
-      socket.off("file:init");
-      socket.off("file:chunk");
-      socket.off("file:abort");
-      socket.off("file:complete");
-      socket.off("room:error-message");
-    };
-  }, []);
-
-  // A lot of these funtions below are self documenting
-  const uid = () => crypto.randomUUID();
-
-  function closePopup() {
-    setIsPopupOpen(!isPopupOpen);
-  }
-
-  function closeScannerPopup() {
-    setIsScannerOpen(false);
-  }
-
-  function handleQRScan(data: QRCodeData) {
-    setRoomSateId(data.roomID);
-    setPairingCode(data.pairingCode);
-    roomID.current = data.roomID;
-    setIsScannerOpen(false);
-  }
-
-  const handleFileClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    sendFile(file);
-  };
-
-  function handleMessageInputChange(
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) {
-    setMessageInput(event.target.value);
-  }
-
-  const handleRoomIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setRoomSateId(value);
-    roomID.current = value;
-  };
-
-  const handlePairKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPairingCode(event.target.value);
-  };
-
-  async function createKeys() {
-    const keyPair = await generateKeyPair();
-    privateKeyRef.current = keyPair.privateKey;
-    publicKeyRef.current = keyPair.publicKey;
-  }
-
-  async function createRoom() {
-    if (!publicKeyRef.current) await createKeys();
-
-    const currentRoomID = roomID.current;
-
-    const aesKey = await generateAESKey();
-    sessionKeyRef.current = aesKey;
-
-    const exportedPublicKey = await exportPublicKey(publicKeyRef.current!);
-
-    socket.emit("room:create", {
-      roomID: currentRoomID,
-      publicKey: exportedPublicKey,
-    });
-
-    socket.once("room:pairing-code", ({ pairingCode, approved }) => {
-      setPairingCode(pairingCode);
-      setApproved(approved);
-      setIsPopupOpen(true);
-      setError("");
-      setIsError(false);
-    });
-  }
-
-  async function joinRoom() {
-    if (!publicKeyRef.current) await createKeys();
-
-    const currentRoomID = roomID.current;
-
-    const exportedPublicKey = await exportPublicKey(publicKeyRef.current!);
-
-    socket.emit("room:join", {
-      roomID: currentRoomID,
-      publicKey: exportedPublicKey,
-      pairingCode,
-    });
-
-    socket.once("room:approved", () => {
-      setApproved(true);
-      setError("");
-      setIsError(false);
-    });
-  }
-
-  async function sendSessionKey() {
-    if (!peerPublicKeyRef.current) return;
-
-    if (!sessionKeyRef.current) return;
-
-    const currentRoomID = roomID.current;
-
-    const exportedAES = await exportAESKey(sessionKeyRef.current);
-    const encryptedKey = await encryptText(
-      exportedAES,
-      peerPublicKeyRef.current,
-    );
-
-    socket.emit("session:key", {
-      roomID: currentRoomID,
-      payload: btoa(String.fromCharCode(...new Uint8Array(encryptedKey))),
-    });
-
-    setError("");
-    setIsError(false);
-  }
-
-  async function sendMessage(text: string) {
-    if (!sessionKeyRef.current || !text) return;
-
-    const currentRoomID = roomID.current;
-    const encoded = new TextEncoder().encode(text);
-    const encrypted = await aesEncrypt(encoded, sessionKeyRef.current);
-
-    socket.emit("msg:encrypted", { roomID: currentRoomID, payload: encrypted });
-
-    setMessages((prev) => [
-      ...prev,
-      { id: uid(), from: "self", type: "text", text },
-    ]);
-
-    setMessageInput("");
-    setError("");
-    setIsError(false);
-  }
-
-  // When sending a file set up chunk the file into the correct chunks and encrypt...
-  // ...then loop through and send each piece until complete
-  async function sendFile(file: File) {
-    if (!sessionKeyRef.current) return;
-
-    const currentRoomID = roomID.current;
-    const chunkSize = 64 * 1024;
-
-    socket.emit("file:init", {
-      roomID: currentRoomID,
-      meta: { name: file.name, size: file.size, type: file.type },
-    });
-
+  }, [snapshot.messages]);
+  const join = useCallback(
+    (invitation: JoinInput) => {
+      setScanner(false);
+      setManual(false);
+      void session.start(invitation);
+    },
+    [session],
+  );
+  async function copy(value: string) {
     try {
-      for (let offset = 0; offset < file.size; offset += chunkSize) {
-        const chunk = new Uint8Array(
-          await file.slice(offset, offset + chunkSize).arrayBuffer(),
-        );
-        const encrypted = await aesEncrypt(chunk, sessionKeyRef.current);
-
-        // Wrap emit in a Promise to wait for ACK
-        await new Promise<void>((resolve, reject) => {
-          socket.emit(
-            "file:chunk",
-            { roomID: currentRoomID, payload: encrypted },
-            (response: any) => {
-              // 'response' comes from the server callback(response)
-              if (response && response.success) {
-                resolve();
-              } else {
-                reject(new Error(response?.error || "Unknown upload error"));
-              }
-            },
-          );
-        });
-      }
-
-      socket.emit("file:complete", { roomID: currentRoomID });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          from: "self",
-          type: "file",
-          name: file.name,
-          blob: file,
-        },
-      ]);
-
-      setError("");
-      setIsError(false);
-    } catch (err: any) {
-      console.error("Upload failed:", err);
-      // Display the error popup if the transfer fails mid-way
-      setError(err.message || "File upload failed");
-      setIsError(true);
+      await navigator.clipboard.writeText(value);
+      setNotice("Copied!");
+    } catch {
+      setNotice("Clipboard unavailable. Select and copy the text manually.");
     }
   }
-
-  function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text);
-  }
-
-  function downloadBlob(blob: Blob, filename: string) {
+  function download(blob: Blob, name: string) {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = name;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-
-  // This is an ugly funcion but all it does it make the user leave then reset everything to default
-  function leaveRoom() {
-    socket.emit("leave");
-
-    privateKeyRef.current = null;
-    publicKeyRef.current = null;
-    peerPublicKeyRef.current = null;
-    sessionKeyRef.current = null;
-    roomID.current = "";
-
-    setApproved(false);
-    setMessageInput("");
-    setMessages([]);
-    setRoomSateId("");
-    setError("");
-    setIsError(false);
-  }
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      sendMessage(messageInput);
-    }
-  };
-
+  const connected = snapshot.state === "connected";
   return (
-    <section id="zipline-app">
-      <Popup isOpen={isPopupOpen} onClose={closePopup}>
-        <h2>Pairing Information</h2>
-        <br />
-        <div id="pairing-info-container">
-          <div id="qr-code-display">
+    <section
+      id="zipline-app"
+      role={embedded ? undefined : "main"}
+      aria-label="Zipline encrypted sharing"
+    >
+      <header className="zip-heading">
+        <div>
+          <Heading>Zipline</Heading>
+          <p>Two devices. One private connection.</p>
+        </div>
+        <span className="zip-status" role="status">
+          {snapshot.state === "hosting"
+            ? "Waiting for your other device"
+            : snapshot.state}
+        </span>
+      </header>
+      {snapshot.error && (
+        <p className="inline-error" role="alert">
+          {snapshot.error}
+        </p>
+      )}
+      {notice && <p role="status">{notice}</p>}
+      {!connected && snapshot.room && (
+        <div className="zip-pairing">
+          <div className="zip-qr">
             <QRCodeSVG
-              value={`https://jovanstosic.dev/zipline?roomID=${encodeURIComponent(roomSateID)}&pairingCode=${encodeURIComponent(pairingCode)}`}
-              size={200}
-              level="H"
+              role="img"
+              aria-label="Zipline pairing QR code"
+              value={pairingLink(snapshot.room)}
+              size={220}
+              level="M"
               marginSize={4}
             />
           </div>
           <div>
-            <h3 className="pairing-info">ID: {roomSateID}</h3>
-            <h3 className="pairing-info">Code: {pairingCode}</h3>
-          </div>
-        </div>
-        <br />
-        <p>
-          All linked up? Once you close this you will no longer be able to see
-          this information!
-        </p>
-      </Popup>
-      <ErrorPopup isError={isError} message={error} />
-      {isScannerOpen && (
-        <QRScanner onScan={handleQRScan} onClose={closeScannerPopup} />
-      )}
-      {!approved ? (
-        <section id="room-options">
-          <div id="create-room">
-            <h2 style={{ margin: "0px" }}>Host</h2>
-            <input
-              type="text"
-              value={roomSateID}
-              onChange={handleRoomIDChange}
-              placeholder="Create an ID"
-            />
-            <button className="primary-button" onClick={createRoom}>
-              Create Room
-            </button>
-          </div>
-          <h2>Or</h2>
-          <div id="join-room">
-            <h2>Pair Device</h2>
+            <h2>Scan. Connect. Share.</h2>
+            <p>
+              Open your other device's camera and scan this code. Keep this page
+              open.
+            </p>
+            <p>Or enter this code on the other device:</p>
+            <strong className="zip-code">{snapshot.room.code}</strong>
             <button
               className="primary-button"
-              onClick={() => setIsScannerOpen(true)}
+              onClick={() => void copy(pairingLink(snapshot.room!))}
             >
-              Scan QR Code
+              Copy pairing link
             </button>
-            <p>Or enter manually:</p>
-            <input
-              type="text"
-              value={roomSateID}
-              onChange={handleRoomIDChange}
-              placeholder="Host ID"
-            />
-            <input
-              type="text"
-              value={pairingCode}
-              onChange={handlePairKeyChange}
-              placeholder="Pairing Code"
-            />
-            <button className="primary-button" onClick={joinRoom}>
-              Join Room
+            <p className="zip-note">
+              Invitation expires after 10 minutes. Anyone with the link can
+              pair—share it privately.
+            </p>
+          </div>
+        </div>
+      )}
+      {!connected && (
+        <div className="zip-alternatives">
+          <button className="secondary-button" onClick={() => setScanner(true)}>
+            Scan instead
+          </button>
+          <button
+            className="secondary-button"
+            onClick={() => setManual((value) => !value)}
+          >
+            Enter code
+          </button>
+          {["interrupted", "closed"].includes(snapshot.state) && (
+            <button
+              className="primary-button"
+              onClick={() => void session.start()}
+            >
+              Create fresh session
+            </button>
+          )}
+        </div>
+      )}
+      {manual && !connected && (
+        <form
+          className="zip-manual"
+          onSubmit={(event) => {
+            event.preventDefault();
+            join({ code: code.trim() });
+          }}
+        >
+          <label htmlFor="zip-code">Pairing code</label>
+          <input
+            id="zip-code"
+            autoComplete="off"
+            value={code}
+            maxLength={8}
+            onChange={(event) => setCode(event.target.value.toUpperCase())}
+          />
+          <button
+            className="primary-button"
+            disabled={code.trim().length !== 8}
+          >
+            Join device
+          </button>
+        </form>
+      )}
+      {scanner && (
+        <Suspense fallback={<p role="status">Loading scanner…</p>}>
+          <QRScanner onScan={join} onClose={() => setScanner(false)} />
+        </Suspense>
+      )}
+      {connected && (
+        <>
+          <div className="zip-toolbar">
+            <span>Encrypted connection ready</span>
+            <button className="danger-button" onClick={() => session.close()}>
+              Leave session
             </button>
           </div>
-        </section>
-      ) : (
-        <section id="zipline-chat-section">
-          <article id="chat-feed">
-            <h2>Feed</h2>
-            <div id="message-feed">
-              <ul>
-                {messages.map((msg) => (
-                  <li key={msg.id} className={msg.from}>
-                    {msg.type === "text" ? (
-                      <ul className="message">
-                        <span>Text from {msg.from}: </span>
-                        <b>{msg.text}</b>
-                        <button onClick={() => copyToClipboard(msg.text)}>
-                          <FaCopy />
-                        </button>
-                      </ul>
-                    ) : (
-                      <ul className="message">
-                        <span>File from {msg.from}: </span>
-                        <b>{msg.name}</b>
-                        <button
-                          onClick={() => downloadBlob(msg.blob, msg.name)}
-                        >
-                          <FaDownload />
-                        </button>
-                      </ul>
+          <ul
+            ref={feed}
+            className="zip-feed"
+            aria-label="Shared items"
+            aria-live="polite"
+          >
+            {snapshot.messages.length === 0 && (
+              <li className="zip-empty">
+                Send a note or a file. It stays only in your browsers.
+              </li>
+            )}
+            {snapshot.messages.map((message) => (
+              <li key={message.id} className={`zip-message ${message.from}`}>
+                <span className="zip-note">
+                  {message.from === "self" ? "You" : "Other device"} ·{" "}
+                  {message.status}
+                </span>
+                {message.text !== undefined ? (
+                  <>
+                    <p>{message.text}</p>
+                    <button
+                      aria-label="Copy message"
+                      onClick={() => void copy(message.text!)}
+                    >
+                      Copy
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <strong>{message.name}</strong>
+                    {message.blob && (
+                      <button
+                        onClick={() => download(message.blob!, message.name!)}
+                      >
+                        Download
+                      </button>
                     )}
-                  </li>
-                ))}
-              </ul>
+                    {message.expired && <span>File no longer retained</span>}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+          {snapshot.progress !== undefined && (
+            <div className="zip-progress" role="status">
+              <progress max={1} value={snapshot.progress} />
+              <span>{Math.round(snapshot.progress * 100)}% acknowledged</span>
+              {snapshot.direction === "sending" && (
+                <button onClick={() => session.cancel()}>Cancel sending</button>
+              )}
             </div>
-            <div id="chat-input">
-              <input
-                id="text-input"
-                type="text"
-                value={messageInput}
-                onChange={handleMessageInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Message..."
-              />
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              />
-              <button
-                id="chat-folder"
-                aria-label="Upload file"
-                type="button"
-                onClick={handleFileClick}
-              >
-                <ImFolderUpload />
-              </button>
-              <button id="chat-send" onClick={() => sendMessage(messageInput)}>
-                Send
-              </button>
-            </div>
-          </article>
-          <article id="control-panel">
-            <h2>Control Panel</h2>
-            <h3>Actions</h3>
-            <button className="danger-button" onClick={leaveRoom}>
-              Leave
+          )}
+          <form
+            className="zip-composer"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (text.trim() && !snapshot.busy) {
+                void session.sendText(text);
+                setText("");
+              }
+            }}
+          >
+            <label className="sr-only" htmlFor="zip-text">
+              Message
+            </label>
+            <textarea
+              id="zip-text"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              placeholder="A note for your other device…"
+              rows={2}
+            />
+            <input
+              ref={input}
+              className="sr-only"
+              type="file"
+              aria-label="Choose file to send"
+              tabIndex={-1}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (file) void session.sendFile(file);
+              }}
+            />
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={snapshot.busy}
+              onClick={() => input.current?.click()}
+            >
+              Send file
             </button>
-          </article>
-        </section>
+            <button
+              className="primary-button"
+              disabled={snapshot.busy || !text.trim()}
+            >
+              Send note
+            </button>
+          </form>
+        </>
       )}
+      <details className="zip-privacy">
+        <summary>Limits & privacy</summary>
+        <p>
+          5 MiB per file (5,242,880 bytes), two devices, short-lived sessions.
+          Transfers have byte quotas and timeouts. Files, chat, and keys are not
+          stored on the server; refreshing or leaving ends the session. Download
+          files you want to keep.
+        </p>
+        <p>
+          The relay sees connection information and file sizes. Encryption does
+          not provide anonymity, prevent harmful content, or replace trust in
+          this site. Use it only for lawful sharing. This is an experimental
+          personal tool, not an audited secure messenger.
+        </p>
+      </details>
     </section>
   );
 }
-
-export default Zipline;

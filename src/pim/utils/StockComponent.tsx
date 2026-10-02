@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import type { StockComponentProps } from "../../types/pimTypes";
 import { useMutation } from "@tanstack/react-query";
 import { postDataToPIM } from "../../api/python";
@@ -29,6 +29,7 @@ function StockComponent({
   week,
   width,
   height,
+  onTrade,
 }: StockComponentProps) {
   const [stockInfoView, setStockInfoView] = useState<boolean>(false);
 
@@ -41,35 +42,29 @@ function StockComponent({
   // PIM Prediction State
   const [pimPrediction, setPimPrediction] = useState<string | null>(null);
 
-  // Force update to trigger re-render when player object mutates
-  const [_, setTick] = useState(0);
-  const forceUpdate = () => setTick((t) => t + 1);
-
-  console.log(globalNews, week);
-
-  const ownedHoldings = useMemo(() => {
-    return Object.entries(player.stocks).filter(
-      ([_, s]) => s.stockObject.name === stock.name,
-    );
-  }, [player.stocks, stock.name, _]); // Depend on _ (tick) to refresh when sales happen
+  const [tradeError, setTradeError] = useState("");
+  const ownedHoldings = Object.entries(player.stocks).filter(
+    ([, holding]) => holding.stockObject.name === stock.name,
+  );
 
   const PIMMutation = useMutation({
     mutationFn: postDataToPIM,
-    onSuccess: async (data: any) => {
-      // Update local state to show in popup
-      const PIMText = handlePIMPrediction(data[0]);
-
-      setPimPrediction(PIMText);
+    onSuccess: (data: number[]) => {
+      try {
+        setPimPrediction(handlePIMPrediction(data[0]));
+      } catch {
+        setPimPrediction("Invalid prediction response. Try again later.");
+      }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const msg =
         error instanceof Error ? error.message : "Unknown error occurred";
-      console.error(msg);
-      setPimPrediction("Error: Unable to reach PIM.");
+      setPimPrediction(`PIM unavailable: ${msg}`);
     },
   });
 
   const askPIM = () => {
+    if (stock.featureHistory.length < 10 || PIMMutation.isPending) return;
     setActivePopup("PIM");
     setPimPrediction(null);
     PIMMutation.mutate(formatStockSequence(stock, 10));
@@ -81,6 +76,7 @@ function StockComponent({
 
   const closePopup = () => {
     setActivePopup(null);
+    setTradeError("");
     setTransactionAmount(0);
     setStakeDir("UP");
   };
@@ -89,32 +85,41 @@ function StockComponent({
     if (transactionAmount <= 0) return;
     const cost = transactionAmount * stock.currentPrice;
     if (player.cash >= cost) {
-      player.addAsset(stock, transactionAmount);
-      forceUpdate(); // Refresh UI to show new cash balance
-      closePopup();
+      try {
+        onTrade("buy", stock, transactionAmount);
+        closePopup();
+      } catch (error) {
+        setTradeError(
+          error instanceof Error ? error.message : "Invalid trade.",
+        );
+      }
     } else {
-      alert("Insufficient funds!");
+      setTradeError("Insufficient funds.");
     }
   };
 
   const handleSell = (id: string) => {
-    player.sellAsset(Number(id));
-    forceUpdate(); // Refresh UI
+    onTrade("sell", stock, Number(id));
   };
 
   const handleStake = () => {
     if (transactionAmount <= 0) return;
     if (player.cash >= transactionAmount) {
-      player.addStake(stock, transactionAmount, stakeDir);
-      forceUpdate();
-      closePopup();
+      try {
+        onTrade("stake", stock, transactionAmount, stakeDir);
+        closePopup();
+      } catch (error) {
+        setTradeError(
+          error instanceof Error ? error.message : "Invalid trade.",
+        );
+      }
     } else {
-      alert("Insufficient funds for this stake!");
+      setTradeError("Insufficient funds for this stake.");
     }
   };
 
   return (
-    <section className="stock">
+    <section className="stock" data-global-news={globalNews}>
       <h3>{stock.name}</h3>
       {stockInfoView ? (
         <table className="stock-table">
@@ -197,13 +202,15 @@ function StockComponent({
           </div>
 
           <div className="popup-input-group">
-            <label>Shares to Buy:</label>
+            <label htmlFor={`shares-${stock.name}`}>Shares to Buy:</label>
             <input
+              id={`shares-${stock.name}`}
               type="number"
               min="0"
+              step="1"
               value={transactionAmount}
               onChange={(e) =>
-                setTransactionAmount(parseInt(e.target.value) || 0)
+                setTransactionAmount(Number(e.target.value) || 0)
               }
             />
           </div>
@@ -213,6 +220,11 @@ function StockComponent({
             </p>
           </div>
 
+          {tradeError && (
+            <p className="inline-error" role="alert">
+              {tradeError}
+            </p>
+          )}
           <button className="pim-button pim-buy-button" onClick={handleBuy}>
             Confirm Purchase
           </button>
@@ -295,8 +307,9 @@ function StockComponent({
                   style={{ marginBottom: "1rem", color: "#4CAF50" }}
                 />
                 <p style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                  {`For:${stock.name} ${pimPrediction}` ||
-                    "No prediction available."}
+                  {pimPrediction
+                    ? `For ${stock.name}: ${pimPrediction}`
+                    : "No prediction available."}
                 </p>
               </>
             )}
@@ -321,10 +334,12 @@ function StockComponent({
           </div>
 
           <div className="popup-input-group">
-            <label>Amount to Wager:</label>
+            <label htmlFor={`stake-${stock.name}`}>Amount to Wager:</label>
             <input
+              id={`stake-${stock.name}`}
               type="number"
               min="0"
+              step="0.01"
               value={transactionAmount}
               onChange={(e) =>
                 setTransactionAmount(Number(e.target.value) || 0)
@@ -351,6 +366,11 @@ function StockComponent({
             </button>
           </div>
 
+          {tradeError && (
+            <p className="inline-error" role="alert">
+              {tradeError}
+            </p>
+          )}
           <button className="pim-button" onClick={handleStake}>
             Place Stake
           </button>

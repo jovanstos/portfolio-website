@@ -1,80 +1,77 @@
-import { useEffect, useRef, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { MdCancel } from "react-icons/md";
-import type { QRCodeData } from "../types/ziplineTypes";
-
-interface QRScannerProps {
-  onScan: (data: QRCodeData) => void;
+import { useEffect, useId, useRef, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
+import Popup from "../components/Popup";
+import type { JoinInput } from "../../backend/shared/zipline";
+import { readInvitation } from "./session";
+export default function QRScanner({
+  onScan,
+  onClose,
+}: {
+  onScan: (data: JoinInput) => void;
   onClose: () => void;
-}
-
-function QRScanner({ onScan, onClose }: QRScannerProps) {
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const [error, setError] = useState<string>("");
-
+}) {
+  const id = useId().replace(/:/g, "");
+  const [error, setError] = useState("");
+  const lifecycle = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1,
-      },
-      false,
-    );
-
-    scannerRef.current = scanner;
-
-    scanner.render(
-      (result) => {
-        try {
-          const url = new URL(result);
-          const roomID = url.searchParams.get("roomID");
-          const pairingCode = url.searchParams.get("pairingCode");
-
-          if (roomID && pairingCode) {
-            scanner.clear();
-            onScan({ roomID, pairingCode });
-          } else {
-            setError("QR code missing pairing info");
-          }
-        } catch {
-          setError("Invalid QR code — must be a Zipline pairing link");
-        }
-      },
-      (error) => {
-        if (
-          error &&
-          !error.toString().includes("NotAllowedError") &&
-          !error.toString().includes("NotFoundException")
-        ) {
-          console.warn("QR Scan Warning:", error);
-        }
-      },
-    );
-
+    let disposed = false;
+    let scanned = false;
+    let scanner: Html5Qrcode | undefined;
+    const starting = lifecycle.current
+      .then(async () => {
+        if (disposed) return;
+        scanner = new Html5Qrcode(id);
+        await scanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 200 },
+          (result) => {
+            if (disposed || scanned) return;
+            try {
+              const url = new URL(result);
+              if (
+                url.origin !== window.location.origin ||
+                !["/zipline", "/projects/live/6"].includes(url.pathname)
+              )
+                throw new Error("Scan a Zipline pairing link from this site.");
+              const invitation = readInvitation(url);
+              if (!invitation)
+                throw new Error("QR code has no pairing invitation.");
+              scanned = true;
+              onScan(invitation);
+            } catch (failure) {
+              setError(
+                failure instanceof Error ? failure.message : "Invalid QR code.",
+              );
+            }
+          },
+          () => undefined,
+        );
+      })
+      .catch(() => {
+        if (!disposed)
+          setError(
+            "Camera unavailable or permission denied. Use Enter code instead.",
+          );
+      });
     return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(() => {});
-      }
+      disposed = true;
+      lifecycle.current = starting
+        .then(async () => {
+          if (scanner?.isScanning) await scanner.stop();
+          scanner?.clear();
+        })
+        .catch(() => undefined);
     };
-  }, [onScan]);
-
+  }, [id, onScan]);
   return (
-    <div className="qr-scanner-overlay">
-      <div className="qr-scanner-container">
-        <button className="qr-scanner-close" onClick={onClose}>
-          <MdCancel />
-        </button>
-        <h2>Scan QR Code</h2>
-        <div id="qr-reader" className="qr-reader" />
-        {error && <p className="qr-error">{error}</p>}
-        <p className="qr-instruction">
-          Point your camera at the QR code to scan
+    <Popup isOpen onClose={onClose} title="Scan a Zipline code">
+      <div id={id} />
+      {error && (
+        <p className="inline-error" role="alert">
+          {error}
         </p>
-      </div>
-    </div>
+      )}
+      <p>Point your camera at the QR code on the other device.</p>
+    </Popup>
   );
 }
-
-export default QRScanner;

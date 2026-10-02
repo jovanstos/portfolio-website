@@ -1,23 +1,25 @@
+import { Link } from "react-router-dom";
 import Stars from "../components/Stars";
-
-// Handles the 404
-
-function NotFound() {
+export default function NotFound() {
   return (
-    <div style={{ backgroundColor: "#13141c" }}>
-      <Stars speed={5} />
-      <main id="not-found">
+    <div
+      style={{
+        background: "#13141c",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <Stars speed={200} />
+      <main
+        id="not-found"
+        style={{ position: "relative", padding: "96px 16px 48px", gap: 16 }}
+      >
         <h1>404 Page Not found</h1>
-        <h2 style={{ marginTop: "15px" }}>Looks like you're lost 🥲</h2>
-        <h2>Try heading home and seeing what you can find there!</h2>
-        <a href="/" rel="noopener noreferrer">
-          <button style={{ marginTop: "15px" }} className="primary-button">
-            Home
-          </button>
-        </a>
+        <h2 style={{ color: "white" }}>Looks like you're lost 🥲</h2>
+        <Link className="primary-button button-link" to="/">
+          Head Home
+        </Link>
       </main>
     </div>
   );
 }
-
-export default NotFound;

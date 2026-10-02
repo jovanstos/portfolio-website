@@ -13,7 +13,16 @@ dist
 dist-ssr
 *.local
 .env
+.env.*
+!.env.example
+!.env.production.example
 backend_dist
+
+# Local verification output
+/test-results/
+/playwright-report/
+/coverage/
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*

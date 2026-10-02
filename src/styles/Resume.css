@@ -1,46 +1,65 @@
 #resume {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px;
-  margin-bottom: 50px;
-  height: 100%;
-  min-height: 80vh;
+  width: min(1000px, calc(100% - 32px));
+  margin: 96px auto 48px;
+  min-height: 70vh;
 }
-
-#resume-header {
-  text-align: center;
-}
-
 #resume-text {
-  margin-top: 25px;
-  padding: 30px 40px;
-  width: 75%;
-  max-width: 1200px;
-  background-color: var(--color-bg-accent);
+  padding: clamp(16px, 4vw, 40px);
+  background: var(--color-bg-accent);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  overflow-wrap: anywhere;
 }
-
+#resume-header {
+  margin-bottom: 24px;
+}
+#resume-header h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
 .resumeSection {
-  margin-top: 15px;
+  margin-top: 32px;
 }
-
+.resumeSection > h2 {
+  font-size: 1.25rem;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
 .resumeDetail {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 20px 0;
 }
-
-.resumeDetail > h4 {
-  margin-top: 10px;
+.resumeDetail h3 {
+  font-size: 1rem;
 }
-
-@media screen and (max-width: 750px) {
-  #resume {
-    margin: 10px;
-    margin-top: 50px;
+.resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+.resume-note {
+  font-size: 0.85rem;
+}
+@media print {
+  nav,
+  footer,
+  #lightDarkToggle,
+  .skip-link,
+  .resume-actions {
+    display: none !important;
   }
-
-  #resume-text {
+  #resume {
     width: 100%;
+    margin: 0;
+  }
+  #resume-text {
+    border: 0;
+    background: white;
+    color: black;
   }
 }

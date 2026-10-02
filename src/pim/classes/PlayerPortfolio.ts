@@ -45,6 +45,14 @@ export class PlayerPortfolio {
   }
 
   addAsset(stock: Stock, shares: number) {
+    if (
+      !Number.isSafeInteger(shares) ||
+      shares <= 0 ||
+      !Number.isFinite(stock.currentPrice) ||
+      stock.currentPrice <= 0 ||
+      stock.currentPrice * shares > this.cash
+    )
+      throw new Error("Choose a whole number of shares you can afford.");
     this.stocks[this.currentID] = {
       stockObject: stock,
       buyPrice: stock.currentPrice,
@@ -55,6 +63,7 @@ export class PlayerPortfolio {
 
     // Deduct cash
     this.cash -= stock.currentPrice * shares;
+    this.calculateAssets();
   }
 
   sellAsset(id: number) {
@@ -66,9 +75,17 @@ export class PlayerPortfolio {
 
     // Remove the asset instantly by ID
     delete this.stocks[id];
+    this.calculateAssets();
   }
 
   addStake(stock: Stock, amount: number, type: "UP" | "DOWN") {
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
+      amount > this.cash ||
+      !["UP", "DOWN"].includes(type)
+    )
+      throw new Error("Choose a stake amount you can afford.");
     this.stakes[this.currentID] = {
       stockObject: stock,
       stakePrice: stock.currentPrice,
@@ -79,6 +96,7 @@ export class PlayerPortfolio {
     this.currentID += 1;
 
     this.cash -= amount;
+    this.calculateAssets();
   }
 
   sellStake(id: number) {
@@ -89,6 +107,7 @@ export class PlayerPortfolio {
     this.cash += stake.stakeAmount;
 
     delete this.stakes[id];
+    this.calculateAssets();
   }
 
   // Calculate total assets
@@ -99,7 +118,11 @@ export class PlayerPortfolio {
       currentStockValue += s.stockObject.currentPrice * s.shares;
     });
 
-    this.assets = this.cash + currentStockValue;
+    const stakePrincipal = Object.values(this.stakes).reduce(
+      (total, stake) => total + stake.stakeAmount,
+      0,
+    );
+    this.assets = this.cash + currentStockValue + stakePrincipal;
   }
 
   calculateStakes() {
