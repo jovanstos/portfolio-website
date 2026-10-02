@@ -1,101 +1,143 @@
 nav[aria-label="Main navigation"] {
+  --wheel-size: clamp(280px, 80vmin, 400px);
+  --orbit-radius: calc(var(--wheel-size) / 2 - 48px);
   position: fixed;
   top: 16px;
   left: 16px;
+  width: 68px;
+  height: 68px;
   z-index: 50;
+  isolation: isolate;
 }
-nav.nav-open {
-  width: min(360px, calc(100vw - 32px));
-  height: min(424px, calc(100dvh - 32px));
-}
+
 .rocketButton {
-  background: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  padding: 4px;
+  border-radius: 50%;
+  background: transparent;
   color: var(--color-accent);
+  touch-action: manipulation;
 }
-.rocketButton span {
-  font-size: 0.8rem;
-}
+
 #rocket {
-  transition: transform 180ms ease;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-accent) 45%, transparent));
+  transition: filter 180ms ease;
 }
+
 .rocketButton[aria-expanded="true"] #rocket {
-  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 12px var(--color-accent));
 }
+
 .nav-backdrop {
   position: fixed;
   inset: 0;
+  padding: 0;
   border-radius: 0;
-  background: #0005;
-  backdrop-filter: blur(2px);
+  background: #0002;
   z-index: 40;
+  cursor: default;
 }
+
+/* The orbit is centered on the stationary rocket, not below it.
+   Its upper/left arcs intentionally continue beyond the viewport. */
 .wheel {
   position: absolute;
-  top: 64px;
-  left: 0;
-  width: min(360px, calc(100vw - 32px), calc(100dvh - 112px));
-  aspect-ratio: 1;
+  top: 34px;
+  left: 34px;
+  width: var(--wheel-size);
+  height: var(--wheel-size);
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: var(--color-bg-accent);
-  border: 2px dotted var(--color-accent);
-  box-shadow: 0 16px 48px #0005;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 75%, transparent);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 5px, color-mix(in srgb, var(--color-accent) 6%, transparent) 5px 6px),
+    radial-gradient(circle, transparent 0 23%, color-mix(in srgb, var(--color-accent) 8%, transparent) 24% 62%, color-mix(in srgb, var(--color-accent) 20%, transparent) 100%);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--color-accent) 25%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--color-accent) 18%, transparent);
   touch-action: none;
+  user-select: none;
+  cursor: grab;
 }
+
+.wheel:active {
+  cursor: grabbing;
+}
+
 .wheel[hidden] {
   display: none;
 }
+
 .wheel-ring {
   position: absolute;
-  inset: 12px;
-  border: 1px dashed var(--color-accent);
+  inset: 10px;
+  border: 2px dashed color-mix(in srgb, var(--color-accent) 65%, transparent);
   border-radius: 50%;
   transform: rotate(var(--rotation));
   pointer-events: none;
 }
+
+.wheel-ring::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  border-radius: 50%;
+}
+
+.wheel-core {
+  position: absolute;
+  inset: calc(50% - 43px);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  pointer-events: none;
+}
+
 .wheelItem {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 88px;
-  padding: 10px 4px;
+  padding: 9px 4px;
   text-align: center;
-  font-size: 0.85rem;
-  border-radius: 12px;
-  background: var(--color-bg);
-  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 65%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  color: var(--color-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 20%, transparent);
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
   transform: translate(-50%, -50%) rotate(calc(var(--angle) + var(--rotation)))
-    translateX(
-      calc(min(180px, (100vw - 32px) / 2, (100dvh - 112px) / 2) - 58px)
-    )
+    translateX(var(--orbit-radius))
     rotate(calc(-1 * (var(--angle) + var(--rotation))));
+  transition: background 160ms ease, box-shadow 160ms ease;
 }
+
 .wheelItem:hover,
+.wheelItem:focus-visible,
 .wheelItem[aria-current="page"] {
-  background: var(--btn-primary);
-  color: white;
+  background: color-mix(in srgb, var(--color-accent) 24%, var(--color-bg));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--color-accent) 45%, transparent);
   text-decoration: none;
 }
+
 .wheel-hint {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
+  top: calc(50% + 46px);
+  left: calc(50% + 8px);
+  width: 88px;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  color: var(--color-accent);
   pointer-events: none;
-}
-@media (max-height: 420px) {
-  .wheel-hint {
-    display: none;
-  }
-  .wheelItem {
-    font-size: 0.65rem;
-    width: 64px;
-    padding: 5px;
-  }
 }

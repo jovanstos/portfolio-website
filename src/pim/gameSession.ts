@@ -21,10 +21,30 @@ function freshGame(): GameSnapshot {
     new Stock("TerraMart Global", 155.1, 1200000000, 45, 10, 12),
     new Stock("CloudStream Inc.", 12.75, 250000000, 95, 80, 88),
   ];
+  // Seed real market history before play, without advancing the game clock
+  // or running opponent strategies. PIM needs ten weekly feature snapshots.
+  let globalNews = 0;
+  for (let week = 0; week < 10; week++) {
+    const chance = Math.random();
+    if ((globalNews !== 0 && chance > 0.4) || chance > 0.75)
+      globalNews = generateNewsValue();
+    stocks.forEach((stock) => {
+      stock.companyNews = generateNewsValue();
+      simulateNextWeek(week, stock, globalNews);
+      stock.featureHistory.push(formatStockData(stock, globalNews, week));
+    });
+  }
+  // The playable news cycle starts fresh, but retains the historical data.
+  stocks.forEach((stock) => {
+    stock.companyNews = 0;
+  });
   const opponents = ["Preston", "Randy", "Granny"].map(
     (name) => new PlayerPortfolio(name),
   );
-  opponents[2].addAsset(stocks[3], 644);
+  opponents[2].addAsset(
+    stocks[3],
+    Math.floor(opponents[2].cash / stocks[3].currentPrice),
+  );
   return {
     phase: "start",
     week: 0,

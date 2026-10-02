@@ -23,9 +23,15 @@ export default function Nav() {
   const trigger = useRef<HTMLButtonElement>(null);
   const dragging = useRef(false);
   const previous = useRef(0);
+  const gesture = useRef<{ id: number; x: number; y: number } | null>(null);
+  const suppressClick = useRef(false);
+  function hasKeyboardFocus() {
+    return !!trigger.current?.closest("nav")?.querySelector(":focus-visible");
+  }
   function dismiss(focus = false) {
     setOpen(false);
     dragging.current = false;
+    gesture.current = null;
     if (focus) trigger.current?.focus();
   }
   useEffect(() => {
@@ -33,12 +39,15 @@ export default function Nav() {
     const element = wheel.current;
     const spin = (event: WheelEvent) => {
       event.preventDefault();
-      setRotation((value) => value + event.deltaY * 0.35);
+      const delta = event.deltaY || event.deltaX;
+      const units = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1;
+      setRotation((value) => (value + delta * units * 0.35) % 360);
     };
     const escape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
         dragging.current = false;
+        gesture.current = null;
         trigger.current?.focus();
       }
     };
@@ -63,7 +72,9 @@ export default function Nav() {
         aria-label="Main navigation"
         className={open ? "nav-open" : ""}
         onMouseEnter={canHover ? () => setOpen(true) : undefined}
-        onMouseLeave={canHover ? () => dismiss() : undefined}
+        onMouseLeave={canHover ? () => {
+          if (!gesture.current && !hasKeyboardFocus()) dismiss();
+        } : undefined}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) dismiss();
         }}
@@ -72,9 +83,16 @@ export default function Nav() {
           ref={trigger}
           type="button"
           className="rocketButton"
-          aria-label="Open navigation menu"
+          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}
           aria-controls="navigation-wheel"
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              setOpen(true);
+              requestAnimationFrame(() => wheel.current?.querySelector("a")?.focus());
+            }
+          }}
           onClick={(event) =>
             setOpen((value) => (canHover && event.detail > 0 ? true : !value))
           }
@@ -87,10 +105,17 @@ export default function Nav() {
           hidden={!open}
           className="wheel"
           style={{ "--rotation": `${rotation}deg` } as CSSProperties}
+          onClickCapture={(event) => {
+            if (suppressClick.current) {
+              event.preventDefault();
+              event.stopPropagation();
+              suppressClick.current = false;
+            }
+          }}
           onPointerDown={(event) => {
-            if ((event.target as HTMLElement).closest("a,button")) return;
-            dragging.current = true;
-            event.currentTarget.setPointerCapture(event.pointerId);
+            if (!event.isPrimary || event.button !== 0) return;
+            suppressClick.current = false;
+            gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
             previous.current = angle(
               event.clientX,
               event.clientY,
@@ -98,7 +123,14 @@ export default function Nav() {
             );
           }}
           onPointerMove={(event) => {
-            if (!dragging.current) return;
+            const start = gesture.current;
+            if (!start || start.id !== event.pointerId) return;
+            if (!dragging.current) {
+              if (Math.hypot(event.clientX - start.x, event.clientY - start.y) < 5) return;
+              dragging.current = true;
+              suppressClick.current = true;
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }
             const next = angle(
               event.clientX,
               event.clientY,
@@ -107,19 +139,26 @@ export default function Nav() {
             let delta = next - previous.current;
             if (delta > 180) delta -= 360;
             if (delta < -180) delta += 360;
-            setRotation((value) => value + delta);
+            setRotation((value) => (value + delta) % 360);
             previous.current = next;
           }}
           onPointerUp={(event) => {
             dragging.current = false;
+            gesture.current = null;
             if (event.currentTarget.hasPointerCapture(event.pointerId))
               event.currentTarget.releasePointerCapture(event.pointerId);
           }}
           onPointerCancel={() => {
             dragging.current = false;
+            gesture.current = null;
+          }}
+          onLostPointerCapture={() => {
+            dragging.current = false;
+            gesture.current = null;
           }}
         >
-          <div className="wheel-ring" />
+          <div className="wheel-ring" aria-hidden="true" />
+          <div className="wheel-core" aria-hidden="true" />
           {SITE_LINKS.map((link, index) => (
             <NavLink
               key={link.href}
@@ -131,12 +170,21 @@ export default function Nav() {
                   "--angle": `${(index * 360) / SITE_LINKS.length}deg`,
                 } as CSSProperties
               }
+              draggable={false}
+              onFocus={(event) => {
+                // Bring keyboard-focused links into the visible corner of the orbit.
+                if (event.currentTarget.matches(":focus-visible")) {
+                  setRotation(45 - (index * 360) / SITE_LINKS.length);
+                }
+              }}
               onClick={() => dismiss()}
             >
               {link.label}
             </NavLink>
           ))}
-          <span className="wheel-hint">Drag to orbit</span>
+          <span className="wheel-hint" aria-hidden="true">
+            {canHover ? "Drag / scroll to spin" : "Drag to spin"}
+          </span>
         </div>
       </nav>
     </>

@@ -31,6 +31,7 @@ function StockComponent({
   height,
   onTrade,
 }: StockComponentProps) {
+  console.log("week:", week);
   const [stockInfoView, setStockInfoView] = useState<boolean>(false);
 
   // Popup State
@@ -64,7 +65,10 @@ function StockComponent({
   });
 
   const askPIM = () => {
-    if (stock.featureHistory.length < 10 || PIMMutation.isPending) return;
+    if (PIMMutation.isPending) {
+      setActivePopup("PIM");
+      return;
+    }
     setActivePopup("PIM");
     setPimPrediction(null);
     PIMMutation.mutate(formatStockSequence(stock, 10));

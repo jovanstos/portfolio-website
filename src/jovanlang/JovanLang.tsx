@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
-import "./monaco";
 import { postCodeToCompiler } from "../api/python";
 import "../styles/JovanLang.css";
 const sample =

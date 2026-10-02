@@ -23,7 +23,7 @@ export default function PIM() {
         <p>
           Trade across 26 weeks. Read the news, manage your assets, and compete
           with Preston, Randy, and Granny. Ask PIM for experimental predictions
-          after ten weeks of market history.
+          anytime—each market starts with ten weeks of generated history.
         </p>
         <p>
           A game, not financial advice. The opponents keep their original
@@ -98,7 +98,19 @@ export default function PIM() {
         ))}
       </div>
       <div id="PIM-game">
-        <div className="pim-content-holder">
+        <div
+          key={view}
+          className="pim-content-holder"
+          role="region"
+          aria-label={
+            view === "stock"
+              ? "Market"
+              : view === "news"
+                ? "Market news"
+                : "Your assets"
+          }
+          tabIndex={0}
+        >
           {view === "stock" &&
             game.stocks.map((stock, index) => (
               <StockComponent
@@ -176,7 +188,7 @@ export default function PIM() {
             </>
           )}
         </div>
-        <aside id="players" aria-label="Players">
+        <aside id="players" aria-label="Players" tabIndex={0}>
           {[game.player, ...game.opponents].map((player, index) => (
             <PlayerCard
               key={player.name}

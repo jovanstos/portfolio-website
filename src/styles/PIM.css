@@ -36,6 +36,36 @@
   grid-template-columns: minmax(0, 1fr) 230px;
   gap: 16px;
 }
+.pim-content-holder,
+#players {
+  min-height: 0;
+  height: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #64748b #141922;
+}
+.pim-content-holder::-webkit-scrollbar,
+#players::-webkit-scrollbar {
+  width: 8px;
+}
+.pim-content-holder::-webkit-scrollbar-track,
+#players::-webkit-scrollbar-track {
+  background: #141922;
+  border-radius: 8px;
+}
+.pim-content-holder::-webkit-scrollbar-thumb,
+#players::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border: 2px solid #141922;
+  border-radius: 8px;
+}
+.pim-content-holder:focus-visible,
+#players:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 .pim-content-holder {
   min-width: 0;
   background: #030303;
@@ -160,9 +190,10 @@
   #PIM-game {
     grid-template-columns: minmax(0, 1fr);
   }
+  .pim-content-holder {
+    height: clamp(280px, 50svh, 500px);
+  }
   #players {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
+    height: 240px;
   }
 }
